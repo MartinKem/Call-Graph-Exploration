@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.3/d3.min.js"></script>
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <title>D3 Graph</title>
+</head>
+<body>
+<button onclick="open_close()">Einklappen</button>
+<div id='graph' style="position: relative"></div>
+
+<script>
+    var vis = d3.select("#graph")
+        .append("svg")
+        .append("foreignObject").attr("width", "89%").attr("height", 1800).attr("position","relative")
+        //.append("div");
+
+
+    var nodes = [
+        {x: 10, y: 50},
+        {x: 70, y: 10},
+        {x: 140, y: 50}
+    ]
+
+    vis.selectAll("div.nodes")
+        .data(nodes)
+        .enter()
+        .append("xhtml:div")
+        .attr("class","div_node")
+        .style("left", function(d) { return d.x*10 +"px"; })
+        .style("top", function(d) { return d.y*10+"px"; })
+
+    //save selection if needed again
+    var enterSelection = d3.select('#graph').selectAll('div')
+    enterSelection
+        .append("xhtml:h3")
+        .text("Hallo")
+    enterSelection
+        .append("xhtml:div")
+        .attr("class","node_inhalt")
+    enterSelection=enterSelection.select('div')
+    enterSelection
+        .append("xhtml:p")
+        .text("Ich bin ein Knoten")
+    enterSelection
+        .append("xhtml:ul")
+    var ulSelection = enterSelection.select('ul')
+    ulSelection
+        .append("xhtml:li")
+        .text("Methodenname 1")
+    ulSelection
+        .append("xhtml:li")
+        .text("Methodenname 2")
+    ulSelection
+        .append("xhtml:li")
+        .text("Methodenname 3")
+
+</script>
+<script>
+    var i = 0
+    function open_close() {
+
+        if (i===0){
+            document.getElementById("graph").style.visibility = "visible";
+            d3.selectAll(".node_inhalt").style("visibility","hidden")
+            //document.getElementsByClassName("div_node").style.visibility = "visible";
+        i++;
+
+        }else {
+            //document.getElementsByClassName("node_inhalt").style.visibility = "hidden";
+            //document.getElementById("graph").style.visibility = "hidden";
+            d3.selectAll(".node_inhalt").style("visibility","visible")
+
+
+            i=0;
+        }
+        return;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+html{
+    font-size: 62.5%;
+}
+
+body{
+    background-color: greenyellow;
+    font-size: 1.0rem;
+}
+/*rect{
+    fill-opacity: 0;
+    fill: white;
+    stroke: black;
+    stroke-width: 5px;
+}*/
+div{position: relative;
+
+
+}
+.div_node{
+    position: absolute;
+    height: 200px;
+    width: 300px;
+    background-color: white;
+    border: 5px black solid;
+    display:block;
+}
+
+#graph, svg{
+    width: 100%;
+    height: 2000px;
+}
