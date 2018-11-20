@@ -10,7 +10,7 @@
     <title>D3 Graph</title>
 </head>
 <body>
-<button onclick="open_close()">Einklappen</button>
+<button id="btn" onclick="open_close()">Einklappen</button>
 <div id='graph' style="position: relative"></div>
 
 <script>
@@ -43,17 +43,19 @@
 
     var vis = svgCont.append("foreignObject").attr("width", "100%").attr("height", 1800).attr("position","relative");
     createNodes(nodes,vis);
- 
+
 </script>
 <script>
     var i = 0
     function open_close() {
         if (i===0){
-            document.getElementById("graph").style.visibility = "visible";
-            d3.selectAll(".node_inhalt").style("visibility","hidden")
-        i++;
+            d3.selectAll(".node_inhalt").style("visibility","hidden");
+            document.getElementById("btn").innerText = "Ausklappen";
+            i++;
         }else {
-            d3.selectAll(".node_inhalt").style("visibility","visible")
+
+            d3.selectAll(".node_inhalt").style("visibility","visible");
+            document.getElementById("btn").innerText = "Einklappen";
             i=0;
         }
         return;

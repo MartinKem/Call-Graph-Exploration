@@ -1,4 +1,6 @@
-
+//creates a div with header and functioncalls for each nodeelement
+//nodes = node objects
+//foreign = foreignObject (needed to create html objects inside)
 function createNodes(nodes,foreign) {
     nodes.forEach(foo);
     function foo(n) {
