@@ -17,15 +17,20 @@
 	var rect_width = 300, rect_height = 200;
 
     var nodes = [
-        {x: 100, y: 500, width: rect_width, height: rect_height, name: "Main.main",inhalt:["Foo.<init","Bar.<init"]},
-        {x: 700, y: 100, width: rect_width, height: rect_height, name: "Foo.m",inhalt:[]},
-        {x: 1400, y: 500, width: rect_width, height: rect_height, name: "Bar.m",inhalt: []}
+        {x: 500, y: 150, width: rect_width, height: rect_height, name: "Main.main",inhalt:["Foo.<init>","Bar.<init>","Foo.m","String.toString"]},
+        {x: 100, y: 100, width: rect_width, height: rect_height, name: "Foo.m",inhalt:["test.m"]},
+        {x: 100, y: 400, width: rect_width, height: rect_height, name: "Bar.m",inhalt:["foobar.m","something.anything"]},
+        {x: 520, y: 700, width: rect_width, height: rect_height, name: "String.toString",inhalt:["foobar"]},
+        {x: 900, y: 100, width: rect_width, height: rect_height, name: "Foo.<init>",inhalt:["foobar"]},
+        {x: 900, y: 400, width: rect_width, height: rect_height, name: "Bar.<init>",inhalt: ["foobar"]}
     ]
 	
 	var links = [
 		{source: nodes[0], dest: nodes[1]},
 		{source: nodes[0], dest: nodes[2]},
-		{source: nodes[1], dest: nodes[2]}
+		{source: nodes[0], dest: nodes[3]},
+		{source: nodes[0], dest: nodes[4]},
+		{source: nodes[0], dest: nodes[5]}
 	]
 	
 	var svgCont = d3.select("#graph")
@@ -78,11 +83,8 @@
         if (i===0){
             document.getElementById("graph").style.visibility = "visible";
             d3.selectAll(".node_inhalt").style("visibility","hidden")
-            //document.getElementsByClassName("div_node").style.visibility = "visible";
         i++;
         }else {
-            //document.getElementsByClassName("node_inhalt").style.visibility = "hidden";
-            //document.getElementById("graph").style.visibility = "hidden";
             d3.selectAll(".node_inhalt").style("visibility","visible")
             i=0;
         }
