@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.3/d3.min.js"></script>
     <script src="Edges.js"></script>
+    <script src="script.js"></script>
     <link href="style.css" rel="stylesheet" type="text/css">
     <title>D3 Graph</title>
 </head>
@@ -16,9 +17,9 @@
 	var rect_width = 300, rect_height = 200;
 
     var nodes = [
-        {x: 100, y: 500, width: rect_width, height: rect_height},
-        {x: 700, y: 100, width: rect_width, height: rect_height},
-        {x: 1400, y: 500, width: rect_width, height: rect_height}
+        {x: 100, y: 500, width: rect_width, height: rect_height, name: "Main.main",inhalt:["Foo.<init","Bar.<init"]},
+        {x: 700, y: 100, width: rect_width, height: rect_height, name: "Foo.m",inhalt:[]},
+        {x: 1400, y: 500, width: rect_width, height: rect_height, name: "Bar.m",inhalt: []}
     ]
 	
 	var links = [
@@ -34,10 +35,10 @@
 	links.forEach(function(element){
 		center2centerEdge(svgCont, element);
 	});
-	
-    var vis = svgCont.append("foreignObject").attr("width", "100%").attr("height", 1800).attr("position","relative")
-	
-    vis.selectAll("div.nodes")
+
+    var vis = svgCont.append("foreignObject").attr("width", "100%").attr("height", 1800).attr("position","relative");
+    createNodes(nodes,vis);
+ /*   vis.selectAll("div.nodes")
         .data(nodes)
         .enter()
         .append("xhtml:div")
@@ -69,8 +70,7 @@
         .text("Methodenname 2")
     ulSelection
         .append("xhtml:li")
-        .text("Methodenname 3")
-
+        .text("Methodenname 3")*/
 </script>
 <script>
     var i = 0
