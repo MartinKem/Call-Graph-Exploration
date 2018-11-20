@@ -16,7 +16,7 @@ var createEdge = function(svg, xStart, yStart, xDest, yDest){
 		 .attr("id", "markerArrow") 
 		 .attr("markerWidth", "13") 
 		 .attr("markerHeight", "13")
-		 .attr("refX", "10") // distance to line
+		 .attr("refX", "9") // distance to line
 		 .attr("refY", "4") 
 		 .attr("orient", "auto") 
 		 .append("svg:path") 
