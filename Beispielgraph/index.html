@@ -20,7 +20,7 @@
         {x: 500, y: 150, width: rect_width, height: rect_height, name: "Main.main",inhalt:["Foo.<init>","Bar.<init>","Foo.m","String.toString"]},
         {x: 100, y: 100, width: rect_width, height: rect_height, name: "Foo.m",inhalt:["test.m"]},
         {x: 100, y: 400, width: rect_width, height: rect_height, name: "Bar.m",inhalt:["foobar.m","something.anything"]},
-        {x: 520, y: 700, width: rect_width, height: rect_height, name: "String.toString",inhalt:["foobar"]},
+        {x: 500, y: 700, width: rect_width, height: rect_height, name: "String.toString",inhalt:["foobar"]},
         {x: 900, y: 100, width: rect_width, height: rect_height, name: "Foo.<init>",inhalt:["foobar"]},
         {x: 900, y: 400, width: rect_width, height: rect_height, name: "Bar.<init>",inhalt: ["foobar"]}
     ]
@@ -43,39 +43,7 @@
 
     var vis = svgCont.append("foreignObject").attr("width", "100%").attr("height", 1800).attr("position","relative");
     createNodes(nodes,vis);
- /*   vis.selectAll("div.nodes")
-        .data(nodes)
-        .enter()
-        .append("xhtml:div")
-        .attr("class","div_node")
-        .style("left", function(d) { return d.x + "px"; })
-        .style("top", function(d) { return d.y + "px"; })
-		.style("width", rect_width + "px")
-		.style("height", rect_height + "px")
-    //save selection if needed again
-    var enterSelection = d3.select('#graph').selectAll('div')
-    enterSelection
-        .append("xhtml:h3")
-        .text("Hallo")
-    enterSelection
-        .append("xhtml:div")
-        .attr("class","node_inhalt")
-    enterSelection=enterSelection.select('div')
-    enterSelection
-        .append("xhtml:p")
-        .text("Ich bin ein Knoten")
-    enterSelection
-        .append("xhtml:ul")
-    var ulSelection = enterSelection.select('ul')
-    ulSelection
-        .append("xhtml:li")
-        .text("Methodenname 1")
-    ulSelection
-        .append("xhtml:li")
-        .text("Methodenname 2")
-    ulSelection
-        .append("xhtml:li")
-        .text("Methodenname 3")*/
+ 
 </script>
 <script>
     var i = 0
