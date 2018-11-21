@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+    <form id="jsonFile" name="jsonFile" enctype="multipart/form-data" method="post">
+
+        <fieldset>
+            <h2>Json File</h2>
+            <input type='file' id='fileinput'>
+            <input type='button' id='btnLoad' value='Load' onclick='loadFile();'>
+            <input type="button" value="show" onclick="show()">
+        </fieldset>
+    </form>
+
+    <p id="demo"></p>
+
+    <script src="parsJson.js"></script>
+    
+    <script>
+        var graphJ;
+        function loadFile() {
+            if (typeof window.FileReader !== 'function') {
+                alert("The file API isn't supported on this browser yet.");
+                return;
+            }
+
+            input = document.getElementById('fileinput');
+            graphJ = loadJsonFile(input);
+
+        }
+
+        function show() {
+            if (graphJ.isLoaded) {
+                document.getElementById("demo").innerHTML = graphJ.file.reachableMethods[0].method.declaringClass;
+            }else{
+                document.getElementById("demo").innerHTML = "Document is not loaded yet.";
+            }   
+
+        }
+    </script>
+
+</body>
+
+</html>
