@@ -4,27 +4,32 @@
 function createNodes(nodes,foreign) {
     nodes.forEach(foo);
     function foo(n) {
-        console.log(n.name + "-" + n.inhalt);
-        var x=foreign
-            .append("xhtml:div")
-            .attr("class","div_node")
-            .style("left", n.x + "px")
-            .style("top", n.y + "px")
-            .style("width", n.width + "px")
-            .style("height", n.height + "px");
-        x
-            .append("xhtml:h3")
+        var node = foreign.append("xhtml:div")
+							.attr("class","div_node")
+							.attr("id", n.name)
+							.style("left", n.x + "px")
+							.style("top", n.y + "px")
+							.style("min-width", "300px")
+							.style("padding", "20px");
+							
+        node.append("xhtml:h3")
             .text(n.name)
-        x=x
-            .append("xhtml:div")
-            .attr("class","node_inhalt")
-            .append("xhtml:ul")
-
-
-            for(var i=0;i!=n.inhalt.length;i++){
-            x
-                .append("xhtml:li")
-                .text(i+ ": " + n.inhalt[i])
+			.style("text-align", "center");
+			
+        node = node.append("xhtml:div")
+					.attr("class","node_inhalt")
+					.append("xhtml:div");
+            for(var i=0; i!=n.inhalt.length; i++){
+            node.append("xhtml:div")
+                .text(i + ": " + n.inhalt[i])
+				.attr("id", n.name + "#" + n.inhalt[i])
+				.style("width", "100%")
+				.style("border", "solid")
+				.style("box-sizing", "border-box")
+				.style("border-width", "2px")
+				.style("border-top-width", (i == 0 ? "2px" : "0px"))
+				.style("border-radius", "4px")
+				.style("padding", "5px");
             }
 
     }

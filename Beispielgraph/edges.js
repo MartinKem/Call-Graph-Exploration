@@ -92,11 +92,15 @@ creates border-to-borer edge on an imaginary center-to-center edge between two r
 
 svg: svg-container to insert the edge in
 link{source, dest}: source node and destination node
+dim1{w, h}: width and height of source node
+dim2{w, h}: width and height of destination node
 
 returns: void
 */
-var center2centerEdge = function(svg, link){
-	var n1 = borderPoint(link.source, link.dest);
-	var n2 = borderPoint(link.dest, link.source);
+function center2centerEdge(svg, link, dim1, dim2){
+	var rect1 = {x: link.source.x, y: link.source.y, width: dim1.w, height: dim1.h};
+	var rect2 = {x: link.dest.x, y: link.dest.y, width: dim2.w, height: dim2.h};
+	var n1 = borderPoint(rect1, rect2);
+	var n2 = borderPoint(rect2, rect1);
 	createEdge(svg, n1.x, n1.y, n2.x, n2.y);
 }
