@@ -11,12 +11,15 @@ function createNodes(nodes,foreign) {
             .style("left", n.x + "px")
             .style("top", n.y + "px")
             .style("width", n.width + "px")
-            .style("height", n.height + "px")
+            .style("height", n.height + "px");
+        x
             .append("xhtml:h3")
             .text(n.name)
+        x=x
             .append("xhtml:div")
             .attr("class","node_inhalt")
             .append("xhtml:ul")
+
 
             for(var i=0;i!=n.inhalt.length;i++){
             x
@@ -26,4 +29,5 @@ function createNodes(nodes,foreign) {
 
     }
 }
+
 
