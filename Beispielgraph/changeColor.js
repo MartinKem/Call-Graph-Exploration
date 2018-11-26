@@ -18,23 +18,27 @@ $("html:not(.div_node)").on("contextmenu",function(e){
 });
 //on rightclick in .div_node calls rightclickmenu and deactivates normal contextmenu
 $(".div_node").contextmenu(function(e) {
+    if(menuIsOpen){
+        $("#main-rightclick").remove();
+        menuIsOpen = false;
+    }
     clickedDiv = this;
     rightclickmenu(e);
     return false;
 });
 //loads rightclickmenu.html on current mouse position
 function rightclickmenu(e) {
+
+
     var x = e.pageX + "px";     // Get the horizontal coordinate
     var y = e.pageY + "px";     // Get the vertical coordinate
 
+    $("body").append($("<div id='main-rightclick'></div>").load("rightclickmenu.html #main-rightclick>"));
+    $("#main-rightclick").css({
+        "position":"absolute",
+        "top":y,
+        "left":x,});
 
-    $.get("rightclickmenu.html", function(data){
-        $("body").append(data);
-        $("#main-rightclick").css({
-            "position":"absolute",
-            "top":y,
-            "left":x,});
-    });
 
     menuIsOpen = true;
 
