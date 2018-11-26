@@ -3,31 +3,29 @@ var clickedDiv;
 var menuIsOpen = false;
 
 //eventhandler for normal leftclick, deaktivates rightclickmenu
-$("html").on("click", function(){
-    
+$("html").on("click", function(e){
     if(menuIsOpen){
         $("#main-rightclick").remove();
         menuIsOpen = false;
     }
 });
 //eventhandler for rightclick, deactivates rightclickmenu (not in .div_node)
-$("html:not(.div_node)").on("contextmenu",function(){
-
+$("html:not(.div_node)").on("contextmenu",function(e){
     if(menuIsOpen){
         $("#main-rightclick").remove();
         menuIsOpen = false;
     }
 });
 //on rightclick in .div_node calls rightclickmenu and deactivates normal contextmenu
-$(".div_node").contextmenu(function() {
+$(".div_node").contextmenu(function(e) {
     clickedDiv = this;
-    rightclickmenu();
+    rightclickmenu(e);
     return false;
 });
 //loads rightclickmenu.html on current mouse position
-function rightclickmenu() {
-    var x = event.pageX + "px";     // Get the horizontal coordinate
-    var y = event.pageY + "px";     // Get the vertical coordinate
+function rightclickmenu(e) {
+    var x = e.pageX + "px";     // Get the horizontal coordinate
+    var y = e.pageY + "px";     // Get the vertical coordinate
 
 
     $.get("rightclickmenu.html", function(data){
