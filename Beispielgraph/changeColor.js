@@ -4,8 +4,7 @@ var menuIsOpen = false;
 
 //eventhandler for normal leftclick, deaktivates rightclickmenu
 $("html").on("click", function(){
-
-    console.log("click");
+    
     if(menuIsOpen){
         $("#main-rightclick").remove();
         menuIsOpen = false;
@@ -13,8 +12,7 @@ $("html").on("click", function(){
 });
 //eventhandler for rightclick, deactivates rightclickmenu (not in .div_node)
 $("html:not(.div_node)").on("contextmenu",function(){
-    //
-    console.log("rclick1");
+
     if(menuIsOpen){
         $("#main-rightclick").remove();
         menuIsOpen = false;
