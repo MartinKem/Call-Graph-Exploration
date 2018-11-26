@@ -18,7 +18,6 @@ function createNodes(nodes,foreign) {
 			
         node = node.append("xhtml:div")
 					.attr("class","node_inhalt")
-					.append("xhtml:div");
             for(var i=0; i!=n.inhalt.length; i++){
             node.append("xhtml:div")
                 .text(i + ": " + n.inhalt[i])

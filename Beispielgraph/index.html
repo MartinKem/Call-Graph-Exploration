@@ -11,7 +11,7 @@
 </head>
 <body>
 <button id="btn" onclick="open_close()">Einklappen</button>
-<div id='graph' style="position: relative"></div>
+<div id='graph' style="position: relative; font-family: Helvetica"></div>
 
 <script>
 	//var rect_width = 300, rect_height = 200;
@@ -26,11 +26,11 @@
     ]
 	
 	var links = [
-		{source: nodes[0], dest: nodes[1]},
-		{source: nodes[0], dest: nodes[2]},
-		{source: nodes[0], dest: nodes[3]},
-		{source: nodes[0], dest: nodes[4]},
-		{source: nodes[0], dest: nodes[5]}
+		{source: "Main.main#Foo.<init>", dest: "Foo.<init>"},
+		{source: "Main.main#Bar.<init>", dest: "Bar.<init>"},
+		{source: "Main.main#Foo.m", dest: "Foo.m"},
+		{source: "Main.main", dest: "Bar.m"},
+		{source: "Main.main#String.toString", dest: "String.toString"}
 	]
 	
 	var svgCont = d3.select("#graph")
@@ -43,16 +43,12 @@
 	//nodes must exist in the graph before edges can be created
 	//requires that each node exists only once in graph
 	//create all edges in links[]
-	var width1, width2, height1, height2;
-	links.forEach(function(element){
-		width1 = document.getElementById(element.source.name).offsetWidth;
-		height1 = document.getElementById(element.source.name).offsetHeight;
-		width2 = document.getElementById(element.dest.name).offsetWidth;
-		height2 = document.getElementById(element.dest.name).offsetHeight;
-		var dim1 = {w: width1, h: height1};
-		var dim2 = {w: width2, h: height2};
-		center2centerEdge(svgCont, element, dim1, dim2);
-	});
+	
+	method2nodeEdge("Main.main#Foo.<init>", "Foo.<init>");
+	method2nodeEdge("Main.main#Bar.<init>", "Bar.<init>");
+	method2nodeEdge("Main.main#Foo.m", "Foo.m");
+	method2nodeEdge("Main.main#Foo.m", "Bar.m");
+	method2nodeEdge("Main.main#String.toString", "String.toString");
 </script>
 <script>
     var i = 0
