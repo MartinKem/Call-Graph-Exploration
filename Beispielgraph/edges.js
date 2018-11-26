@@ -9,7 +9,7 @@ yDest: y-value of the destination point
 
 returns: void
 */
-var createEdge = function(svg, xStart, yStart, xDest, yDest){
+function createEdge(svg, xStart, yStart, xDest, yDest){
 	 var marker = svg.append("svg:defs"); 
 	
 	 marker.append("svg:marker") 
@@ -40,7 +40,7 @@ var createEdge = function(svg, xStart, yStart, xDest, yDest){
  
  returns: {x, y} as intersection
  */
- var borderPoint = function(node1, node2){
+function borderPoint(node1, node2){
 	var center1 = {x: node1.x + node1.width/2, y: node1.y + node1.height/2};
 	var center2 = {x: node2.x + node2.width/2, y: node2.y + node2.height/2};
 	
@@ -92,15 +92,82 @@ creates border-to-borer edge on an imaginary center-to-center edge between two r
 
 svg: svg-container to insert the edge in
 link{source, dest}: source node and destination node
-dim1{w, h}: width and height of source node
-dim2{w, h}: width and height of destination node
 
 returns: void
 */
-function center2centerEdge(svg, link, dim1, dim2){
-	var rect1 = {x: link.source.x, y: link.source.y, width: dim1.w, height: dim1.h};
-	var rect2 = {x: link.dest.x, y: link.dest.y, width: dim2.w, height: dim2.h};
-	var n1 = borderPoint(rect1, rect2);
-	var n2 = borderPoint(rect2, rect1);
+function center2centerEdge(svg, link){
+	var n1 = borderPoint(link.source, link.dest);
+	var n2 = borderPoint(link.dest, link.source);
 	createEdge(svg, n1.x, n1.y, n2.x, n2.y);
+}
+
+/*
+creates borde-to-border edge from the left or the right side of the source node to the center
+of the destination node
+
+svg: svg-container to insert the edge in
+link{source, dest}: source node and destination node
+
+returns: void
+*/
+function side2centerEdge(svg, link){
+	var n1;
+	if(link.dest.x + link.dest.width/2 < link.source.x){
+		n1 = {x: link.source.x, y: link.source.y + link.source.height/2};
+	}
+	else if(link.dest.x + link.dest.width/2 > link.source.x + link.source.width){
+		n1 = {x: link.source.x + link.source.width, y: link.source.y + link.source.height/2}
+	}
+	else{
+		center2centerEdge(svg, link);
+		return;
+	}
+	var n2 = borderPoint(link.dest, link.source);
+	createEdge(svg, n1.x, n1.y, n2.x, n2.y);
+}
+
+/*
+returns the absolute dimensions of an element anywhere in the graph
+
+id: id of the element
+
+returns: {xPos, yPos, width, height}
+*/
+function absPosition(id){
+	var element = document.getElementById(id);
+	var widthVal = element.offsetWidth;
+	var heightVal = element.offsetHeight;
+	var xVal = 0, yVal = 0;
+    do {
+        yVal += element.offsetTop  || 0;
+        xVal += element.offsetLeft || 0;
+        element = element.offsetParent;
+    } while(element);
+	return {x: xVal, y: yVal, width: widthVal, height: heightVal}
+}
+
+/*
+creates a center2centerEdge from one element to another
+
+id1: id of the source element
+id2: id of the destination element
+
+returns: void
+*/
+function node2nodeEdge(id1, id2){
+	var link = {source: absPosition(id1), dest: absPosition(id2)}
+	center2centerEdge(svgCont, link);
+}
+
+/*
+creates a side2centerEdge from one element to another
+
+id1: id of the source element
+id2: id of the destination element
+
+returns: void
+*/
+function method2nodeEdge(id1, id2){
+	var link = {source: absPosition(id1), dest: absPosition(id2)}
+	side2centerEdge(svgCont, link);
 }
