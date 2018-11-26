@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>rightclickmenu</title>
+</head>
+<body>
+    <div id="main-rightclick">
+        <div class="menuelement" onclick="colorChosen(this)">Red<div class="color" style="background-color:red "></div> </div>
+        <div class="menuelement" onclick="colorChosen(this)">Green<div class="color" style="background-color: green"></div></div>
+        <div class="menuelement" onclick="colorChosen(this)">Blau<div class="color" style="background-color: blue"></div></div>
+        <div class="menuelement" onclick="colorChosen(this)">Gelb<div class="color" style="background-color: yellow"></div></div>
+        <div class="menuelement" onclick="colorChosen(this)">Weiß<div class="color" style="background-color: white"></div></div>
+    </div>
+<style>
+
+    #main-rightclick{
+        width:100px;
+        background-color: #c3c3c3;
+        box-sizing: border-box;
+        border: black 1px solid;
+        border-bottom: 0px;
+        margin:0;
+
+    }
+    .menuelement{
+        height: 30px;
+        border-bottom: black 1px solid;
+        padding: 5px;
+        font-size: 15px;
+        box-sizing: border-box;
+    }
+    .menuelement:hover{
+        cursor: pointer;
+        background-color: #d3d3d3;
+        font-weight: bold;
+    }
+    .color{
+        float: right;
+        width: 20px;
+        height: 20px;
+    }
+</style>
+</body>
+</html>
