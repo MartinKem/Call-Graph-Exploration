@@ -13,18 +13,18 @@
 </head>
 <body>
 <button id="btn" onclick="open_close()">Einklappen</button>
-<div id='graph' style="position: relative"></div>
+<div id='graph' style="position: relative; font-family: Helvetica"></div>
 
 <script>
     //var rect_width = 300, rect_height = 200;
 
     var nodes = [
-        {x: 500, y: 150, name: "Main.main",inhalt:["Foo.<init>","Bar.<init>","Foo.m","String.toString"]},
-        {x: 100, y: 100, name: "Foo.m",inhalt:["test.m"]},
-        {x: 100, y: 400, name: "Bar.m",inhalt:["foobar.m","something.anything"]},
-        {x: 500, y: 700, name: "String.toString",inhalt:["foobar"]},
-        {x: 900, y: 100, name: "Foo.<init>",inhalt:["foobar"]},
-        {x: 900, y: 400, name: "Bar.<init>",inhalt: ["foobar"]}
+        {x: 500, y: 150, name: "Main.main", inhalt:["Foo.<init>","Bar.<init>","Foo.m","String.toString"]},
+        {x: 100, y: 100, name: "Foo.m", inhalt:["test.m"]},
+        {x: 100, y: 400, name: "Bar.m", inhalt:["foobar.m","something.anything"]},
+        {x: 500, y: 700, name: "String.toString", inhalt:["foobar"]},
+        {x: 900, y: 100, name: "Foo.<init>", inhalt:["foobar"]},
+        {x: 900, y: 400, name: "Bar.<init>", inhalt: ["foobar"]}
     ]
 
     var links = [
@@ -45,16 +45,10 @@
     //nodes must exist in the graph before edges can be created
     //requires that each node exists only once in graph
     //create all edges in links[]
-    var width1, width2, height1, height2;
-    links.forEach(function(element){
-        width1 = document.getElementById(element.source.name).offsetWidth;
-        height1 = document.getElementById(element.source.name).offsetHeight;
-        width2 = document.getElementById(element.dest.name).offsetWidth;
-        height2 = document.getElementById(element.dest.name).offsetHeight;
-        var dim1 = {w: width1, h: height1};
-        var dim2 = {w: width2, h: height2};
-        center2centerEdge(svgCont, element, dim1, dim2);
-    });
+	method2nodeEdge("Main.main#Foo.m", "Bar.m");
+	nodes[0].inhalt.forEach(function(functionName){
+		method2nodeEdge("Main.main#" + functionName, functionName);
+	});
 </script>
 <script>
     var i = 0
