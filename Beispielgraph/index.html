@@ -6,6 +6,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.3/d3.min.js"></script>
     <script src="Edges.js"></script>
     <script src="script.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
     <link href="style.css" rel="stylesheet" type="text/css">
     <title>D3 Graph</title>
 </head>
@@ -14,7 +16,7 @@
 <div id='graph' style="position: relative"></div>
 
 <script>
-	//var rect_width = 300, rect_height = 200;
+    //var rect_width = 300, rect_height = 200;
 
     var nodes = [
         {x: 500, y: 150, name: "Main.main",inhalt:["Foo.<init>","Bar.<init>","Foo.m","String.toString"]},
@@ -24,35 +26,35 @@
         {x: 900, y: 100, name: "Foo.<init>",inhalt:["foobar"]},
         {x: 900, y: 400, name: "Bar.<init>",inhalt: ["foobar"]}
     ]
-	
-	var links = [
-		{source: nodes[0], dest: nodes[1]},
-		{source: nodes[0], dest: nodes[2]},
-		{source: nodes[0], dest: nodes[3]},
-		{source: nodes[0], dest: nodes[4]},
-		{source: nodes[0], dest: nodes[5]}
-	]
-	
-	var svgCont = d3.select("#graph")
+
+    var links = [
+        {source: nodes[0], dest: nodes[1]},
+        {source: nodes[0], dest: nodes[2]},
+        {source: nodes[0], dest: nodes[3]},
+        {source: nodes[0], dest: nodes[4]},
+        {source: nodes[0], dest: nodes[5]}
+    ]
+
+    var svgCont = d3.select("#graph")
         .append("svg")
 
 
     var vis = svgCont.append("foreignObject").attr("width", "100%").attr("height", 1800).attr("position","relative");
     createNodes(nodes,vis);
 
-	//nodes must exist in the graph before edges can be created
-	//requires that each node exists only once in graph
-	//create all edges in links[]
-	var width1, width2, height1, height2;
-	links.forEach(function(element){
-		width1 = document.getElementById(element.source.name).offsetWidth;
-		height1 = document.getElementById(element.source.name).offsetHeight;
-		width2 = document.getElementById(element.dest.name).offsetWidth;
-		height2 = document.getElementById(element.dest.name).offsetHeight;
-		var dim1 = {w: width1, h: height1};
-		var dim2 = {w: width2, h: height2};
-		center2centerEdge(svgCont, element, dim1, dim2);
-	});
+    //nodes must exist in the graph before edges can be created
+    //requires that each node exists only once in graph
+    //create all edges in links[]
+    var width1, width2, height1, height2;
+    links.forEach(function(element){
+        width1 = document.getElementById(element.source.name).offsetWidth;
+        height1 = document.getElementById(element.source.name).offsetHeight;
+        width2 = document.getElementById(element.dest.name).offsetWidth;
+        height2 = document.getElementById(element.dest.name).offsetHeight;
+        var dim1 = {w: width1, h: height1};
+        var dim2 = {w: width2, h: height2};
+        center2centerEdge(svgCont, element, dim1, dim2);
+    });
 </script>
 <script>
     var i = 0
@@ -70,5 +72,6 @@
         return;
     }
 </script>
+<script src="changeColor.js"></script>
 </body>
 </html>
