@@ -33,7 +33,7 @@ function rightclickmenu(e) {
     var x = e.pageX + "px";     // Get the horizontal coordinate
     var y = e.pageY + "px";     // Get the vertical coordinate
 
-    $("body").append($("<div id='main-rightclick'></div>").load("rightclickmenu.html #main-rightclick>"));
+    $("body").append($("<div id='main-rightclick'></div>").load("https://raw.githubusercontent.com/MartinKem/Call-Graph-Exploration/developer's/Beispielgraph/rightclickmenu.html?token=AYfhz5UKv8gSKiT9AOLnqIxmJZc7VUD7ks5cBmYMwA%3D%3D #main-rightclick>"));
     $("#main-rightclick").css({
         "position":"absolute",
         "top":y,
