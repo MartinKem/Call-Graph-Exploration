@@ -6,7 +6,7 @@ body{
     background-color: lightgray;
     font-size: 15px;
     margin: 0;
-	font-family: Helvetica;
+    font-family: Helvetica;
 }
 
 div{position: relative;
@@ -18,8 +18,8 @@ div{position: relative;
     background-color: white;
     border: 5px black solid;
     display:block;
-	padding: 10px;
-	box-sizing: border-box;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 
@@ -38,6 +38,7 @@ svg{
     border: black 1px solid;
     border-bottom: 0px;
     margin:0;
+    font-family: Helvetica;
 
 }
 .menuelement{
@@ -56,8 +57,8 @@ svg{
     float: right;
     width: 20px;
     height: 20px;
-	border: solid;
-	box-sizing: border-box;
+    border: solid;
+    box-sizing: border-box;
     border-width: 1px;
     border-radius: 5px;
 }
