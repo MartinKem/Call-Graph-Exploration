@@ -21,10 +21,12 @@
     var nodes = [
         {x: 500, y: 150, name: "Main.main", inhalt:["Foo.<init>","Bar.<init>","Foo.m","String.toString"]},
         {x: 100, y: 100, name: "Foo.m", inhalt:["test.m"]},
-        {x: 100, y: 400, name: "Bar.m", inhalt:["foobar.m","something.anything"]},
-        {x: 500, y: 700, name: "String.toString", inhalt:["foobar"]},
+        {x: 100, y: 400, name: "Bar.m", inhalt:["foobar.m","something.anything","hello.world"]},
+        {x: 500, y: 450, name: "String.toString", inhalt:["foobar"]},
         {x: 900, y: 100, name: "Foo.<init>", inhalt:["foobar"]},
-        {x: 900, y: 400, name: "Bar.<init>", inhalt: ["foobar"]}
+        {x: 900, y: 400, name: "Bar.<init>", inhalt: ["foobar"]},
+        {x: 100, y: 600, name: "hello.world", inhalt:[]},
+        {x: 500, y: 700, name: "dhfoapgf", inhalt:["blah","blah"]}
     ]
 
     var links = [
@@ -32,11 +34,14 @@
         {source: nodes[0], dest: nodes[2]},
         {source: nodes[0], dest: nodes[3]},
         {source: nodes[0], dest: nodes[4]},
-        {source: nodes[0], dest: nodes[5]}
+        {source: nodes[0], dest: nodes[5]},
+        {source: nodes[2], dest: nodes[6]},
+        {source: nodes[3], dest: nodes[7]}
+
     ]
 
     var svgCont = d3.select("#graph")
-        .append("svg")
+        .append("svg");
 
 
     var vis = svgCont.append("foreignObject").attr("width", "100%").attr("height", 1800).attr("position","relative");
@@ -46,20 +51,24 @@
     //requires that each node exists only once in graph
     //create all edges in links[]
 	method2nodeEdge("Main.main#Foo.m", "Bar.m");
+	method2nodeEdge("Bar.m#hello.world", "hello.world");
 	nodes[0].inhalt.forEach(function(functionName){
 		method2nodeEdge("Main.main#" + functionName, functionName);
 	});
+
 </script>
 <script>
-    var i = 0
+    var i = 0;
     function open_close() {
         if (i===0){
-            d3.selectAll(".node_inhalt").style("visibility","hidden");
+            d3.selectAll(".node_inhalt").style("display","none");
+            // d3.selectAll(".node_inhalt").style("visibility","hidden");
             document.getElementById("btn").innerText = "Ausklappen";
             i++;
         }else {
 
-            d3.selectAll(".node_inhalt").style("visibility","visible");
+            // d3.selectAll(".node_inhalt").style("visibility","visible");
+            d3.selectAll(".node_inhalt").style("display","block");
             document.getElementById("btn").innerText = "Einklappen";
             i=0;
         }
@@ -67,5 +76,8 @@
     }
 </script>
 <script src="changeColor.js"></script>
+<script>
+
+</script>
 </body>
 </html>

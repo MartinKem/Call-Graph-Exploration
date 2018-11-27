@@ -48,3 +48,20 @@ function colorChosen(elem) {
     var color = $(elem).find(".color").css('backgroundColor');
     $(clickedDiv).css('background-color', color);
 }
+
+function deleteNodes() {
+    var nodeId= $(clickedDiv).attr('id');
+    nodeId = parseInt(nodeId);
+    hideNodes(nodes[nodeId]);
+
+}
+function hideNodes(nId) {
+    for(var i = 0;i<links.length;i++){
+
+        if(links[i].source == nId){
+            $("#"+nodes.indexOf(links[i].dest)).hide();
+            hideNodes(links[i].dest); //
+        }
+    }
+
+}

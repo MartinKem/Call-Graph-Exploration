@@ -2,15 +2,17 @@
 //nodes = node objects
 //foreign = foreignObject (needed to create html objects inside)
 function createNodes(nodes,foreign) {
-    nodes.forEach(foo);
+    var j= 0;
+	nodes.forEach(foo);
     function foo(n) {
         var node = foreign.append("xhtml:div")
-							.attr("class","div_node")
-							.attr("id", n.name)
-							.style("left", n.x + "px")
-							.style("top", n.y + "px")
-							.style("min-width", "300px")
-							.style("padding", "20px");
+                .attr("class","div_node")
+                .attr("id", n.name)
+                .attr("id", j)
+                .style("left", n.x + "px")
+                .style("top", n.y + "px")
+                .style("min-width", "300px")
+                .style("padding", "20px");
 							
         node.append("xhtml:h3")
             .text(n.name)
@@ -31,7 +33,9 @@ function createNodes(nodes,foreign) {
 				.style("padding", "5px");
             }
 
+		j++;
     }
+
 }
 
 
