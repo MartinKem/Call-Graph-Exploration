@@ -139,8 +139,10 @@ function absPosition(id){
 	var heightVal = element.offsetHeight;
 	var xVal = 0, yVal = 0;
     do {
-        yVal += element.offsetTop  || 0;
-        xVal += element.offsetLeft || 0;
+		var borderwidth = 0;
+		if(element != document.getElementById(id)) borderwidth = parseInt(element.style.borderWidth, 10) || 0;
+        yVal += element.offsetTop + borderwidth || 0;
+        xVal += element.offsetLeft + borderwidth || 0;
         element = element.offsetParent;
     } while(element);
 	return {x: xVal, y: yVal, width: widthVal, height: heightVal}

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.3/d3.min.js"></script>
     <script src="Edges.js"></script>
-    <script src="script.js"></script>
+    <script src="nodes.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <link href="style.css" rel="stylesheet" type="text/css">
@@ -48,13 +48,14 @@
     createNodes(nodes,vis);
 
     //nodes must exist in the graph before edges can be created
-    //requires that each node exists only once in graph
     //create all edges in links[]
-	method2nodeEdge("Main.main#Foo.m", "Bar.m");
-	method2nodeEdge("Bar.m#hello.world", "hello.world");
-	nodes[0].inhalt.forEach(function(functionName){
-		method2nodeEdge("Main.main#" + functionName, functionName);
-	});
+	method2nodeEdge("0#0", "4");
+	method2nodeEdge("0#1", "5");
+	method2nodeEdge("0#2", "1");
+	method2nodeEdge("0#2", "2");
+	method2nodeEdge("0#3", "3");
+	method2nodeEdge("2#2", "6");
+	method2nodeEdge("3", "7");
 
 </script>
 <script>

@@ -16,8 +16,9 @@ div{position: relative;
 .div_node{
     position: absolute;
     background-color: white;
-    border: 5px black solid;
-    display:block;
+    border: solid;
+	border-color: black;
+    display: block;
     padding: 10px;
     box-sizing: border-box;
 }
