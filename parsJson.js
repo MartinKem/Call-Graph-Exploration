@@ -16,37 +16,12 @@
 //
 //}
 
-//var graphJ;
-//
-//function loadJSON(callback) {   
-//
-//    var xobj = new XMLHttpRequest();
-//        xobj.overrideMimeType("application/json");
-//    xobj.open('GET', 'test.json', true); // Replace 'my_data' with the path to your file
-//    xobj.onreadystatechange = function () {
-//          if (xobj.readyState == 4 && xobj.status == "200") {
-//            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-//            callback(xobj.responseText);
-//          }
-//    };
-//    xobj.send(null);  
-// }
-//
-//
-// function init() {
-//    document.write("Start");
-//    loadJSON(function(response) {
-//     // Parse JSON string into object
-//       graphJ = JSON.parse(response);
-//       document.write(graphJ);
-//    });
-//    document.write("End");
-//    document.write(graphJ.reachableMethods[0].method.declaringClass);
-//    document.write("Test" + graphJ.reachableMethods[0]);
-//    document.write("2End2");
-//   }
 
-
+/**
+ * is loading a JSON file
+ * and returns a FileLoad Object with a parst file in it.
+ * @param {JSON input file from <input type='file'>} input 
+ */
 function loadJsonFile(input) {
     var file, fr;
     var fileIsLoaded = false;
@@ -66,20 +41,29 @@ function loadJsonFile(input) {
       file = input.files[0];
       fr = new FileReader();
       fr.onload = receivedText;
+      fr.onerror = fileError;
       fr.readAsText(file);
       return returnFile;
     }
 
+    //get result, parse and set it in the returnt object
     function receivedText(e) {
       let lines = e.target.result;
       returnFile.file = JSON.parse(lines);
       returnFile.isLoaded = true;
-
     }
 
+    // if an error occurs on the file load
+    function fileError(e){
+      alert("Error on file read");
+    }
 
   }
 
+  /**
+   * Object with a file and a boolen
+   * @param {boolean if the file is set} isLoaded 
+   */
   function FileLoad(isLoaded){
     this.file = undefined;
     this.isLoaded = isLoaded;
