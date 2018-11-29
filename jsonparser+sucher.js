@@ -1,7 +1,27 @@
-//Javascript Objekt, das die JSON Datei enthält
-var newArr;
+//Javascript Objekt FileLoad, das die JSON Datei enthält
+var fileObj;
 
-//Aktionen die beim drücken von "Load" ausgeführt werden (Code aus dem Internet)
+//Add the events for the drop zone
+var dropZone = document.getElementById('dropZone');
+dropZone.addEventListener('dragover', handleDragOver, false);
+dropZone.addEventListener('drop', handleFileSelect, false);
+
+function handleDragOver(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    evt.dataTransfer.dropEffect = 'copy'; //shows it is a copy
+  }
+
+function handleFileSelect(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+
+    var files = evt.dataTransfer.files; // FileList object.
+
+    document.getElementById('fileinput').files = files; // set new file
+}
+
+//Aktionen die beim drücken von "Load" ausgeführt werden 
 function loadFile() {
     var input, file, fr;
 
@@ -11,33 +31,19 @@ function loadFile() {
     }
 
     input = document.getElementById('fileinput');
-    if (!input) {
-        alert("Um, couldn't find the fileinput element.");
-    }
-    else if (!input.files) {
-        alert("This browser doesn't seem to support the files property of file inputs.");
-    }
-    else if (!input.files[0]) {
-        alert("Please select a file before clicking 'Load'");
-    }
-    else {
-        file = input.files[0];
-        fr = new FileReader();
-        fr.onload = receivedText;
-        fr.readAsText(file);
-    }
-
-    function receivedText(e) {
-        let lines = e.target.result;
-        //Parsen der JSON Struktur in Javascript variable
-        newArr = JSON.parse(lines);
-    }
+    fileObj = loadJsonFile(input);
 }
 
 // Suchfunktion die den im Browser eingegebenen Text in den Klassennamen sucht. Sehr schlechte Performanz
 function setElement() {
+
+    if(fileObj === undefined || !fileObj.isLoaded){
+        alert("File is not loaded yet.");
+        return;
+    }
+
     var text = document.getElementById("text").value;
-    var json = jsonQ(newArr);
+    var json = jsonQ(fileObj.file);
     classes = json.find("declaringClass");
 
 
@@ -52,8 +58,14 @@ function setElement() {
 //Alternative Suchfunktion mit gleichem Zweck die allerdings jsonQ benutzt für bessere Performanz
 //Läuft aktuell noch nicht so wie gewollt. Wir können lediglich alle Klassennamen anzeigen
 function setElement2() {
+
+    if(fileObj === undefined || !fileObj.isLoaded){
+        alert("File is not loaded yet.");
+        return;
+    }
+
     var text2 = document.getElementById("text").value;
-    var json2 = jsonQ(newArr);
+    var json2 = jsonQ(fileObj.file);
     classes2 = json2.find("declaringClass");
 
     document.getElementById("demo").innerHTML = classes2.value();
