@@ -12,7 +12,7 @@ function createNodes(nodes,foreign) {
                 .style("top", n.y + "px")
                 .style("min-width", "300px")
                 .style("padding", "20px")
-				.style("border-width", "5px"); // sizes must stay in js-file for later calculations
+				.style("border-width", "5px") // sizes must stay in js-file for later calculations
 							
         node.append("xhtml:h3")
             .text(n.name)
@@ -38,6 +38,38 @@ function createNodes(nodes,foreign) {
 		NodeNr++;
     }
 
+}
+
+function createSingleNode(nodeID, cont, x, y, name, content){
+	var node = cont.append("xhtml:div")
+			.attr("id", nodeID)
+			.attr("class","div_node")
+			.style("left", x + "px")
+			.style("top", y + "px")
+			.style("min-width", "300px")
+			.style("padding", "20px")
+			.style("border-width", "5px") // sizes must stay in js-file for later calculations
+						
+	node.append("xhtml:h3")
+		.text(name)
+		.style("text-align", "center");
+		
+	node = node.append("xhtml:div")
+				.attr("class","node_inhalt")
+	var methodNr = 0;
+	for(var i=0; i < content.length; i++){
+		node.append("xhtml:div")
+			.text(i + ": " + content[i])
+			.attr("id", nodeID + "#" + methodNr)
+			.style("width", "100%")
+			.style("border", "solid")
+			.style("box-sizing", "border-box")
+			.style("border-width", "2px")
+			.style("border-top-width", (i == 0 ? "2px" : "0px"))
+			.style("border-radius", "5px")
+			.style("padding", "5px");
+		methodNr++;
+	}
 }
 
 

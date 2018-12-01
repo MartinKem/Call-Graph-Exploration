@@ -13,6 +13,12 @@ div{position: relative;
 
 
 }
+
+#graph{
+	width: 100%;
+	height: 2000px;
+}
+
 .div_node{
     position: absolute;
     background-color: white;
@@ -25,8 +31,8 @@ div{position: relative;
 
 
 svg{
-    width: 1200px;
-    height: 1000px;
+    width: 100%;
+    height: 2000px;
 }
 
 

@@ -9,7 +9,7 @@ yDest: y-value of the destination point
 
 returns: void
 */
-function createEdge(svg, xStart, yStart, xDest, yDest){
+function createEdge(svg, xStart, yStart, xDest, yDest, edgeID){
 	 var marker = svg.append("svg:defs"); 
 	
 	 marker.append("svg:marker") 
@@ -24,7 +24,8 @@ function createEdge(svg, xStart, yStart, xDest, yDest){
 			 .style("fill", "black");
 	
 	 svg.append("svg:path") 
-		 .attr("d", "M" + xStart + "," + yStart + "L" + xDest + "," + yDest) 
+		 .attr("d", "M" + xStart + "," + yStart + "L" + xDest + "," + yDest)
+		 .attr("id", edgeID)
 		 .style("stroke", "black") 
 		 .style("stroke-width", "3px") 
 		 .style("fill", "none") 
@@ -95,10 +96,10 @@ link{source, dest}: source node and destination node
 
 returns: void
 */
-function center2centerEdge(svg, link){
+function center2centerEdge(svg, link, edgeID){
 	var n1 = borderPoint(link.source, link.dest);
 	var n2 = borderPoint(link.dest, link.source);
-	createEdge(svg, n1.x, n1.y, n2.x, n2.y);
+	createEdge(svg, n1.x, n1.y, n2.x, n2.y, edgeID);
 }
 
 /*
@@ -110,7 +111,7 @@ link{source, dest}: source node and destination node
 
 returns: void
 */
-function side2centerEdge(svg, link){
+function side2centerEdge(svg, link, edgeID){
 	var n1;
 	if(link.dest.x + link.dest.width/2 < link.source.x){
 		n1 = {x: link.source.x, y: link.source.y + link.source.height/2};
@@ -123,7 +124,7 @@ function side2centerEdge(svg, link){
 		return;
 	}
 	var n2 = borderPoint(link.dest, link.source);
-	createEdge(svg, n1.x, n1.y, n2.x, n2.y);
+	createEdge(svg, n1.x, n1.y, n2.x, n2.y, edgeID);
 }
 
 /*
@@ -158,7 +159,7 @@ returns: void
 */
 function node2nodeEdge(id1, id2){
 	var link = {source: absPosition(id1), dest: absPosition(id2)}
-	center2centerEdge(svgCont, link);
+	center2centerEdge(svgCont, link, id1 + "->" + id2);
 }
 
 /*
@@ -171,5 +172,5 @@ returns: void
 */
 function method2nodeEdge(id1, id2){
 	var link = {source: absPosition(id1), dest: absPosition(id2)}
-	side2centerEdge(svgCont, link);
+	side2centerEdge(svgCont, link, id1 + "->" + id2);
 }

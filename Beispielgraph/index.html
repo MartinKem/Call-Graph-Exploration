@@ -12,11 +12,58 @@
     <title>D3 Graph</title>
 </head>
 <body>
-<button id="btn" onclick="open_close()">Einklappen</button>
+<button id="btn" onclick="open_close()">Hide Details</button>
 <div id='graph' style="position: relative; font-family: Helvetica"></div>
 
 <script>
     //var rect_width = 300, rect_height = 200;
+	
+	class node{
+		constructor(nodeID, parentID, container, xVal, yVal, nameVal, contentVal){
+			this.nodeID = nodeID;
+			this.parentID = parentID;
+			this.container = container;
+			this.x = xVal;
+			this.y = yVal;
+			this.name = nameVal;
+			this.content = contentVal;
+			this.children = [];
+		}
+		
+		addChild(nodeID, xVal, yVal, nameVal, contentVal){
+			var parentID = this.nodeID + "#" + this.children.length;
+			this.children.push(new node(nodeID, parentID, this.container, xVal, yVal, nameVal, contentVal));
+			return this.children[this.children.length-1];
+		}
+		
+		showChild(childID){
+			var i = 0;
+			for (i; i < this.children.length; i++){
+				if(childID == this.children[i].getID()) {
+					this.children[i].showNode();
+					break;
+				}
+			}
+			method2nodeEdge(this.nodeID + '#' + i, childID);
+		}
+		
+		showNode(){
+			createSingleNode(this.nodeID, this.container, this.x, this.y, this.name, this.content);
+			this.visible = true;
+		}
+		
+		hideNode(){
+			this.children.forEach(function (elem){elem.hideNode()});
+			if(parseInt(this.parentID) >= 0){
+				var node = document.getElementById(this.nodeID);
+				var edge = document.getElementById(this.parentID + '->' + this.nodeID);
+				node.style.visibility = "hidden";
+				edge.style.visibility = "hidden";
+			}
+		}
+		
+		getID(){ return this.nodeID; }
+	}
 
     var nodes = [
         {x: 500, y: 150, name: "Main.main", inhalt:["Foo.<init>","Bar.<init>","Foo.m","String.toString"]},
@@ -44,8 +91,15 @@
         .append("svg");
 
 
-    var vis = svgCont.append("foreignObject").attr("width", "100%").attr("height", 1800).attr("position","relative");
+    var vis = svgCont.append("foreignObject").attr("width", "100%").attr("height", 2000).attr("position","relative");
     createNodes(nodes,vis);
+	
+	let testNode = new node(10, -1, vis, 1000, 800, "ClassNode", ["Foo.<init>","Bar.<init>","Foo.m","String.toString"]);
+	testNode.showNode();
+	let childNode = testNode.addChild(11, 600, 1100, "ChildNode", ["Foo.<init>", "String.toString"]);
+	testNode.showChild(11);
+	let childchildNode = childNode.addChild(12, 200, 1100, "ChildChildNode", ["foobar.m","something.anything","hello.world"]);
+	childNode.showChild(12);
 
     //nodes must exist in the graph before edges can be created
     //create all edges in links[]
@@ -76,7 +130,7 @@
         return;
     }
 </script>
-<script src="changeColor.js"></script>
+<script src="rightclickmenu.js"></script>
 <script>
 
 </script>
