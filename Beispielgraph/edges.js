@@ -6,6 +6,7 @@ xStart: x-value of the start point
 yStart: y-value of the start point
 xDest: x-value of the destination point
 yDest: y-value of the destination point
+edgeID: id of the constructed edge
 
 returns: void
 */
@@ -93,6 +94,7 @@ creates border-to-borer edge on an imaginary center-to-center edge between two r
 
 svg: svg-container to insert the edge in
 link{source, dest}: source node and destination node
+edgeID: id of the constructed edge
 
 returns: void
 */
@@ -108,6 +110,7 @@ of the destination node
 
 svg: svg-container to insert the edge in
 link{source, dest}: source node and destination node
+edgeID: id of the constructed edge
 
 returns: void
 */

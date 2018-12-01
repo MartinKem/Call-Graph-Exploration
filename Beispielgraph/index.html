@@ -18,52 +18,6 @@
 <script>
     //var rect_width = 300, rect_height = 200;
 	
-	class node{
-		constructor(nodeID, parentID, container, xVal, yVal, nameVal, contentVal){
-			this.nodeID = nodeID;
-			this.parentID = parentID;
-			this.container = container;
-			this.x = xVal;
-			this.y = yVal;
-			this.name = nameVal;
-			this.content = contentVal;
-			this.children = [];
-		}
-		
-		addChild(nodeID, xVal, yVal, nameVal, contentVal){
-			var parentID = this.nodeID + "#" + this.children.length;
-			this.children.push(new node(nodeID, parentID, this.container, xVal, yVal, nameVal, contentVal));
-			return this.children[this.children.length-1];
-		}
-		
-		showChild(childID){
-			var i = 0;
-			for (i; i < this.children.length; i++){
-				if(childID == this.children[i].getID()) {
-					this.children[i].showNode();
-					break;
-				}
-			}
-			method2nodeEdge(this.nodeID + '#' + i, childID);
-		}
-		
-		showNode(){
-			createSingleNode(this.nodeID, this.container, this.x, this.y, this.name, this.content);
-			this.visible = true;
-		}
-		
-		hideNode(){
-			this.children.forEach(function (elem){elem.hideNode()});
-			if(parseInt(this.parentID) >= 0){
-				var node = document.getElementById(this.nodeID);
-				var edge = document.getElementById(this.parentID + '->' + this.nodeID);
-				node.style.visibility = "hidden";
-				edge.style.visibility = "hidden";
-			}
-		}
-		
-		getID(){ return this.nodeID; }
-	}
 
     var nodes = [
         {x: 500, y: 150, name: "Main.main", inhalt:["Foo.<init>","Bar.<init>","Foo.m","String.toString"]},
