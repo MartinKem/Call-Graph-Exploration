@@ -11,10 +11,10 @@ edgeID: id of the constructed edge
 returns: void
 */
 function createEdge(svg, xStart, yStart, xDest, yDest, edgeID){
-	 var marker = svg.append("svg:defs"); 
-	
+	 var marker = svg;
 	 marker.append("svg:marker") 
 		 .attr("id", "markerArrow") 
+		 .attr("class", "arrowHead")
 		 .attr("markerWidth", "13") 
 		 .attr("markerHeight", "13")
 		 .attr("refX", "9") // distance to line
@@ -27,13 +27,14 @@ function createEdge(svg, xStart, yStart, xDest, yDest, edgeID){
 	 svg.append("svg:path") 
 		 .attr("d", "M" + xStart + "," + yStart + "L" + xDest + "," + yDest)
 		 .attr("id", edgeID)
+		 .attr("class", "edge")
 		 .style("stroke", "black") 
 		 .style("stroke-width", "3px") 
 		 .style("fill", "none") 
 		 .style("marker-end", "url(#markerArrow)");
  }
  
- /*
+/*
  returns the intersection between a center-to-center line of two rectangles
  (given as an origin, width and height) and the border of the first rectangle
  
@@ -41,7 +42,7 @@ function createEdge(svg, xStart, yStart, xDest, yDest, edgeID){
  node2{x, y, width, height}: second rectangle (but only center is relevant)
  
  returns: {x, y} as intersection
- */
+*/
 function borderPoint(node1, node2){
 	var center1 = {x: node1.x + node1.width/2, y: node1.y + node1.height/2};
 	var center2 = {x: node2.x + node2.width/2, y: node2.y + node2.height/2};
@@ -85,9 +86,32 @@ function borderPoint(node1, node2){
 			xRes = lineFunction(yRes, "x");
 		}
 	}
-	return {x: xRes,y: yRes};
- }
+	return {x: xRes, y: yRes};
+}
+
+/*
+ returns the border point on the left or the right border
  
+ node1{x, y, width, height}: first rectangle with result point on its border
+ node2{x, y, width, height}: second rectangle (but only center is relevant)
+ 
+ returns: {x, y} as side point
+*/
+function sidePoint(node1, node2){
+	var xRes;
+	if(node2.x + node2.width/2 < node1.x){
+		xRes = node1.x;
+	}
+	else if(node2.x + node2.width/2 > node1.x + node1.width){
+		xRes = node1.x + node1.width;
+	}
+	else{
+		return borderPoint(node1, node2);
+	}
+	return {x: xRes, y: node1.y + node1.height/2};
+}
+
+
 /*
 creates border-to-borer edge on an imaginary center-to-center edge between two rectangles
 (available as link) into an svg-container
@@ -115,17 +139,7 @@ edgeID: id of the constructed edge
 returns: void
 */
 function side2centerEdge(svg, link, edgeID){
-	var n1;
-	if(link.dest.x + link.dest.width/2 < link.source.x){
-		n1 = {x: link.source.x, y: link.source.y + link.source.height/2};
-	}
-	else if(link.dest.x + link.dest.width/2 > link.source.x + link.source.width){
-		n1 = {x: link.source.x + link.source.width, y: link.source.y + link.source.height/2}
-	}
-	else{
-		center2centerEdge(svg, link);
-		return;
-	}
+	var n1 = sidePoint(link.source, link.dest);
 	var n2 = borderPoint(link.dest, link.source);
 	createEdge(svg, n1.x, n1.y, n2.x, n2.y, edgeID);
 }
@@ -177,3 +191,38 @@ function method2nodeEdge(id1, id2){
 	var link = {source: absPosition(id1), dest: absPosition(id2)}
 	side2centerEdge(svgCont, link, id1 + "->" + id2);
 }
+
+/*
+changes the path of a given edge so that it starts from the outer border of it's source node
+
+id: id of the edge
+
+returns: void
+*/
+function toggleToAbstract(id){
+	var edge = document.getElementById(id);
+	[sourceID, destID] = id.split("->");
+	[sourceID, __] = sourceID.split("#");
+	var link = {source: absPosition(sourceID), dest: absPosition(destID)};
+	var n1 = borderPoint(link.source, link.dest);
+	var n2 = borderPoint(link.dest, link.source);
+	edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
+}
+
+/*
+changes the path of a given edge so that it starts from the border of it's source nodes's inner mathod div
+
+id: id of the edge
+
+returns: void
+*/
+function toggleToDetailed(id){
+	var edge = document.getElementById(id);
+	[sourceID, destID] = id.split("->");
+	var link = {source: absPosition(sourceID), dest: absPosition(destID)};
+	var n1 = sidePoint(link.source, link.dest);
+	var n2 = borderPoint(link.dest, link.source);
+	edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
+}
+
+

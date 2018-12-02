@@ -18,7 +18,11 @@
 <script>
     //var rect_width = 300, rect_height = 200;
 	
-
+	function removeEdges(){
+		d3.selectAll(".arrowHead").remove();
+		d3.selectAll(".edge").remove();
+	}
+	
     var nodes = [
         {x: 500, y: 150, name: "Main.main", inhalt:["Foo.<init>","Bar.<init>","Foo.m","String.toString"]},
         {x: 100, y: 100, name: "Foo.m", inhalt:["test.m"]},
@@ -63,7 +67,6 @@
 	method2nodeEdge("0#2", "2");
 	method2nodeEdge("0#3", "3");
 	method2nodeEdge("2#2", "6");
-	method2nodeEdge("3", "7");
 
 </script>
 <script>
@@ -71,6 +74,10 @@
     function open_close() {
         if (i===0){
             d3.selectAll(".node_inhalt").style("display","none");
+			d3.selectAll(".edge").each(function(){
+				var id = d3.select(this).attr("id");
+				toggleToAbstract(id);
+			});
             // d3.selectAll(".node_inhalt").style("visibility","hidden");
             document.getElementById("btn").innerText = "Ausklappen";
             i++;
@@ -78,6 +85,10 @@
 
             // d3.selectAll(".node_inhalt").style("visibility","visible");
             d3.selectAll(".node_inhalt").style("display","block");
+			d3.selectAll(".edge").each(function(){
+				var id = d3.select(this).attr("id");
+				toggleToDetailed(id);
+			});
             document.getElementById("btn").innerText = "Einklappen";
             i=0;
         }
