@@ -27,6 +27,10 @@ function loadJsonFile(input) {
     var fileIsLoaded = false;
     var returnFile = new FileLoad(fileIsLoaded);
 
+    //get progress element from html and set it to 0
+    var progress = document.getElementById("progress");
+    progress.style.width = '0%';
+    progress.textContent = '0%';
 
     if (!input) {
       alert("Um, couldn't find the fileinput element.");
@@ -40,10 +44,24 @@ function loadJsonFile(input) {
     else {
       file = input.files[0];
       fr = new FileReader();
+      fr.onprogress = updateProgress;
       fr.onload = receivedText;
       fr.onerror = fileError;
       fr.readAsText(file);
       return returnFile;
+    }
+
+
+    function updateProgress(evt) {
+      // evt is an ProgressEvent.
+      if (evt.lengthComputable) {
+        var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
+        // Increase the progress bar length.
+        if (percentLoaded < 100) {
+          progress.style.width = percentLoaded + '%';
+          progress.textContent = percentLoaded + '%';
+        }
+      }
     }
 
     //get result, parse and set it in the returnt object
@@ -51,6 +69,9 @@ function loadJsonFile(input) {
       let lines = e.target.result;
       returnFile.file = JSON.parse(lines);
       returnFile.isLoaded = true;
+      //set progress to 100%
+      progress.style.width = '100%';
+      progress.textContent = '100%';
     }
 
     // if an error occurs on the file load
