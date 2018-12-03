@@ -6,6 +6,14 @@ var dropZone = document.getElementById('dropZone');
 dropZone.addEventListener('dragover', handleDragOver, false);
 dropZone.addEventListener('drop', handleFileSelect, false);
 
+
+function setProgBarToZero(){
+    //get progress element from html and set it to 0
+    var progress = document.getElementById("progress");
+    progress.style.width = '0%';
+    progress.textContent = '0%';
+}
+
 function handleDragOver(evt) {
     evt.stopPropagation();
     evt.preventDefault();
