@@ -7,23 +7,57 @@ yStart: y-value of the start point
 xDest: x-value of the destination point
 yDest: y-value of the destination point
 edgeID: id of the constructed edge
+label: declared target as arrow index
 
 returns: void
 */
-function createEdge(svg, xStart, yStart, xDest, yDest, edgeID){
+function createEdge(svg, xStart, yStart, xDest, yDest, edgeID, label){
 	 var marker = svg;
-	 marker.append("svg:marker") 
-		 .attr("id", "markerArrow") 
-		 .attr("class", "arrowHead")
-		 .attr("markerWidth", "13") 
-		 .attr("markerHeight", "13")
-		 .attr("refX", "9") // distance to line
-		 .attr("refY", "4") 
-		 .attr("orient", "auto") 
-		 .append("svg:path") 
-			 .attr("d", "M5,4 L3,1 L10,4 L3,7 L5,4")
-			 .style("fill", "black");
-	
+	 
+	 if(document.getElementById("markerArrow") == null){
+		 d3.select("#definitions").append("svg:marker")
+			 .attr("id", "markerArrow") 
+			 .attr("class", "arrowHead")
+			 .attr("markerWidth", "13") 
+			 .attr("markerHeight", "13")
+			 .attr("refX", "9") // distance to line
+			 .attr("refY", "4") 
+			 .attr("orient", "auto") 
+			 .append("svg:path") 
+				 .attr("d", "M5,4 L3,1 L10,4 L3,7 L5,4")
+				 .style("fill", "black");
+	 }
+	 
+	 if(label != null){
+		var marker = d3.select("#definitions")
+			.append("svg:marker")
+			.attr("id", label)
+			.attr("markerWidth", "200")
+			.attr("markerHeight", "100")
+			.attr("refX", "100")
+			.attr("refY", "50");
+			
+		marker.append("svg:rect")
+			.attr("id", label + "_background")
+			.attr("y", "45")
+			.attr("height", "10")
+			.style("fill", "white")
+			.style("stroke-width", "1")
+			.style("stroke", "black");
+			
+		marker.append("svg:text")
+			.attr("id", label + "_text")
+			.attr("y", "52")
+			.style("font-family", "Helvetica")
+			.style("font-size", "5")
+			.text(label);
+		
+		var textWidth = document.getElementById(label + "_text").getBBox().width;
+		
+		d3.select("#" + label + "_text").attr("x", 100-textWidth/2);
+		d3.select("#" + label + "_background").attr("x", 96-textWidth/2).attr("width", textWidth+6);
+	 }
+	 
 	 svg.append("svg:path") 
 		 .attr("d", "M" + xStart + "," + yStart + "L" + xDest + "," + yDest)
 		 .attr("id", edgeID)
@@ -31,7 +65,8 @@ function createEdge(svg, xStart, yStart, xDest, yDest, edgeID){
 		 .style("stroke", "black") 
 		 .style("stroke-width", "3px") 
 		 .style("fill", "none") 
-		 .style("marker-end", "url(#markerArrow)");
+		 .style("marker-end", "url(#markerArrow)")
+		 .style("marker-mid", "url(#" + label + ")");
  }
  
 /*
@@ -141,7 +176,7 @@ returns: void
 function side2centerEdge(svg, link, edgeID){
 	var n1 = sidePoint(link.source, link.dest);
 	var n2 = borderPoint(link.dest, link.source);
-	createEdge(svg, n1.x, n1.y, n2.x, n2.y, edgeID);
+	createEdge(svg, n1.x, n1.y, n2.x, n2.y, edgeID, "declaredTarget");
 }
 
 /*
@@ -206,7 +241,12 @@ function toggleToAbstract(id){
 	var link = {source: absPosition(sourceID), dest: absPosition(destID)};
 	var n1 = borderPoint(link.source, link.dest);
 	var n2 = borderPoint(link.dest, link.source);
-	edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
+	
+	var xMid = (n2.x+n1.x)/2;
+	var yMid = (n2.y+n1.y)/2;
+	var mid = "L" + xMid + "," + yMid;
+		
+	edge.setAttribute("d", "M" + n1.x + "," + n1.y + mid + "L" + n2.x + "," + n2.y);
 }
 
 /*
