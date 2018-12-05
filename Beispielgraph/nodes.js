@@ -66,8 +66,8 @@ class node{
 		if(parseInt(this.parentID) >= 0){
 			var node = document.getElementById(this.nodeID);
 			var edge = document.getElementById(this.parentID + '->' + this.nodeID);
-			node.style.visibility = "hidden";
-			edge.style.visibility = "hidden";
+			node.style.display = "none";
+			edge.style.display = "none";
 		}
 	}
 	
@@ -75,6 +75,8 @@ class node{
 	returns the id of this node
 	*/
 	getID(){ return this.nodeID; }
+	
+	getChildNodes(){ return this.children; }
 	
 }
 

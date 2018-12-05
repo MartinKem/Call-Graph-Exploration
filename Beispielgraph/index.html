@@ -17,6 +17,16 @@
 
 <script>
     //var rect_width = 300, rect_height = 200;
+	function getNodeById(id, sourceNode){
+		if(sourceNode.getID() == id){
+			return sourceNode;
+		}
+		var result;
+		sourceNode.getChildNodes().forEach(function(element){
+			if(getNodeById(id, element)) result = getNodeById(id, element);
+		});
+		return result;
+	}
 	
     var nodes = [
         {x: 800, y: 150, name: "Main.main", inhalt:["Foo.<init>","Bar.<init>","Foo.m","String.toString"]},
@@ -52,9 +62,13 @@
 	testNode.showNode();
 	let childNode = testNode.addChild(11, 800, 1100, "ChildNode", ["Foo.<init>", "String.toString"]);
 	testNode.showChild(11);
+	let secondChild = testNode.addChild(13, 1400, 1100, "SecondChild", ["Foo.<init>", "String.toString"]);
+	testNode.showChild(13);
 	let childchildNode = childNode.addChild(12, 200, 1100, "ChildChildNode", ["foobar.m","something.anything","hello.world"]);
 	childNode.showChild(12);
 
+	console.log(getNodeById(11, testNode));
+	
     //nodes must exist in the graph before edges can be created
     //create all edges in links[]
 	method2nodeEdge("0#0", "4");
