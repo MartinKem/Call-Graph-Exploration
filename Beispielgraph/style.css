@@ -6,23 +6,66 @@ body{
     background-color: lightgray;
     font-size: 15px;
     margin: 0;
+    font-family: Helvetica;
 }
 
 div{position: relative;
 
 
 }
+
+#graph{
+	width: 100%;
+	height: 2000px;
+}
+
 .div_node{
     position: absolute;
     background-color: white;
-    border: 5px black solid;
-    display:block;
-	padding: 10px;
-	box-sizing: border-box;
+    border: solid;
+	border-color: black;
+    display: block;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 
 svg{
-    width: 1200px;
-    height: 1000px;
+    width: 100%;
+    height: 2000px;
+}
+
+
+/*Style for rightclickmenu*/
+
+#main-rightclick{
+    width:100px;
+    background-color: #ececec;
+    box-sizing: border-box;
+    border: black 1px solid;
+    border-bottom: 0px;
+    margin:0;
+    font-family: Helvetica;
+
+}
+.menuelement{
+    height: 30px;
+    border-bottom: black 1px solid;
+    padding: 5px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+.menuelement:hover{
+    cursor: pointer;
+    background-color: #d3d3d3;
+    font-weight: bold;
+}
+.color{
+    float: right;
+    width: 20px;
+    height: 20px;
+    border: solid;
+    box-sizing: border-box;
+    border-width: 1px;
+    border-radius: 5px;
 }

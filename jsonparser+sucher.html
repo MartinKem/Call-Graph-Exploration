@@ -21,6 +21,19 @@
           padding-bottom: 25px;
           padding-left: 25px;
         }
+
+        #progress_bar{
+          background-color: #ddd;
+          padding: 3px;
+        }
+
+        #progress{
+          background-color: rgb(24, 190, 30);
+          color: white;
+          width: 0%;
+          text-align: center;
+        }
+
       </style>
   </head>
 <body>
@@ -30,9 +43,13 @@
     <fieldset>
       <h2>Json File</h2>
       <div id="dropZone">You can Drop files here <br/>
-          <input type='file' id='fileinput'>
+          <input type='file' id='fileinput' onchange="setProgBarToZero()">
       </div> <br/>
       
+      <div id="progress_bar">
+        <div id="progress" class="percent">0%</div>
+      </div> <br/>
+
       <input type='button' id='btnLoad' value='Load' onclick='loadFile();'>
     </fieldset>
   </form>

@@ -5,61 +5,110 @@
     <meta name="viewport" content="width=device-width">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.3/d3.min.js"></script>
     <script src="Edges.js"></script>
-    <script src="script.js"></script>
+    <script src="nodes.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
     <link href="style.css" rel="stylesheet" type="text/css">
     <title>D3 Graph</title>
 </head>
 <body>
-<button id="btn" onclick="open_close()">Einklappen</button>
-<div id='graph' style="position: relative"></div>
+<button id="btn" onclick="open_close()">Hide Details</button>
+<div id='graph' style="position: relative; font-family: Helvetica"></div>
 
 <script>
-	var rect_width = 300, rect_height = 200;
-
+    //var rect_width = 300, rect_height = 200;
+	function getNodeById(id, sourceNode){
+		if(sourceNode.getID() == id){
+			return sourceNode;
+		}
+		var result;
+		sourceNode.getChildNodes().forEach(function(element){
+			if(getNodeById(id, element)) result = getNodeById(id, element);
+		});
+		return result;
+	}
+	
     var nodes = [
-        {x: 500, y: 150, width: rect_width, height: rect_height, name: "Main.main",inhalt:["Foo.<init>","Bar.<init>","Foo.m","String.toString"]},
-        {x: 100, y: 100, width: rect_width, height: rect_height, name: "Foo.m",inhalt:["test.m"]},
-        {x: 100, y: 400, width: rect_width, height: rect_height, name: "Bar.m",inhalt:["foobar.m","something.anything"]},
-        {x: 500, y: 700, width: rect_width, height: rect_height, name: "String.toString",inhalt:["foobar"]},
-        {x: 900, y: 100, width: rect_width, height: rect_height, name: "Foo.<init>",inhalt:["foobar"]},
-        {x: 900, y: 400, width: rect_width, height: rect_height, name: "Bar.<init>",inhalt: ["foobar"]}
+        {x: 800, y: 150, name: "Main.main", inhalt:["Foo.<init>","Bar.<init>","Foo.m","String.toString"]},
+        {x: 100, y: 100, name: "Foo.m", inhalt:["test.m"]},
+        {x: 100, y: 400, name: "Bar.m", inhalt:["foobar.m","something.anything","hello.world"]},
+        {x: 800, y: 450, name: "String.toString", inhalt:["foobar"]},
+        {x: 1500, y: 100, name: "Foo.<init>", inhalt:["foobar"]},
+        {x: 1500, y: 400, name: "Bar.<init>", inhalt: ["foobar"]},
+        {x: 100, y: 600, name: "hello.world", inhalt:[]},
+        {x: 600, y: 700, name: "dhfoapgf", inhalt:["blah","blah"]}
     ]
-	
-	var links = [
-		{source: nodes[0], dest: nodes[1]},
-		{source: nodes[0], dest: nodes[2]},
-		{source: nodes[0], dest: nodes[3]},
-		{source: nodes[0], dest: nodes[4]},
-		{source: nodes[0], dest: nodes[5]}
-	]
-	
-	var svgCont = d3.select("#graph")
-        .append("svg")
 
-	//create all edges in links[]
-	links.forEach(function(element){
-		center2centerEdge(svgCont, element);
-	});
+    var links = [
+        {source: nodes[0], dest: nodes[1]},
+        {source: nodes[0], dest: nodes[2]},
+        {source: nodes[0], dest: nodes[3]},
+        {source: nodes[0], dest: nodes[4]},
+        {source: nodes[0], dest: nodes[5]},
+        {source: nodes[2], dest: nodes[6]},
+        {source: nodes[3], dest: nodes[7]}
 
-    var vis = svgCont.append("foreignObject").attr("width", "100%").attr("height", 1800).attr("position","relative");
+    ]
+
+    var svgCont = d3.select("#graph")
+        .append("svg");
+		
+	svgCont.append("defs").attr("id", "definitions");
+	
+    var vis = svgCont.append("foreignObject").attr("width", "100%").attr("height", 2000).attr("position","relative");
     createNodes(nodes,vis);
+	
+	let testNode = new node(10, -1, vis, 1200, 800, "ClassNode", ["Foo.<init>","Bar.<init>","Foo.m","String.toString"]);
+	testNode.showNode();
+	let childNode = testNode.addChild(11, 800, 1100, "ChildNode", ["Foo.<init>", "String.toString"]);
+	testNode.showChild(11);
+	let secondChild = testNode.addChild(13, 1400, 1100, "SecondChild", ["Foo.<init>", "String.toString"]);
+	testNode.showChild(13);
+	let childchildNode = childNode.addChild(12, 200, 1100, "ChildChildNode", ["foobar.m","something.anything","hello.world"]);
+	childNode.showChild(12);
+
+	console.log(getNodeById(11, testNode));
+	
+    //nodes must exist in the graph before edges can be created
+    //create all edges in links[]
+	method2nodeEdge("0#0", "4");
+	method2nodeEdge("0#1", "5");
+	method2nodeEdge("0#2", "1");
+	method2nodeEdge("0#2", "2");
+	method2nodeEdge("0#3", "3");
+	method2nodeEdge("2#2", "6");
+	method2nodeEdge("3#0", "7");
 
 </script>
 <script>
-    var i = 0
+    var i = 0;
     function open_close() {
         if (i===0){
-            d3.selectAll(".node_inhalt").style("visibility","hidden");
+            d3.selectAll(".node_inhalt").style("display","none");
+			d3.selectAll(".edge").each(function(){
+				var id = d3.select(this).attr("id");
+				toggleToAbstract(id);
+			});
+            // d3.selectAll(".node_inhalt").style("visibility","hidden");
             document.getElementById("btn").innerText = "Ausklappen";
             i++;
         }else {
 
-            d3.selectAll(".node_inhalt").style("visibility","visible");
+            // d3.selectAll(".node_inhalt").style("visibility","visible");
+            d3.selectAll(".node_inhalt").style("display","block");
+			d3.selectAll(".edge").each(function(){
+				var id = d3.select(this).attr("id");
+				toggleToDetailed(id);
+			});
             document.getElementById("btn").innerText = "Einklappen";
             i=0;
         }
         return;
     }
+</script>
+<script src="rightclickmenu.js"></script>
+<script>
+
 </script>
 </body>
 </html>
