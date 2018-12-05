@@ -49,11 +49,10 @@ function colorChosen(elem) {
     $(clickedDiv).css('background-color', color);
 }
 
-function deleteNodes(t) {
+function deleteNodes() {
     var nodeId= $(clickedDiv).attr('id');
     nodeId = parseInt(nodeId);
     hideNodes(nodes[nodeId]);
-    t.hideNode();
 
 }
 
