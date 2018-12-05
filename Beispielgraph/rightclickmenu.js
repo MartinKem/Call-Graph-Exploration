@@ -32,8 +32,8 @@ function rightclickmenu(e) {
 
     var x = e.pageX + "px";     // Get the horizontal coordinate
     var y = e.pageY + "px";     // Get the vertical coordinate
-
-    $("body").append($("<div id='main-rightclick'></div>").load("https://raw.githubusercontent.com/MartinKem/Call-Graph-Exploration/developer's/Beispielgraph/rightclickmenu.html?token=AYfhz5UKv8gSKiT9AOLnqIxmJZc7VUD7ks5cBmYMwA%3D%3D #main-rightclick>"));
+    var link = "https://raw.githubusercontent.com/MartinKem/Call-Graph-Exploration/developer's/Beispielgraph/rightclickmenu.html?token=AYfhzy2KTg8b5K0bfVB-Aqo4bfPb58BSks5cENZywA%3D%3D";
+    $("body").append($("<div id='main-rightclick'></div>").load(link +" #main-rightclick>"));
     $("#main-rightclick").css({
         "position":"absolute",
         "top":y,
@@ -49,10 +49,11 @@ function colorChosen(elem) {
     $(clickedDiv).css('background-color', color);
 }
 
-function deleteNodes() {
+function deleteNodes(t) {
     var nodeId= $(clickedDiv).attr('id');
     nodeId = parseInt(nodeId);
     hideNodes(nodes[nodeId]);
+    t.hideNode();
 
 }
 
