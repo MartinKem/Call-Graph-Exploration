@@ -8,7 +8,7 @@
         <fieldset>
             <h2>Json File</h2>
             <input type='file' id='fileinput'>
-            <input type='button' id='btnLoad' value='Load' onclick='loadFile();'>
+            <input type='button' id='btnLoad' value='Load' onclick='loadFile();console.log("started load");'>
             <input type="button" value="show" onclick="show()">
         </fieldset>
     </form>
@@ -19,8 +19,13 @@
 
     <script>
         var strJson = "";
+        var arr = [];
         var setString = function (str){
             strJson += str;
+            if(strJson.length >= 100000000){
+                arr.push(strJson);
+                strJson = "";
+            }
         }
 
 
@@ -43,8 +48,19 @@
             //} else {
             //    document.getElementById("demo").innerHTML = "Document is not loaded yet.";
             //}
-            let json = JSON.parse(strJson);
-            document.getElementById("demo").innerHTML = json.reachableMethods[0].method.declaringClass;
+            //let json = JSON.parse(strJson);
+            function makeString(){
+                arr.forEach(function (a) {
+                    console.log(a.slice(-100));
+                    //document.getElementById(("demo")).innerHTML += a;
+
+
+                });
+                console.log(strJson.slice(-1000000));
+                //document.getElementById("demo").innerHTML += strJson;
+
+            }
+            makeString();
         }
 
 
