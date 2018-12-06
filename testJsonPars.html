@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
+</head>
 <body>
 
     <form id="jsonFile" name="jsonFile" enctype="multipart/form-data" method="post">
@@ -50,32 +53,26 @@
             //}
             //let json = JSON.parse(strJson);
             var rest = "";
+            var finalarray;
             function makeString(){
                 arr.push(strJson);
                 arr.forEach(function (a) {
                     a = rest + a;
                     var first = a.indexOf("\n    \"method\" : {")-1;
                     var last = a.lastIndexOf("\n    \"method\" : {")-3;
-                   // console.log(("{\n  \"reachableMethods\" : [ "+a.slice(first,last)+" ]\n}").slice(58818010))
-                    console.log(JSON.parse("{\n  \"reachableMethods\" : [ "+a.slice(first,last)+" ]\n}"));
+
+                    if (finalarray == null) {finalarray = JSON.parse("{\n  \"reachableMethods\" : [ "+a.slice(first,last)+" ]\n}").reachableMethods;}
+                    else {Array.prototype.push.apply(finalarray,JSON.parse("{\n  \"reachableMethods\" : [ "+a.slice(first,last)+" ]\n}").reachableMethods)}
 
                     rest = a.slice(last);
-                    //document.getElementById(("demo")).innerHTML += a;
 
 
                 });
-                console.log(JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}"));
-                console.log("rest: "+rest.slice(-3))
-              /*  console.log(strJson.indexOf("[ {")+2)
-                console.log(strJson.indexOf("{\n" + "      \"method\" : {"));
-                console.log(strJson.indexOf("\"method\" : {"))
-                console.log(strJson.indexOf(" \"method\" : {"))
-                console.log(strJson.indexOf("  \"method\" : {"))
-                console.log(strJson.indexOf("   \"method\" : {"))
-                console.log(strJson.indexOf("\n    \"method\" : {"))
-                console.log(strJson.indexOf("     \"method\" : {"))
-                //document.getElementById("demo").innerHTML += strJson;*/
-
+                //console.log(finalarray)
+               // console.log(JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}"));
+                Array.prototype.push.apply(finalarray,JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}").reachableMethods);
+                var parsedJson = {reachableMethods: finalarray};
+                console.log(parsedJson);
             }
             makeString();
         }
