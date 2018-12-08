@@ -250,7 +250,7 @@ function toggleToAbstract(id){
 	var mid = "L" + xMid + "," + yMid;
 		
 	edge.setAttribute("d", "M" + n1.x + "," + n1.y + mid + "L" + n2.x + "," + n2.y);*/
-	edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
+	if(n1.x && n2.x) edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
 }
 
 /*
@@ -266,7 +266,7 @@ function toggleToDetailed(id){
 	var link = {source: absPosition(sourceID), dest: absPosition(destID)};
 	var n1 = sidePoint(link.source, link.dest);
 	var n2 = borderPoint(link.dest, link.source);
-	edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
+	if(n1.x && n2.x) edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
 }
 
 

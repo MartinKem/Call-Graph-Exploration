@@ -49,24 +49,10 @@ function colorChosen(elem) {
     $(clickedDiv).css('background-color', color);
 }
 
+
 function deleteNodes() {
     var nodeId= $(clickedDiv).attr('id');
     nodeId = parseInt(nodeId);
 	var nodeInstance = getNodeById(nodeId, testNode);
-	if(nodeInstance){
-		nodeInstance.hideNode();
-	}
-    hideNodes(nodes[nodeId]);
-
-}
-
-function hideNodes(nId) {
-    for(var i = 0;i<links.length;i++){
-
-        if(links[i].source == nId){
-            $("#"+nodes.indexOf(links[i].dest)).hide();
-            hideNodes(links[i].dest); //
-        }
-    }
-
+	nodeInstance.hideNode();
 }
