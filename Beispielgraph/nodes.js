@@ -30,6 +30,7 @@ class node{
 		var parentID = this.nodeID + "#" + source;
 		this.children.push(new node(nodeID, parentID, this.container, xVal, yVal, nameVal, contentVal));
 		this.declaredTargets[source]++;
+		this.reloadContent();
 		return this.children[this.children.length-1];
 	}
 	
@@ -48,7 +49,6 @@ class node{
 				break;
 			}
 		}
-		this.reloadContent();
 		method2nodeEdge(this.children[i].parentID, childID);
 	}
 	
@@ -76,13 +76,13 @@ class node{
 		}
 	}
 	
-	/*
-	returns the id of this node
-	*/
+	// returns the id of this node
 	getID(){ return this.nodeID; }
 	
+	// returns the array of children of this node
 	getChildNodes(){ return this.children; }
 	
+	// reloads all call site numbers of this node
 	reloadContent(){
 		var methodDivs = document.getElementById(this.nodeID).childNodes[1].childNodes;
 		for(var i = 0; i < methodDivs.length; i++){
@@ -181,4 +181,23 @@ function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 			.style("float", "right")
 			.style("color", "#b0b0b0");
 	}
+}
+
+/*
+returns the node instance to a given id
+
+id: id of the searched node
+sourceNode: node instance to start the search on
+
+returns: node instance
+*/
+function getNodeById(id, sourceNode){
+	if(sourceNode.getID() == id){
+		return sourceNode;
+	}
+	var result;
+	sourceNode.getChildNodes().forEach(function(element){
+		if(getNodeById(id, element)) result = getNodeById(id, element);
+	});
+	return result;
 }

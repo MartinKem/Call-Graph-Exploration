@@ -203,6 +203,7 @@ function absPosition(id){
 
 /*
 creates a center2centerEdge from one element to another
+nodes must exist in the graph before edges can be created
 
 id1: id of the source element
 id2: id of the destination element
@@ -216,6 +217,7 @@ function node2nodeEdge(id1, id2){
 
 /*
 creates a side2centerEdge from one element to another
+nodes must exist in the graph before edges can be created
 
 id1: id of the source element
 id2: id of the destination element
