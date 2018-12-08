@@ -151,7 +151,7 @@ function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 			.attr("class","div_node")
 			.style("left", x + "px")
 			.style("top", y + "px")
-			.style("min-width", "300px")
+			.style("width", "300px")
 			.style("padding", "20px")
 			.style("border-width", "5px") // sizes must stay in js-file for later calculations
 						
@@ -163,8 +163,10 @@ function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 				.attr("class","node_inhalt")
 				
 	for(var i=0; i < content.length; i++){
-		var entry = node.append("xhtml:div")
+		var entry = node.append("xhtml:button")
 			.attr("id", nodeID + "#" + i)
+			.on("click", function(){console.log("Hallo")})
+			//.on("click", function(){getNodeById(nodeID + "#" + i).showChildNode()})
 			.style("width", "100%")
 			.style("border", "solid")
 			.style("box-sizing", "border-box")
@@ -172,7 +174,8 @@ function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 			.style("border-top-width", (i == 0 ? "2px" : "0px"))
 			.style("border-radius", "5px")
 			.style("padding", "5px")
-			.style("overflow", "auto");
+			.style("overflow", "auto")
+			.style("background-color", "white");
 		entry.append("xhtaml:div")
 			.text(i + ": " + content[i])
 			.style("float", "left");
