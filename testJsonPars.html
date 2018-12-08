@@ -25,7 +25,7 @@
         var arr = [];
         var setString = function (str){
             strJson += str;
-            if(strJson.length >= 100000000){
+            if(strJson.length >= 132217728){//128MB
                 arr.push(strJson);
                 strJson = "";
             }
@@ -68,11 +68,13 @@
 
 
                 });
+
                 //console.log(finalarray)
                // console.log(JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}"));
                 Array.prototype.push.apply(finalarray,JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}").reachableMethods);
                 var parsedJson = {reachableMethods: finalarray};
-                console.log(parsedJson);
+                //console.log(parsedJson);
+                console.log("fertig")
             }
             makeString();
         }
@@ -82,7 +84,7 @@
 
         function parseFile(file, callback) {
             var fileSize = file.size;
-            var chunkSize = 64 * 1024; // bytes
+            var chunkSize = 16*4*1024 * 1024; // bytes
             var offset = 0;
             var self = this; // we need a reference to the current object
             var chunkReaderBlock = null;
