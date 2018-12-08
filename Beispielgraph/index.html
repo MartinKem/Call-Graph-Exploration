@@ -60,14 +60,18 @@
 	
 	let testNode = new node(10, -1, vis, 1200, 800, "ClassNode", ["Foo.<init>","Bar.<init>","Foo.m","String.toString"]);
 	testNode.showNode();
-	let childNode = testNode.addChild(11, 800, 1100, "ChildNode", ["Foo.<init>", "String.toString"]);
+	let childNode = testNode.addChild(11, 800, 1100, 0, "ChildNode", ["Foo.<init>", "String.toString"]);
 	testNode.showChild(11);
-	let secondChild = testNode.addChild(13, 1400, 1100, "SecondChild", ["Foo.<init>", "String.toString"]);
+	let secondChild = testNode.addChild(13, 1400, 1100, 0, "SecondChild", ["Foo.<init>", "String.toString"]);
 	testNode.showChild(13);
-	let childchildNode = childNode.addChild(12, 200, 1100, "ChildChildNode", ["foobar.m","something.anything","hello.world"]);
+	let childchildNode = childNode.addChild(12, 200, 1100, 1, "ChildChildNode", ["foobar.m","something.anything","hello.world"]);
 	childNode.showChild(12);
+	let testNode1 = childchildNode.addChild(14, 200, 1400, 2, "testNode1", ["Foo.<init>","Bar.<init>","Foo.m","String.toString"]);
+	childchildNode.showChild(14);
+	let testNode2 = childchildNode.addChild(15, 600, 1400, 2, "testNode2", ["foobar.m","something.anything","hello.world"]);
+	childchildNode.showChild(15);
 
-	console.log(getNodeById(11, testNode));
+	testNode.reloadContent();
 	
     //nodes must exist in the graph before edges can be created
     //create all edges in links[]

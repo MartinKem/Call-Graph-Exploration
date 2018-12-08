@@ -9,6 +9,9 @@ class node{
 		this.name = nameVal;
 		this.content = contentVal;
 		this.children = [];
+		this.declaredTargets = [];
+		var length = contentVal.length;
+		while(length-- > 0) this.declaredTargets.push(0);
 	}
 	
 	/*
@@ -17,14 +20,16 @@ class node{
 	nodeID: id of the child node
 	xVal: left distance
 	yVal: right distance
+	source: index of contentVal of parentNode
 	nameVal: child's title
 	contentVal: child's list of methods
 	
 	returns: created instance of the node
 	*/
-	addChild(nodeID, xVal, yVal, nameVal, contentVal){
-		var parentID = this.nodeID + "#" + this.children.length;
+	addChild(nodeID, xVal, yVal, source, nameVal, contentVal){
+		var parentID = this.nodeID + "#" + source;
 		this.children.push(new node(nodeID, parentID, this.container, xVal, yVal, nameVal, contentVal));
+		this.declaredTargets[source]++;
 		return this.children[this.children.length-1];
 	}
 	
@@ -43,7 +48,8 @@ class node{
 				break;
 			}
 		}
-		method2nodeEdge(this.nodeID + '#' + i, childID);
+		this.reloadContent();
+		method2nodeEdge(this.children[i].parentID, childID);
 	}
 	
 	/*
@@ -52,8 +58,7 @@ class node{
 	return: void
 	*/
 	showNode(){
-		createSingleNode(this.nodeID, this.container, this.x, this.y, this.name, this.content);
-		this.visible = true;
+		createSingleNode(this.nodeID, this.container, this.x, this.y, this.name, this.content, this.declaredTargets);
 	}
 	
 	/*
@@ -78,6 +83,12 @@ class node{
 	
 	getChildNodes(){ return this.children; }
 	
+	reloadContent(){
+		var methodDivs = document.getElementById(this.nodeID).childNodes[1].childNodes;
+		for(var i = 0; i < methodDivs.length; i++){
+			var text = methodDivs[i].childNodes[1].textContent = "(" + this.declaredTargets[i] + ")";
+		}
+	}
 }
 
 
@@ -103,11 +114,11 @@ function createNodes(nodes,foreign) {
 			
         node = node.append("xhtml:div")
 					.attr("class","node_inhalt")
-		var methodNr = 0;
+					
 		for(var i=0; i!=n.inhalt.length; i++){
 			node.append("xhtml:div")
 				.text(i + ": " + n.inhalt[i])
-				.attr("id", NodeNr + "#" + methodNr)
+				.attr("id", NodeNr + "#" + i)
 				.style("width", "100%")
 				.style("border", "solid")
 				.style("box-sizing", "border-box")
@@ -115,7 +126,6 @@ function createNodes(nodes,foreign) {
 				.style("border-top-width", (i == 0 ? "2px" : "0px"))
 				.style("border-radius", "5px")
 				.style("padding", "5px");
-			methodNr++;
 		}
 
 		NodeNr++;
@@ -135,7 +145,7 @@ content: list of methods
 
 returns: void
 */
-function createSingleNode(nodeID, cont, x, y, name, content){
+function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 	var node = cont.append("xhtml:div")
 			.attr("id", nodeID)
 			.attr("class","div_node")
@@ -151,20 +161,24 @@ function createSingleNode(nodeID, cont, x, y, name, content){
 		
 	node = node.append("xhtml:div")
 				.attr("class","node_inhalt")
-	var methodNr = 0;
+				
 	for(var i=0; i < content.length; i++){
-		node.append("xhtml:div")
-			.text(i + ": " + content[i])
-			.attr("id", nodeID + "#" + methodNr)
+		var entry = node.append("xhtml:div")
+			.attr("id", nodeID + "#" + i)
 			.style("width", "100%")
 			.style("border", "solid")
 			.style("box-sizing", "border-box")
 			.style("border-width", "2px")
 			.style("border-top-width", (i == 0 ? "2px" : "0px"))
 			.style("border-radius", "5px")
-			.style("padding", "5px");
-		methodNr++;
+			.style("padding", "5px")
+			.style("overflow", "auto");
+		entry.append("xhtaml:div")
+			.text(i + ": " + content[i])
+			.style("float", "left");
+		entry.append("xhtaml:div")
+			.text("(" + declaredTargets[i] + ")")
+			.style("float", "right")
+			.style("color", "#b0b0b0");
 	}
 }
-
-

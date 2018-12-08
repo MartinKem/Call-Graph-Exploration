@@ -242,11 +242,13 @@ function toggleToAbstract(id){
 	var n1 = borderPoint(link.source, link.dest);
 	var n2 = borderPoint(link.dest, link.source);
 	
-	var xMid = (n2.x+n1.x)/2;
+	/*
+	var xMid = (n2.x+n1.x)/2;  // use this to activate edge label
 	var yMid = (n2.y+n1.y)/2;
 	var mid = "L" + xMid + "," + yMid;
 		
-	edge.setAttribute("d", "M" + n1.x + "," + n1.y + mid + "L" + n2.x + "," + n2.y);
+	edge.setAttribute("d", "M" + n1.x + "," + n1.y + mid + "L" + n2.x + "," + n2.y);*/
+	edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
 }
 
 /*
