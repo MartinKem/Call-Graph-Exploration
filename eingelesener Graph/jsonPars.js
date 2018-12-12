@@ -9,7 +9,6 @@ var setString = function (str){
 }
 
 
-var graphJ;
 function loadFile() {
 	if (typeof window.FileReader !== 'function') {
 		alert("The file API isn't supported on this browser yet.");
@@ -22,38 +21,31 @@ function loadFile() {
 	
 }
 
-function show() {
-	//if (graphJ.isLoaded) {
-	//    document.getElementById("demo").innerHTML = graphJ.file.reachableMethods[0].method.declaringClass;
-	//} else {
-	//    document.getElementById("demo").innerHTML = "Document is not loaded yet.";
-	//}
-	//let json = JSON.parse(strJson);
+function parseString() {
+
 	var rest = "";
 	var finalarray;
-	function makeString(){
-		arr.push(strJson);
-		arr.forEach(function (a) {
-			a = rest + a;
-			var first = a.indexOf("\n    \"method\" : {")-1;
-			var last = a.lastIndexOf("\n    \"method\" : {")-3;
 
-			if (finalarray == null) {finalarray = JSON.parse("{\n  \"reachableMethods\" : [ "+a.slice(first,last)+" ]\n}").reachableMethods;}
-			else {Array.prototype.push.apply(finalarray,JSON.parse("{\n  \"reachableMethods\" : [ "+a.slice(first,last)+" ]\n}").reachableMethods)}
+	arr.push(strJson);
+	arr.forEach(function (a) {
+		a = rest + a;
+		var first = a.indexOf("\n    \"method\" : {")-1;
+		var last = a.lastIndexOf("\n    \"method\" : {")-3;
 
-			rest = a.slice(last);
+		if (finalarray == null) {finalarray = JSON.parse("{\n  \"reachableMethods\" : [ "+a.slice(first,last)+" ]\n}").reachableMethods;}
+		else {Array.prototype.push.apply(finalarray,JSON.parse("{\n  \"reachableMethods\" : [ "+a.slice(first,last)+" ]\n}").reachableMethods)}
+
+		rest = a.slice(last);
 
 
-		});
+	});
 
-		//console.log(finalarray)
-	   // console.log(JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}"));
-		Array.prototype.push.apply(finalarray,JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}").reachableMethods);
-		var parsedJson = {reachableMethods: finalarray};
-		//console.log(parsedJson);
-		console.log("fertig")
-	}
-	makeString();
+	//console.log(finalarray)
+   // console.log(JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}"));
+	Array.prototype.push.apply(finalarray,JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}").reachableMethods);
+	var parsedJson = {reachableMethods: finalarray};
+	//console.log(parsedJson);
+	console.log("fertig");
 }
 
 
@@ -76,6 +68,8 @@ function parseFile(file, callback) {
 		}
 		if (offset >= fileSize) {
 			console.log("Done reading file");
+			parseString();
+			changeDiv();
 			return;
 		}
 
@@ -92,4 +86,9 @@ function parseFile(file, callback) {
 
 	// now let's start the read with the first block
 	chunkReaderBlock(offset, chunkSize, file);
+}
+function changeDiv() {
+	$("#load_page").addClass("invis");
+	$("#graph_page").removeClass("inivs");
+
 }
