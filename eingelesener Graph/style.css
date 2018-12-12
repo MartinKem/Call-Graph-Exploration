@@ -9,9 +9,8 @@ body{
     font-family: Helvetica;
 }
 
-div{position: relative;
-
-
+.invis{
+	display: none
 }
 
 #graph{
@@ -83,4 +82,33 @@ svg{
 
 .methodButton:active{
     background-color: #f0f0f0;
+}
+
+#dropZone{
+	text-align: center;
+	color: #aaa;
+	border: 2px dashed #aaa;
+	border-radius: 5px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+
+	padding: 25px;
+	padding-top: 25px;
+	padding-right: 25px;
+	padding-bottom: 25px;
+	padding-left: 25px;
+}
+
+#progress_bar{
+	background-color: #ddd;
+	padding: 3px;
+}
+
+#progress{
+	background-color: rgb(24, 190, 30);
+	color: white;
+	width: 0%;
+	text-align: center;
 }
