@@ -76,7 +76,8 @@ function loadJsonFile(input) {
       //set progress to 100%
       progress.style.width = '100%';
       progress.textContent = '100%';
-	  
+	  document.getElementById("load_page").setAttribute("class", "invis");
+	  document.getElementById("graph_page").setAttribute("class", "");
     }
 
     // if an error occurs on the file load
