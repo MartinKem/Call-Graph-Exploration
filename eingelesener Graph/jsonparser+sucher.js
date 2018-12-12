@@ -1,47 +1,9 @@
 //Javascript Objekt FileLoad, das die JSON Datei enthält
+
+
 var fileObj;
 
-//Add the events for the drop zone
-var dropZone = document.getElementById('dropZone');
-dropZone.addEventListener('dragover', handleDragOver, false);
-dropZone.addEventListener('drop', handleFileSelect, false);
 
-
-function setProgBarToZero(){
-    //get progress element from html and set it to 0
-    var progress = document.getElementById("progress");
-    progress.style.width = '0%';
-    progress.textContent = '0%';
-}
-
-function handleDragOver(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
-    evt.dataTransfer.dropEffect = 'copy'; //shows it is a copy
-  }
-
-function handleFileSelect(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
-
-    var files = evt.dataTransfer.files; // FileList object.
-
-    document.getElementById('fileinput').files = files; // set new file
-}
-
-//Aktionen die beim drücken von "Load" ausgeführt werden 
-function loadFile() {
-    var input, file, fr;
-
-    if (typeof window.FileReader !== 'function') {
-        alert("The file API isn't supported on this browser yet.");
-        return;
-    }
-
-    input = document.getElementById('fileinput').files[0];
-    //fileObj = loadJsonFile(input);
-    parseFile(input,setString);
-}
 
 // Suchfunktion die den im Browser eingegebenen Text in den Klassennamen sucht. Sehr schlechte Performanz
 function setElement() {

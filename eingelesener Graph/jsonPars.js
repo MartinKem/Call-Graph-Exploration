@@ -1,5 +1,40 @@
 var strJson = "";
 var arr = [];
+
+//Add the events for the drop zone
+var dropZone = document.getElementById('dropZone');
+dropZone.addEventListener('dragover', handleDragOver, false);
+dropZone.addEventListener('drop', handleFileSelect, false);
+
+
+function setProgBarToZero(){
+    //get progress element from html and set it to 0
+    var progress = document.getElementById("progress");
+    progress.style.width = '0%';
+    progress.textContent = '0%';
+}
+
+function handleDragOver(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    evt.dataTransfer.dropEffect = 'copy'; //shows it is a copy
+}
+
+function handleFileSelect(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+
+    var files = evt.dataTransfer.files; // FileList object.
+
+    document.getElementById('fileinput').files = files; // set new file
+}
+
+
+
+
+
+
+
 var setString = function (str){
 	strJson += str;
 	if(strJson.length >= 132217728){//128MB
@@ -15,7 +50,7 @@ function loadFile() {
 		return;
 	}
 
-	input = document.getElementById('fileinput').files[0];
+	let input = document.getElementById('fileinput').files[0];
 	//graphJ = loadJsonFile(input);
 	parseFile(input, setString);
 	
@@ -46,6 +81,8 @@ function parseString() {
 	var parsedJson = {reachableMethods: finalarray};
 	console.log(parsedJson);
 	console.log("fertig");
+	return parsedJson;
+
 }
 
 
@@ -68,9 +105,14 @@ function parseFile(file, callback) {
 		}
 		if (offset >= fileSize) {
 			console.log("Done reading file");
-			parseString();
-			changeDiv();
-			return;
+            var parsedJson = parseString();
+            changeDiv();
+			(function reset(){
+                strJson = "";
+                arr = [];
+            })();
+            return parsedJson;
+
 		}
 
 		// of to the next chunk
@@ -89,6 +131,6 @@ function parseFile(file, callback) {
 }
 function changeDiv() {
 	$("#load_page").addClass("invis");
-	$("#graph_page").removeClass("inivs");
+	$("#graph_page").removeClass( "invis" );
 
 }
