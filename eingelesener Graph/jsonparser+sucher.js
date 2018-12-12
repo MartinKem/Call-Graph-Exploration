@@ -38,8 +38,9 @@ function loadFile() {
         return;
     }
 
-    input = document.getElementById('fileinput');
-    fileObj = loadJsonFile(input);
+    input = document.getElementById('fileinput').files[0];
+    //fileObj = loadJsonFile(input);
+    parseFile(input,setString);
 }
 
 // Suchfunktion die den im Browser eingegebenen Text in den Klassennamen sucht. Sehr schlechte Performanz
