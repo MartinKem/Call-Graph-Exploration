@@ -7,26 +7,26 @@ dropZone.addEventListener('dragover', handleDragOver, false);
 dropZone.addEventListener('drop', handleFileSelect, false);
 
 
-function setProgBarToZero(){
-    //get progress element from html and set it to 0
-    var progress = document.getElementById("progress");
-    progress.style.width = '0%';
-    progress.textContent = '0%';
+function setProgBarToZero() {
+	//get progress element from html and set it to 0
+	var progress = document.getElementById("progress");
+	progress.style.width = '0%';
+	progress.textContent = '0%';
 }
 
 function handleDragOver(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
-    evt.dataTransfer.dropEffect = 'copy'; //shows it is a copy
+	evt.stopPropagation();
+	evt.preventDefault();
+	evt.dataTransfer.dropEffect = 'copy'; //shows it is a copy
 }
 
 function handleFileSelect(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
+	evt.stopPropagation();
+	evt.preventDefault();
 
-    var files = evt.dataTransfer.files; // FileList object.
+	var files = evt.dataTransfer.files; // FileList object.
 
-    document.getElementById('fileinput').files = files; // set new file
+	document.getElementById('fileinput').files = files; // set new file
 }
 
 
@@ -35,9 +35,9 @@ function handleFileSelect(evt) {
 
 
 
-var setString = function (str){
+var setString = function (str) {
 	strJson += str;
-	if(strJson.length >= 132217728){//128MB
+	if (strJson.length >= 132217728) {//128MB
 		arr.push(strJson);
 		strJson = "";
 	}
@@ -53,7 +53,7 @@ function loadFile() {
 	let input = document.getElementById('fileinput').files[0];
 	//graphJ = loadJsonFile(input);
 	parseFile(input, setString);
-	
+
 }
 
 function parseString() {
@@ -64,11 +64,11 @@ function parseString() {
 	arr.push(strJson);
 	arr.forEach(function (a) {
 		a = rest + a;
-		var first = a.indexOf("\n    \"method\" : {")-1;
-		var last = a.lastIndexOf("\n    \"method\" : {")-3;
+		var first = a.indexOf("\n    \"method\" : {") - 1;
+		var last = a.lastIndexOf("\n    \"method\" : {") - 3;
 
-		if (finalarray == null) {finalarray = JSON.parse("{\n  \"reachableMethods\" : [ "+a.slice(first,last)+" ]\n}").reachableMethods;}
-		else {Array.prototype.push.apply(finalarray,JSON.parse("{\n  \"reachableMethods\" : [ "+a.slice(first,last)+" ]\n}").reachableMethods)}
+		if (finalarray == null) { finalarray = JSON.parse("{\n  \"reachableMethods\" : [ " + a.slice(first, last) + " ]\n}").reachableMethods; }
+		else { Array.prototype.push.apply(finalarray, JSON.parse("{\n  \"reachableMethods\" : [ " + a.slice(first, last) + " ]\n}").reachableMethods) }
 
 		rest = a.slice(last);
 
@@ -76,10 +76,9 @@ function parseString() {
 	});
 
 	//console.log(finalarray)
-   // console.log(JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}"));
-	Array.prototype.push.apply(finalarray,JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}").reachableMethods);
-	var parsedJson = {reachableMethods: finalarray};
-	console.log(parsedJson);
+	// console.log(JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}"));
+	Array.prototype.push.apply(finalarray, JSON.parse("{\n  \"reachableMethods\" : [ " + rest.slice(rest.indexOf("\n    \"method\" : {") - 1, -3) + " ]\n}").reachableMethods);
+	var parsedJson = { reachableMethods: finalarray };
 	console.log("fertig");
 	return parsedJson;
 
@@ -90,9 +89,8 @@ function parseString() {
 
 function parseFile(file, callback) {
 	var fileSize = file.size;
-	var chunkSize = 16*4*1024 * 1024; // bytes
+	var chunkSize = 16 * 4 * 1024 * 1024; // bytes
 	var offset = 0;
-	var self = this; // we need a reference to the current object
 	var chunkReaderBlock = null;
 
 	var readEventHandler = function (evt) {
@@ -105,13 +103,21 @@ function parseFile(file, callback) {
 		}
 		if (offset >= fileSize) {
 			console.log("Done reading file");
-            var parsedJson = parseString();
-            changeDiv();
-			(function reset(){
-                strJson = "";
-                arr = [];
-            })();
-            return parsedJson;
+			var parsedJson = parseString();
+
+			//progress to 100%
+			var progress = document.getElementById("progress");
+			progress.style.width = '100%';
+			progress.textContent = '100%';
+			
+			changeDiv();
+			(function reset() {
+				strJson = "";
+				arr = [];
+			})();
+
+
+			return;
 
 		}
 
@@ -123,14 +129,27 @@ function parseFile(file, callback) {
 		var r = new FileReader();
 		var blob = _file.slice(_offset, length + _offset);
 		r.onload = readEventHandler;
+		r.onprogress = function (evt) {
+			// evt is an ProgressEvent.
+			if (evt.lengthComputable) {
+				var percentLoaded = Math.round(((offset + evt.loaded) / fileSize) * 100);
+				// Increase the progress bar length.
+				if (percentLoaded < 100) {
+					progress.style.width = percentLoaded + '%';
+					progress.textContent = percentLoaded + '%';
+				}
+			}
+		};
 		r.readAsText(blob);
 	}
+
+
 
 	// now let's start the read with the first block
 	chunkReaderBlock(offset, chunkSize, file);
 }
 function changeDiv() {
 	$("#load_page").addClass("invis");
-	$("#graph_page").removeClass( "invis" );
+	$("#graph_page").removeClass("invis");
 
 }
