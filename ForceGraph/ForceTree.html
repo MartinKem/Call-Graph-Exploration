@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<style>
+
+		circle {
+		  stroke-width: 1.5px;
+		}
+
+		line {
+		  stroke: #999;
+		  stroke-width: 1.5px;
+		}
+
+	</style>
+	<script src='http://d3js.org/d3.v3.min.js'></script>
+	<script src='ForceTree.js'></script>
+</head>
+<body>
+additional nodes can be inserted via addNode(_sourceNodeIndex_) in the console
+	<script>
+
+		var width = 960,
+			height = 500,
+			radius = 6;
+
+		var fill = d3.scale.category20();
+
+		var svg = d3.select("body").append("svg")
+			.attr("width", width)
+			.attr("height", height);
+
+		links = [
+			{source: 0, target: 1},
+			{source: 0, target: 2},
+			{source: 1, target: 3}
+		];
+		
+		nodes = [
+			{index: 0, x: 483, y: 252, fixed: true}
+		];
+		
+		for(var i = 0; i < 3; i++){
+			nodes.push({index: i});
+		}
+			  
+		[force, node, link] = initForce(nodes, links);
+		node.call(force.drag);
+		
+		addNode(0);
+		addNode(3);
+		addNode(3);
+		addNode(3);
+		addNode(2, 5);
+
+
+	</script>
+</body>
+</html>
