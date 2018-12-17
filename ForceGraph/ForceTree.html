@@ -18,12 +18,10 @@
 	<script src='ForceTree.js'></script>
 </head>
 <body>
-additional nodes can be inserted via addNode(_sourceNodeIndex_) in the console
 	<script>
 
-		var width = 960,
-			height = 500,
-			radius = 6;
+		var width = 4000,
+			height = 4000;
 
 		var fill = d3.scale.category20();
 
@@ -31,29 +29,20 @@ additional nodes can be inserted via addNode(_sourceNodeIndex_) in the console
 			.attr("width", width)
 			.attr("height", height);
 
-		links = [
-			{source: 0, target: 1},
-			{source: 0, target: 2},
-			{source: 1, target: 3}
-		];
+		links = [];
 		
 		nodes = [
-			{index: 0, x: 483, y: 252, fixed: true}
+			{index: 0, x: width/2, y: height/2, fixed: true, id: '0'}
 		];
-		
-		for(var i = 0; i < 3; i++){
-			nodes.push({index: i});
-		}
 			  
-		[force, node, link] = initForce(nodes, links);
-		node.call(force.drag);
+		[force, nodeSelection, linkSelection] = initForce(svg, nodes, links);
 		
-		addNode(0);
-		addNode(3);
-		addNode(3);
-		addNode(3);
-		addNode(2, 5);
-
+		addNodeToForceTree(0, ['1', '1', '1']);
+		addNodeToForceTree(1, ['2', '3', '4']);
+		addNodeToForceTree(2, ['5', '6', '7', '8', '9']);
+		addNodeToForceTree(3, ['10']);
+		addNodeToForceTree(3, ['11']);
+		addNodeToForceTree(3, ['12']);
 
 	</script>
 </body>

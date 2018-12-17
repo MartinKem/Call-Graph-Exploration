@@ -1,38 +1,43 @@
 
-function initForce(nodeArr, linkArr){
+function initForce(svg, nodeArr, linkArr){
 
-	var link = svg.selectAll("line")
+	var linkSelection = svg.selectAll("line")
 		.data(linkArr)
 		.enter().append("line");
 
-	var node = svg.selectAll("circle")
+	var nodeSelection = svg.selectAll("circle")
 		.data(nodeArr)
 		.enter().append("circle")
-		.attr("r", radius - .75)
+		.attr("r", 10 - .75)
 		.style("fill", function(d) { return fill(d.group); })
 		.style("stroke", function(d) { return d3.rgb(fill(d.group)).darker(); });
-
+	
+	width = d3.select("svg").attr("width");
+	height = d3.select("svg").attr("height");
+	
 	var force = d3.layout.force()
-		.charge(-200)
-		.linkDistance(50)
+		.charge(-8000)
+		.linkDistance(400)
 		.size([width, height])
 		.nodes(nodeArr)
 		.links(linkArr)
-		.on("tick", function(e){ tick(e, link, node); })
-		.on("end", function(e){ fix(e, link); })
+		.on("tick", function(e){ tick(e, linkSelection, nodeSelection); })
+		.on("end", function(e){ fix(e, linkSelection); })
 		.start();
 
 	for(var i = 0; i < 1000; i++){
 		force.tick();
 	}
 	force.stop();
-	return [force, node, link];
+	
+	nodeSelection.call(force.drag);
+	return [force, nodeSelection, linkSelection];
 }
 
-function tick(e, link, node) {
-	var k = 0.15 * e.alpha;
+function tick(e, linkSelection, nodeSelection) {
+	var k = 0.1 * e.alpha;
 	// push targets away from center
-	link.each(function(d) {
+	linkSelection.each(function(d) {
 		if(!d.target.fixed || !d.source.fixed){
 			var diffx = d.target.x - nodes[0].x;
 			var diffy = d.target.y - nodes[0].y;
@@ -45,49 +50,65 @@ function tick(e, link, node) {
 		.attr("x2", function(d) { return d.target.x; })
 		.attr("y2", function(d) { return d.target.y; });
 
-	node
+	nodeSelection
 		.attr("cx", function(d) { return d.x; })
 		.attr("cy", function(d) { return d.y; });
 
 }
 
-function fix(e, link){
-	link.each(function(d) {
+function fix(e, linkSelection){
+	linkSelection.each(function(d) {
 		d.source.fixed = true;
 		d.target.fixed = true;
 	});
 }
 
-function addNode(sourceNode, count){
+function addNodeToForceTree(sourceNodeID, targetNodeIDs){
+	console.log(sourceNodeID, targetNodeIDs);
+	sourceNode = 0;
+	for(var i = 0; i < nodes.length; i++){
+		if(sourceNodeID == nodes[i].id){
+			sourceNode = i;
+			break;
+		}
+	}
+	
+	var firstIdx = nodes.length;
+	var count = targetNodeIDs.length;
 	do {
-		idx = nodes.length;
-		nodes.push({index: idx})
+		var idx = nodes.length;
+		nodes.push({index: idx, id: targetNodeIDs[targetNodeIDs.length - count]})
 		links.push({source: sourceNode, target: idx})
 	} while(--count > 0);
 	restart();
+	var positions = [];
+	for(var i = firstIdx; i < nodes.length; i++){
+		positions.push({x: nodes[i].x, y: nodes[i].y});
+	}
+	return positions;
 }
 
 
 function restart() {
-	node = node.data(nodes);
+	nodeSelection = nodeSelection.data(nodes);
 
-	node.enter().insert("circle", ".cursor")
-		.attr("r", radius - .75)
+	nodeSelection.enter().insert("circle", ".cursor")
+		.attr("r", 10 - .75)
 		.style("fill", function(d) { return fill(d.group); })
 		.style("stroke", function(d) { return d3.rgb(fill(d.group)).darker(); })
 		.call(force.drag);
 
-	link = link.data(links);
+	linkSelection = linkSelection.data(links);
 
-	link.enter().insert("line", ".node")
+	linkSelection.enter().insert("line", ".node")
 		.attr("class", "link");
 
 	force.nodes(nodes)
 		.links(links)
-		.on("tick", function(e){ tick(e, link, node); })
-		.on("end", function(e){ fix(e, link); })
+		.on("tick", function(e){ tick(e, linkSelection, nodeSelection); })
+		.on("end", function(e){ fix(e, linkSelection); })
 		.start();
-	for(var i = 0; i < 1000; i++){
+	for(var i = 0; i < 500; i++){
 		force.tick();
 	}
 	force.stop();
