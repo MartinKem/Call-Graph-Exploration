@@ -9,11 +9,6 @@ body{
 	overflow: auto;
 }
 
-div{position: relative;
-
-
-}
-
 #graph{
 	overflow: auto;
 	width: 4000px;
@@ -82,4 +77,15 @@ svg{
 
 .methodButton:active{
     background-color: #f0f0f0;
+}
+
+circle {
+	stroke-width: 3px;
+	visibility: visible; /* visible or hidden */
+}
+
+line {
+	stroke: #d8a806;
+	stroke-width: 5px;
+	visibility: visible; /* visible or hidden */
 }

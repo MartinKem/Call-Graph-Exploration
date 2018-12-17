@@ -1,5 +1,15 @@
+/*
+initialized the force graph throw declaring a link selection, a node selection and the d3-force-layout
+also starts the force-layouting
 
+svg: svg container to plot the graph in
+nodeArr: array of nodes:{index: a, x: b, y:c, id: d}
+linkArr: array of links:{source: nodeA, target: nodeB}
+
+returns: [force, nodeSelection, linkSelection] initialized force instance and d3-selection of nodes and links
+*/
 function initForce(svg, nodeArr, linkArr){
+	console.log("Visibility of the force graph can be toggled by changing the visibility property of circle and line in style.css");
 
 	var linkSelection = svg.selectAll("line")
 		.data(linkArr)
@@ -34,6 +44,15 @@ function initForce(svg, nodeArr, linkArr){
 	return [force, nodeSelection, linkSelection];
 }
 
+/*
+defines the distribution of child nodes in the graph
+
+e: tick instance given by on tick function
+linkSelection: d3-selection of links
+nodeSelection: d3-selection of nodes
+
+returns void
+*/
 function tick(e, linkSelection, nodeSelection) {
 	var k = 0.1 * e.alpha;
 	// push targets away from center
@@ -56,6 +75,14 @@ function tick(e, linkSelection, nodeSelection) {
 
 }
 
+/*
+fixes all plotted nodes
+
+e: tick instance given by on tick function
+linkSelection: d3 selection of links
+
+returns: void
+*/
 function fix(e, linkSelection){
 	linkSelection.each(function(d) {
 		d.source.fixed = true;
@@ -63,8 +90,15 @@ function fix(e, linkSelection){
 	});
 }
 
+/*
+adds several nodes to the current force graph and calculates their positions
+
+sourceNodeID: id of the source node
+targetNodeIDs: array of ids of all the target nodes
+
+returns: positions: array of positions:{x: a, y: b} for each of the target nodes
+*/
 function addNodeToForceTree(sourceNodeID, targetNodeIDs){
-	console.log(sourceNodeID, targetNodeIDs);
 	sourceNode = 0;
 	for(var i = 0; i < nodes.length; i++){
 		if(sourceNodeID == nodes[i].id){
@@ -88,7 +122,12 @@ function addNodeToForceTree(sourceNodeID, targetNodeIDs){
 	return positions;
 }
 
+/*
+updates the node- and link-selection for the arrays "nodes" and "links"
+also starts the force-layouting
 
+returns: void
+*/
 function restart() {
 	nodeSelection = nodeSelection.data(nodes);
 

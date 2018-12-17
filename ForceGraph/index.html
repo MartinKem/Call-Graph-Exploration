@@ -36,7 +36,7 @@
 		
 	svgCont.append("defs").attr("id", "definitions");
 	
-    var vis = svgCont.append("foreignObject").attr("width", '100%').attr("height", 4000).attr("position","relative");
+    var vis = svgCont.append("foreignObject").attr("width", 4000).attr("height", 4000).attr("position","relative");
 	
 	
 	var fill = d3.scale.category20();
@@ -48,12 +48,12 @@
 			  
 	[force, nodeSelection, linkSelection] = initForce(svgCont, nodes, links);
 	
-	let testNode = new node(0, -1, vis, svgCont.attr('width')/2, svgCont.attr('height')/2, "ClassNode", ["Foo.<init>","Bar.<init>","Foo.m","String.toString"]);
-	let childNode = testNode.addChild(1, 800, 500, 0, "ChildNode", ["Foo.<init>", "String.toString"]);
-	let secondChild = testNode.addChild(2, 1400, 500, 0, "SecondChild", ["Foo.<init>", "String.toString"]);
-	let childchildNode = childNode.addChild(3, 200, 500, 1, "ChildChildNode", ["foobar.m","something.anything","hello.world"]);
-	let testNode1 = childchildNode.addChild(4, 200, 900, 2, "testNode1", ["Foo.<init>","Bar.<init>","Foo.m","String.toString"]);
-	let testNode2 = childchildNode.addChild(5, 600, 900, 2, "testNode2", ["foobar.m","something.anything","hello.world"]);
+	let testNode = new node(0, -1, vis, "ClassNode", ["Foo.<init>","Bar.<init>","Foo.m","String.toString"]);
+	let childNode = testNode.addChild(1, 0, "ChildNode", ["Foo.<init>", "String.toString"]);
+	let secondChild = testNode.addChild(2, 0, "SecondChild", ["Foo.<init>", "String.toString"]);
+	let childchildNode = childNode.addChild(3, 1, "ChildChildNode", ["foobar.m","something.anything","hello.world"]);
+	let testNode1 = childchildNode.addChild(4, 2, "testNode1", ["Foo.<init>","Bar.<init>","Foo.m","String.toString"]);
+	let testNode2 = childchildNode.addChild(5, 2, "testNode2", ["foobar.m","something.anything","hello.world"]);
 	testNode.showNode();
 	/*testNode.showChildNodes(0);
 	childNode.showChildNodes(1);
