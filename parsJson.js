@@ -67,6 +67,10 @@ function loadJsonFile(input) {
     //get result, parse and set it in the returnt object
     function receivedText(e) {
       let lines = e.target.result;
+      if (lines === ""){
+        alert("File is empty");
+        return;
+      }
       returnFile.file = JSON.parse(lines);
       returnFile.isLoaded = true;
       //set progress to 100%

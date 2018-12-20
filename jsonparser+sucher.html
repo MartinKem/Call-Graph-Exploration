@@ -1,11 +1,12 @@
 <html>
-  <head>
-      <meta charset="utf-8">
-      <title>???</title>
-      <script src="jsonQ-master/jsonq.min.js">//Import von jsonQ-Library zum manipulieren von JSON Dateien https://github.com/s-yadav/jsonQ</script>
-      
-      <style>
-        #dropZone{
+
+<head>
+  <meta charset="utf-8">
+  <title>???</title>
+  <script src="jsonQ-master/jsonq.min.js">//Import von jsonQ-Library zum manipulieren von JSON Dateien https://github.com/s-yadav/jsonQ</script>
+
+  <style>
+    #dropZone{
           text-align: center;
           color: #aaa;
           border: 2px dashed #aaa;
@@ -35,22 +36,22 @@
         }
 
       </style>
-  </head>
+</head>
+
 <body>
 
   <!--Filereader für JSON Datei-->
   <form id="jsonFile" name="jsonFile" enctype="multipart/form-data" method="post">
     <fieldset>
       <h2>Json File</h2>
-      <div id="dropZone">You can Drop files here <br/>
-          <input type='file' id='fileinput' onchange="setProgBarToZero()">
-      </div> <br/>
-      
+      <div id="dropZone">You can Drop files here <br />
+        <input type='file' id='fileinput' onchange="setProgBarToZero(); loadFile()">
+      </div> <br />
+
       <div id="progress_bar">
         <div id="progress" class="percent">0%</div>
-      </div> <br/>
+      </div> <br />
 
-      <input type='button' id='btnLoad' value='Load' onclick='loadFile();'>
     </fieldset>
   </form>
 
@@ -61,8 +62,8 @@
   <button type="button" onclick="setElement2()">Alle Klassennamen anzeigen</button>
   <p id="demo">Text</p>
 
-<script src="parsJson.js"></script>
-<script src="jsonparser+sucher.js">//Import von JvaScript Datei zum suchen in der Json Datei</script>
+  <script src="parsJson.js"></script>
+  <script src="jsonparser+sucher.js">//Import von JvaScript Datei zum suchen in der Json Datei</script>
 
 </body>
 

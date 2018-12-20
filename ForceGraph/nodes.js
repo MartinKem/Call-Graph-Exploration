@@ -1,56 +1,58 @@
 
 class node{
-	constructor(nodeID, parentID, container, xVal, yVal, nameVal, contentVal){
+	constructor(nodeID, parentID, container, nameVal, contentVal){
+		// only if this the root node this, node is placed right now otherwise this node is placed by setPosition(x, y)
+		if(parentID == '-1'){
+			var width = 300;
+			var height = 108 + 27 * contentVal.length;	// node-width, node-hight, and content-height are still hard coded
+			
+			this.x = container.attr("width")/2 - width/2;
+			this.y = container.attr("height")/2 - height/2;
+		}
 		this.nodeID = nodeID;
 		this.parentID = parentID;
 		this.container = container;
-		this.x = xVal;
-		this.y = yVal;
 		this.name = nameVal;
 		this.content = contentVal;
 		this.children = [];
 		this.declaredTargets = [];
 		var length = contentVal.length;
-		while(length-- > 0) this.declaredTargets.push(0);
+		while(length-- > 0) this.declaredTargets.push(0);	// declaredTargets holds the number of child nodes to a given content element
 		this.visible = null;
+	}
+	
+	/*
+	sets the x and y values of this node
+	
+	x: new x-value
+	y: new y-value
+	
+	returns: void
+	*/
+	setPosition(x, y){
+		var width = 300;
+		var height = 108 + 27 * this.content.length;
+		
+		this.x = x - width/2;
+		this.y = y - height/2;
 	}
 	
 	/*
 	adds a child node to the current node
 	
 	nodeID: id of the child node
-	xVal: left distance
-	yVal: right distance
 	source: index of contentVal of parentNode
 	nameVal: child's title
 	contentVal: child's list of methods
 	
 	returns: created instance of the node
 	*/
-	addChild(nodeID, xVal, yVal, source, nameVal, contentVal){
+	addChild(nodeID, source, nameVal, contentVal){
 		var parentID = this.nodeID + "#" + source;
-		this.children.push(new node(nodeID, parentID, this.container, xVal, yVal, nameVal, contentVal));
+		this.children.push(new node(nodeID, parentID, this.container, nameVal, contentVal));
 		this.declaredTargets[source]++;
 		this.reloadContent();
 		return this.children[this.children.length-1];
-	}
-	
-	/*
-	plottes one of the child nodes and an edge to it
-	
-	childID: id of the child node
-	
-	returns: void
-	*/
-	showChild(childID){
-		var i = 0;
-		for (i; i < this.children.length; i++){
-			if(childID == this.children[i].getID()) {
-				this.children[i].showNode();
-				break;
-			}
-		}
-		method2nodeEdge(this.children[i].parentID, childID);
 	}
 	
 	/*
@@ -64,11 +66,40 @@ class node{
 		for(var i = 0; i < this.children.length; i++){
 			var childIndex = this.children[i].getParentID().split('#')[1];
 			if(childIndex == index){
+				if(this.children[i].getVisibility() == null){
+					this.placeChildNodes(index);
+					break;
+				}
+			}
+		}
+		for(var i = 0; i < this.children.length; i++){
+			var childIndex = this.children[i].getParentID().split('#')[1];
+			if(childIndex == index){
 				this.children[i].showNode();
 				var edgeID = this.children[i].getParentID() + '->' + this.children[i].getID();
 				if(!document.getElementById(edgeID)) method2nodeEdge(this.children[i].getParentID(), this.children[i].getID());
 				else document.getElementById(edgeID).style.display = "block";
 			}
+		}
+	}
+	
+	/*
+	sets x and y values of all child nodes to a given content index but doesn't show these nodes yet
+	*/
+	placeChildNodes(index){
+		var childArray = [];
+		var idArray = [];
+		for(var i = 0; i < this.children.length; i++){
+			var childIndex = this.children[i].getParentID().split('#')[1];
+			if(childIndex == index){
+				childArray.push(this.children[i]);
+				idArray.push(this.children[i].getID());
+			}
+		}
+		var positions = addNodeToForceTree(this.nodeID, idArray);
+		
+		for(var i = 0; i < childArray.length; i++){
+			childArray[i].setPosition(positions[i].x, positions[i].y);
 		}
 	}
 	
@@ -178,8 +209,6 @@ function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 	
 	//on rightclick in this node calls rightclickmenu and deactivates normal contextmenu
 	$("#" + nodeID).contextmenu(function(e) {
-	console.log("Hallo");
-	console.log(this);
     if(menuIsOpen){
         $("#main-rightclick").remove();
         menuIsOpen = false;

@@ -203,6 +203,7 @@ function absPosition(id){
 
 /*
 creates a center2centerEdge from one element to another
+nodes must exist in the graph before edges can be created
 
 id1: id of the source element
 id2: id of the destination element
@@ -216,6 +217,7 @@ function node2nodeEdge(id1, id2){
 
 /*
 creates a side2centerEdge from one element to another
+nodes must exist in the graph before edges can be created
 
 id1: id of the source element
 id2: id of the destination element
@@ -242,11 +244,13 @@ function toggleToAbstract(id){
 	var n1 = borderPoint(link.source, link.dest);
 	var n2 = borderPoint(link.dest, link.source);
 	
-	var xMid = (n2.x+n1.x)/2;
+	/*
+	var xMid = (n2.x+n1.x)/2;  // use this to activate edge label
 	var yMid = (n2.y+n1.y)/2;
 	var mid = "L" + xMid + "," + yMid;
 		
-	edge.setAttribute("d", "M" + n1.x + "," + n1.y + mid + "L" + n2.x + "," + n2.y);
+	edge.setAttribute("d", "M" + n1.x + "," + n1.y + mid + "L" + n2.x + "," + n2.y);*/
+	if(n1.x && n2.x) edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
 }
 
 /*
@@ -262,7 +266,7 @@ function toggleToDetailed(id){
 	var link = {source: absPosition(sourceID), dest: absPosition(destID)};
 	var n1 = sidePoint(link.source, link.dest);
 	var n2 = borderPoint(link.dest, link.source);
-	edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
+	if(n1.x && n2.x) edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
 }
 
 
