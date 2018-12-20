@@ -1,6 +1,20 @@
 
+/**
+ * 
+ */
 class node{
-	constructor(nodeID, parentID, container, nameVal, contentVal){
+	/**
+	 * 
+	 * @param {number} nodeID - id of this node
+	 * @param {number} parentID - id of the parent node
+	 * @param {*} container - svg
+	 * @param {string} nameVal - name of the method name
+	 * @param {string[]} contentVal - string array with the name of the targets
+	 * @param {string} declaringClass - dclaring Class of the mehtod
+	 * @param {string[]} parameterTypes - string array with the types of the parameters
+	 * @param {string} returnType - name of the returnType
+	 */
+	constructor(nodeID, parentID, container, nameVal, contentVal, declaringClass, parameterTypes, returnType){
 		// only if this the root node this, node is placed right now otherwise this node is placed by setPosition(x, y)
 		if(parentID == '-1'){
 			var width = 300;
@@ -14,7 +28,10 @@ class node{
 		this.container = container;
 		this.name = nameVal;
 		this.content = contentVal;
-		this.children = [];
+		this.declaringClass = declaringClass;
+		this.parameterTypes = parameterTypes;
+		this.returnType = returnType;
+		this.children = []; //targets
 		this.declaredTargets = [];
 		var length = contentVal.length;
 		while(length-- > 0) this.declaredTargets.push(0);	// declaredTargets holds the number of child nodes to a given content element
@@ -47,9 +64,9 @@ class node{
 	
 	returns: created instance of the node
 	*/
-	addChild(nodeID, source, nameVal, contentVal){
+	addChild(nodeID, source, nameVal, contentVal, declaringClass, parameterTypes, returnType){
 		var parentID = this.nodeID + "#" + source;
-		this.children.push(new node(nodeID, parentID, this.container, nameVal, contentVal));
+		this.children.push(new node(nodeID, parentID, this.container, nameVal, contentVal, declaringClass, parameterTypes, returnType));
 		this.declaredTargets[source]++;
 		this.reloadContent();
 		return this.children[this.children.length-1];
@@ -145,6 +162,19 @@ class node{
 	
 	// returns visibility of this node
 	getVisibility(){ return this.visible; }
+
+	/**
+	 * @returns {string} - dclaring Class of the mehtod
+	 */
+	getDeclaringClass(){ return this.declaringClass; }
+
+	/**
+	 * @returns {string[]} - string array with the types of the parameters
+	 */
+	getParameterTypes(){ return this.parameterTypes; }
+
+	// returns the returnType of this node
+	getReturnType(){ return this.returnType; }
 	
 	// reloads all call site numbers of this node
 	reloadContent(){
