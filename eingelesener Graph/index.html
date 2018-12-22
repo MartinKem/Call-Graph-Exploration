@@ -15,26 +15,31 @@
 <body>
 	<div id="load_page">
 		<!--Filereader für JSON Datei-->
-		  <form id="jsonFile" name="jsonFile" enctype="multipart/form-data" method="post">
+		<form id="jsonFile" name="jsonFile" enctype="multipart/form-data" method="post">
 			<fieldset>
-			  <h2>Json File</h2>
-			  <div id="dropZone">You can Drop files here <br />
+				<h2>Json File</h2>
+			  	<div id="dropZone">You can Drop files here <br />
 				<input type='file' id='fileinput' onchange="setProgBarToZero(); loadFile()">
-			  </div> <br />
+			  	</div> <br />
 
-			  <div id="progress_bar">
-				<div id="progress" class="percent">0%</div>
-			  </div> <br />
-
+			  	<div id="progress_bar">
+					<div id="progress" class="percent">0%</div>
+			  	</div> <br/>
 			</fieldset>
 		  </form>
-
-		  <!--Seiteninhalt-->
-		  <p>Immer erst laden ehe einer der Schaltflaechen unten gedrueckt wird</p>
-		  <input type="text" name="enter" class="enter" value="" id="text">
-		  <button type="button" onclick="setElement()">Pruefen ob Enthalten</button>
-		  <button type="button" onclick="setElement2()">Alle Klassennamen anzeigen</button>
-		  <p id="demo">Text</p>
+	</div>
+	<div id="search_page" class="invis">
+		<!--Seiteninhalt-->
+		<p id="demo"></p>
+		<form autocomplete="off"></form>
+			<div class="autocomplete" style="width:500px;">
+			<input type="text" name="searchMethod" id="methodInput" placeholder="Methode">
+			</div><br/><br/>
+			<div class="autocomplete" style="width:500px;">
+			<input type="text" name="searchClass" id="classInput" placeholder="Klasse">
+			</div>
+		</form><br/>
+		<button id="search" onclick="callSearch()">Get Element</button><br/><br/>
 
 	</div>
 
@@ -84,9 +89,9 @@
 			}
 			return;
 		}
-	</script>
-	<script src="jsonparser+sucher.js">//Import von JvaScript Datei zum suchen in der Json Datei</script>
-	<script src="rightclickmenu.js"></script>
+	</script><script src="rightclickmenu.js"></script>
 	<script src="jsonPars.js"></script>
+	<script src="../jsonQ-master/jsonQ.js"></script>
+	<script src="search.js"></script>
 </body>
 </html>

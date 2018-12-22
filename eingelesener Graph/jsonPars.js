@@ -1,5 +1,6 @@
 var strJson = "";
 var arr = [];
+var parsedJson;
 
 //Add the events for the drop zone
 var dropZone = document.getElementById('dropZone');
@@ -78,7 +79,17 @@ function parseString() {
 	//console.log(finalarray)
 	// console.log(JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}"));
 	Array.prototype.push.apply(finalarray, JSON.parse("{\n  \"reachableMethods\" : [ " + rest.slice(rest.indexOf("\n    \"method\" : {") - 1, -3) + " ]\n}").reachableMethods);
-	var parsedJson = { reachableMethods: finalarray };
+	parsedJson = { reachableMethods: finalarray };
+
+	//Initialisiere Autovervollständigung
+    var jsonQObject = jsonQ(parsedJson);
+    var methodList = jsonQ.sort(jsonQObject.find("name").unique());
+    var classList = jsonQ.sort(jsonQObject.find("declaringClass").unique());
+
+    autocomplete(document.getElementById("classInput"), classList);
+	autocomplete(document.getElementById("methodInput"), methodList);
+	
+
 	console.log("fertig");
 	return parsedJson;
 
@@ -150,6 +161,101 @@ function parseFile(file, callback) {
 }
 function changeDiv() {
 	$("#load_page").addClass("invis");
+	$("#search_page").removeClass("invis");
 	$("#graph_page").removeClass("invis");
 
+}
+
+//Eingabe bei gegebenem Texteingabefeld mit gegebenem Stringarray autovervollständigen 
+function autocomplete(inp, arr) {
+    //2 Parameter, Textfeld und Array mit Vervollständigungsdaten
+    var currentFocus = 0;
+    //Texteingabe erkennen
+    inp.addEventListener("input", function(e) {
+        var div, items, i, value = this.value;
+        //Alle offenen Listen schließen
+        closeAllLists();
+        //Unterbrechen, wenn das Textfeld leer ist
+        if (!value) { return false;}
+        currentFocus = -1;
+        //DIV Element erstellen, das alle Vervollständigungsvorschläge enthält
+        div = document.createElement("DIV");
+        div.setAttribute("id", this.id + "autocomplete-list");
+        div.setAttribute("class", "autocomplete-items");
+        //Füge das DIV Element dem Container als Kindelement hinzu
+        this.parentNode.appendChild(div);
+        for (i = 0; i < arr.length; i++) {
+          //Prüfe, ob die eingegebenen Zeichen mit dem Anfang des Vorschlags übereinstimmen
+          if (arr[i].substr(0, value.length).toUpperCase() == value.toUpperCase()) {
+            //Erstelle DIV Element für jeden übereinstimmenden Vorschlag
+            items = document.createElement("DIV");
+            //Hebe übereinstimmende Zeichen als fettgedruckt hervor
+            items.innerHTML = "<strong>" + arr[i].substr(0, value.length) + "</strong>";
+            items.innerHTML += arr[i].substr(value.length);
+            //Erstelle INPUT Feld, das den aktuellen Wert der Vorschlags enthält
+            items.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+            //Führe die übergebene Funktion bei Knopfdruck des Elements aus
+                items.addEventListener("click", function(e) {
+                //Füge den Vervollständigungsvorschlag in das Textfeld ein
+                inp.value = this.getElementsByTagName("input")[0].value;
+                //Alle offenen Listen schließen
+                closeAllLists();
+            });
+            div.appendChild(items);
+            //Schleife unterbrechen wenn 10 Elemente gefunden wurden
+            if (div.childElementCount >= 10) {break;}
+          }
+        }
+    });
+    //Führe eine Funktion aus, wenn die Tastatur betätigt wird
+    inp.addEventListener("keydown", function(e) {
+        var x = document.getElementById(this.id + "autocomplete-list");
+        if (x) x = x.getElementsByTagName("div");
+        if (e.keyCode == 40) {
+          //Erhöhe aktuellen Fokus bei Pfeiltaste UNTEN
+          currentFocus++;
+          //Hebe aktuelles Listenelement hervor
+          addActive(x);
+        } else if (e.keyCode == 38) {
+          //Verringere aktuellen Fokus bei Pfeiltaste HOCH
+          currentFocus--;
+          //Hebe aktuelles Listenelement hervor
+          addActive(x);
+        } else if (e.keyCode == 13) {
+          //Verhindere, dass ein Formular gesendet wird, wenn ENTER gedrückt wird
+          e.preventDefault();
+          if (currentFocus > -1) {
+            //Simuliere Klick auf Listenelement
+            if (x) x[currentFocus].click();
+          }
+        }
+    });
+    function addActive(x) {
+      //Funktion um Listenelement als aktiv zu klassifizieren
+      if (!x) return false;
+      //Entferne die "aktiv" Klasse von allen anderen Elementen
+      removeActive(x);
+      if (currentFocus >= x.length) currentFocus = 0;
+      if (currentFocus < 0) currentFocus = (x.length - 1);
+      //Füge Klasse "autocomplete-active" hinzu
+      x[currentFocus].classList.add("autocomplete-active");
+    }
+    function removeActive(x) {
+      //Entferne die "aktiv" Klasse von allen Listenelementen
+      for (var i = 0; i < x.length; i++) {
+        x[i].classList.remove("autocomplete-active");
+      }
+    }
+    function closeAllLists(elmnt) {
+      //Schließe alle offenen Autovervollständigungslisten mit Ausnahme der übergebenen
+      var x = document.getElementsByClassName("autocomplete-items");
+      for (var i = 0; i < x.length; i++) {
+        if (elmnt != x[i] && elmnt != inp) {
+        x[i].parentNode.removeChild(x[i]);
+      }
+    }
+  }
+  document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
 }
