@@ -5,9 +5,9 @@
 class node{
 	/**
 	 * 
-	 * @param {number} nodeID - id of this node
-	 * @param {number} parentID - id of the parent node
-	 * @param {*} container - svg
+	 * @param {string} nodeID - id of this node
+	 * @param {string[]} parentIDs - id of the parent node
+	 * @param {HTML svg object} container - svg
 	 * @param {string} nameVal - name of the method name
 	 * @param {string[]} contentVal - string array with the name of the targets
 	 * @param {string} declaringClass - dclaring Class of the mehtod
@@ -15,16 +15,20 @@ class node{
 	 * @param {string} returnType - name of the returnType
 	 */
 	constructor(nodeID, parentID, container, nameVal, contentVal, declaringClass, parameterTypes, returnType){
-		// only if this the root node this, node is placed right now otherwise this node is placed by setPosition(x, y)
+		// Only if this is the root node, this node is placed right now. Otherwise it is placed by setPosition(x, y).
+		// Also generation is set to 0
 		if(parentID == '-1'){
 			var width = 300;
 			var height = 108 + 27 * contentVal.length;	// node-width, node-hight, and content-height are still hard coded
 			
 			this.x = container.attr("width")/2 - width/2;
 			this.y = container.attr("height")/2 - height/2;
+			
+			this.generation = 0;
+			this.rootNode = this;
 		}
 		this.nodeID = nodeID;
-		this.parentID = parentID;
+		this.parentIDs = [parentID];
 		this.container = container;
 		this.name = nameVal;
 		this.content = contentVal;
@@ -36,6 +40,7 @@ class node{
 		var length = contentVal.length;
 		while(length-- > 0) this.declaredTargets.push(0);	// declaredTargets holds the number of child nodes to a given content element
 		this.visible = null;
+		this.visibleParentNodes = 0;
 	}
 	
 	/*
@@ -66,10 +71,18 @@ class node{
 	*/
 	addChild(nodeID, source, nameVal, contentVal, declaringClass, parameterTypes, returnType){
 		var parentID = this.nodeID + "#" + source;
-		this.children.push(new node(nodeID, parentID, this.container, nameVal, contentVal, declaringClass, parameterTypes, returnType));
+		var child = getNodeByName(nameVal, this.rootNode);
+		var alreadyExisting = true;
+		if(!child){
+			child = new node(nodeID, parentID, this.container, nameVal, contentVal, declaringClass, parameterTypes, returnType);
+		}
+		else child.addParent(parentID);
+		child.setRootNode(this.rootNode);
+		child.setGeneration(this.generation + 1);
+		this.children.push([child, source]);
 		this.declaredTargets[source]++;
 		this.reloadContent();
-		return this.children[this.children.length-1];
+		return this.children[this.children.length-1][0];
 	}
 	
 	/*
@@ -81,21 +94,27 @@ class node{
 	*/
 	showChildNodes(index){
 		for(var i = 0; i < this.children.length; i++){
-			var childIndex = this.children[i].getParentID().split('#')[1];
-			if(childIndex == index){
-				if(this.children[i].getVisibility() == null){
+			if(this.children[i][1] == index){
+				if(this.children[i][0].getVisibility() == null){
 					this.placeChildNodes(index);
 					break;
 				}
 			}
 		}
 		for(var i = 0; i < this.children.length; i++){
-			var childIndex = this.children[i].getParentID().split('#')[1];
-			if(childIndex == index){
-				this.children[i].showNode();
-				var edgeID = this.children[i].getParentID() + '->' + this.children[i].getID();
-				if(!document.getElementById(edgeID)) method2nodeEdge(this.children[i].getParentID(), this.children[i].getID());
-				else document.getElementById(edgeID).style.display = "block";
+			if(this.children[i][1] == index){
+				this.children[i][0].showNode();
+				var parentID = this.nodeID + '#' + this.children[i][1];
+				var edge = document.getElementById(parentID + '->' + this.children[i][0].getID());
+				if(!edge){
+					method2nodeEdge(parentID, this.children[i][0].getID());
+					this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() + 1);
+				}
+				else if(edge.style.display != 'block'){
+					this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() + 1);
+					edge.style.display = "block";
+				}
+				edge = document.getElementById(parentID + '->' + this.children[i][0].getID());
 			}
 		}
 	}
@@ -107,16 +126,16 @@ class node{
 		var childArray = [];
 		var idArray = [];
 		for(var i = 0; i < this.children.length; i++){
-			var childIndex = this.children[i].getParentID().split('#')[1];
-			if(childIndex == index){
+			var childIndex = this.children[i][1];
+			if(childIndex == index && !this.children[i][0].getVisibility()){
 				childArray.push(this.children[i]);
-				idArray.push(this.children[i].getID());
+				idArray.push(this.children[i][0].getID());
 			}
 		}
 		var positions = addNodeToForceTree(this.nodeID, idArray);
 		
 		for(var i = 0; i < childArray.length; i++){
-			childArray[i].setPosition(positions[i].x, positions[i].y);
+			childArray[i][0].setPosition(positions[i].x, positions[i].y);
 		}
 	}
 	
@@ -140,22 +159,69 @@ class node{
 	*/
 	hideNode(){
 		if(this.visible != null){
-			this.children.forEach(function (elem){elem.hideNode()});
-			if(parseInt(this.parentID) >= 0){
-				var node = document.getElementById(this.nodeID);
-				var edge = document.getElementById(this.parentID + '->' + this.nodeID);
-				node.style.display = "none";
-				edge.style.display = "none";
+			for(var i = 0; i < this.children.length; i++){
+				if(this.children[i][0].getVisibleParentNodes() == 1) this.children[i][0].hideNode();
+				else if(this.children[i][0].getVisibleParentNodes() > 1){
+					var edge = document.getElementById(this.nodeID + '#' + this.children[i][1] + '->' + this.children[i][0].getID());
+					edge.style.display = 'none';
+					this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() - 1);
+				}
 			}
-			this.visible = false
+			for(var i = 0; i < this.parentIDs.length; i++){
+				if(parseInt(this.parentIDs[i]) >= 0){
+					var node = document.getElementById(this.nodeID);
+					var edge = document.getElementById(this.parentIDs[i] + '->' + this.nodeID);
+					node.style.display = "none";
+					edge.style.display = "none";
+				}
+			}
+			this.visible = false;
+			if(this.visibleParentNodes >= 1) this.visibleParentNodes = 0;
 		}
 	}
+	
+	/**
+	 * add a parentID to the parentID array
+	 *
+	 * @param {string} parentID - new parent id
+	 */
+	addParent(parentID){
+		this.parentIDs.push(parentID);
+	}
+	
+	/**
+	 * updates generation if new generation is smaller then current one
+	 *
+	 * @param {number} newGen - new possible generation value
+	 */
+	setGeneration(newGen){
+		if(this.generation == undefined || this.generation > newGen) this.generation = newGen;
+	}
+	
+	/**
+	 * sets this root node
+	 *
+	 * @param {node object} rootNode - new root node
+	 */
+	setRootNode(rootNode){
+		this.rootNode = rootNode;
+	}
+	
+	/**
+	 * @returns {number} - generation = shortest path to root node
+	 */
+	getGeneration(){ return this.generation; }
 	
 	// returns the id of this node
 	getID(){ return this.nodeID; }
 	
 	// return the parentID of this node
-	getParentID(){ return this.parentID; }
+	getParentIDs(){ return this.parentIDs; } // ++++++++++++++++++++++++++++++++++++++++++++ TODO: alle dependencies zu getParentID() anpassen ++++++++++++++++++++++++++++++++++++++++
+	
+	/**
+	 * @returns {number} - generation = shortest path to root node
+	 */
+	getName(){ return this.name; }
 	
 	// returns the array of children of this node
 	getChildNodes(){ return this.children; }
@@ -164,7 +230,7 @@ class node{
 	getVisibility(){ return this.visible; }
 
 	/**
-	 * @returns {string} - dclaring Class of the mehtod
+	 * @returns {string} - declaring class of the method
 	 */
 	getDeclaringClass(){ return this.declaringClass; }
 
@@ -175,6 +241,18 @@ class node{
 
 	// returns the returnType of this node
 	getReturnType(){ return this.returnType; }
+	
+	/**
+	 * @returns {number} - number of visible parent nodes
+	 */
+	getVisibleParentNodes(){ return this.visibleParentNodes; }
+	
+	/**
+	 * sets visibleParentNodes of this node
+	 *
+	 * @param {number} - new number of visible parent nodes
+	 */
+	setVisibleParentNodes(number){ this.visibleParentNodes = number; }
 	
 	// reloads all call site numbers of this node
 	reloadContent(){
@@ -257,13 +335,32 @@ sourceNode: node instance to start the search on
 
 returns: node instance
 */
-function getNodeById(id, sourceNode){
+function getNodeById(id, sourceNode){ // circle beheben
 	if(sourceNode.getID() == id){
 		return sourceNode;
 	}
 	var result;
 	sourceNode.getChildNodes().forEach(function(element){
-		if(getNodeById(id, element)) result = getNodeById(id, element);
+		if(getNodeById(id, element[0])) result = getNodeById(id, element[0]);
+	});
+	return result;
+}
+
+/**
+ * returns the node instance to a given name
+ * 
+ * @param {string} name - name of the searched node
+ * @param {node object} sourceNode - node instance to start the search on
+ *
+ * @returns {node object} - node instance with the given name
+ */
+function getNodeByName(name, sourceNode){ // circle beheben
+	if(sourceNode.getName() == name){
+		return sourceNode;
+	}
+	var result;
+	sourceNode.getChildNodes().forEach(function(element){
+		if(getNodeByName(name, element[0])) result = getNodeByName(name, element[0]);
 	});
 	return result;
 }

@@ -9,7 +9,6 @@ linkArr: array of links:{source: nodeA, target: nodeB}
 returns: [force, nodeSelection, linkSelection] initialized force instance and d3-selection of nodes and links
 */
 function initForce(svg, nodeArr, linkArr){
-	console.log("Visibility of the force graph can be toggled by changing the visibility property of circle and line in style.css");
 
 	var linkSelection = svg.selectAll("line")
 		.data(linkArr)

@@ -11,8 +11,6 @@ $("html").on("click", function(e){
 });
 //eventhandler for rightclick, deactivates rightclickmenu (not in .div_node)
 $("html:not(.div_node)").on("contextmenu",function(e){
-	console.log("Hallo2");
-	console.log(this);
     if(menuIsOpen){
         $("#main-rightclick").remove();
         menuIsOpen = false;
@@ -21,8 +19,6 @@ $("html:not(.div_node)").on("contextmenu",function(e){
 //on rightclick in .div_node calls rightclickmenu and deactivates normal contextmenu
 //not used anymore
 $(".div_node").contextmenu(function(e) {
-	console.log("Hallo");
-	console.log(this);
     if(menuIsOpen){
         $("#main-rightclick").remove();
         menuIsOpen = false;
