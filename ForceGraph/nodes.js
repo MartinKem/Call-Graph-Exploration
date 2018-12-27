@@ -26,7 +26,7 @@ class node{
 			
 			this.generation = 0;
 			this.rootNode = this;
-			this.parentIDs = [];
+			this.parentIDs = [];	// parentIDs must be set to [], to potentially allow methods call the root node
 		}
 		else{
 			this.parentIDs = [parentID];
@@ -38,22 +38,23 @@ class node{
 		this.declaringClass = declaringClass;
 		this.parameterTypes = parameterTypes;
 		this.returnType = returnType;
-		this.children = []; //targets
+		this.children = [];		// target nodes
 		this.declaredTargets = [];
 		var length = contentVal.length;
 		while(length-- > 0) this.declaredTargets.push(0);	// declaredTargets holds the number of child nodes to a given content element
-		this.visible = null;
-		this.visibleParentNodes = 0;
+		this.visible = null;	// this.visible == null: node has never been placed or displayed;
+								// this.visible == false: this node has valid x- and y-values, but is currently invisible
+								// this.visible == true: node has valid x- and y-values and is currently displayed
+		this.visibleParentNodes = 0;	// visible parent-nodes must be counted, because if one parent-node becomes hidden, this node must still be shown,
+										// if there exists another visible parent-node
 	}
 	
-	/*
-	sets the x and y values of this node
-	
-	x: new x-value
-	y: new y-value
-	
-	returns: void
-	*/
+	/**
+	 * sets the x and y values of this node
+	 *
+	 * @param {number} x - new x-value
+	 * @param {number} y - new y-value
+	 */
 	setPosition(x, y){
 		var width = 300;
 		var height = 108 + 27 * this.content.length;
@@ -62,24 +63,28 @@ class node{
 		this.y = y - height/2;
 	}
 	
-	/*
-	adds a child node to the current node
-	
-	nodeID: id of the child node
-	source: index of contentVal of parentNode
-	nameVal: child's title
-	contentVal: child's list of methods
-	
-	returns: created instance of the node
-	*/
+	/**
+	 * adds a child node to the current node where parentID and container are given by this node
+	 * this node also sets the child's rootNode, it's generation and updates his own children and declaredTargets
+	 *
+	 * @param {string} nodeID - id of the child node
+	 * @param {number} source - index of contentVal of parentNode
+	 * @param {string} nameVal - child's title
+	 * @param {string[]} contentVal - string array with the name of the targets
+	 * @param {string} declaringClass - dclaring class of the mehtod
+	 * @param {string[]} parameterTypes - string array with the types of the parameters
+	 * @param {string} returnType - name of the returnType
+	 *
+	 * @returns {node object} - child node instance
+	 */
 	addChild(nodeID, source, nameVal, contentVal, declaringClass, parameterTypes, returnType){
 		var parentID = this.nodeID + "#" + source;
 		var child = getNodeByName(nameVal, this.rootNode);
 		var alreadyExisting = true;
-		if(!child){
+		if(!child){		// new node-instance is only created, if it didn't exist yet
 			child = new node(nodeID, parentID, this.container, nameVal, contentVal, declaringClass, parameterTypes, returnType);
 		}
-		else child.addParent(parentID);
+		else child.addParent(parentID);		// if the child-node already existed, it just adds this as new parent
 		child.setRootNode(this.rootNode);
 		child.setGeneration(this.generation + 1);
 		this.children.push([child, source]);
@@ -88,36 +93,35 @@ class node{
 		return this.children[this.children.length-1][0];
 	}
 	
-	/*
-	plottes all child nodes of a single called method and an edge to them
-	
-	index: method index in cententVal
-	
-	returns: void
-	*/
+	/**
+	 * shows all child nodes of a single call site and plottes an edge to them
+	 *
+	 * @param {number} index - index of the content array
+	 */
 	showChildNodes(index){
+		// if there exists a child-node with the given source index, the has never been placed, it must be placed with respect on the existing force tree
 		for(var i = 0; i < this.children.length; i++){
 			if(this.children[i][1] == index){
-				if(this.children[i][0].getVisibility() == null){
+				if(this.children[i][0].getVisibility() == null){ // if true, child-node has never been placed
 					this.placeChildNodes(index);
 					break;
 				}
 			}
 		}
+		// all child-nodes must be displayed right now
 		for(var i = 0; i < this.children.length; i++){
 			if(this.children[i][1] == index){
 				this.children[i][0].showNode();
 				var parentID = this.nodeID + '#' + this.children[i][1];
 				var edge = document.getElementById(parentID + '->' + this.children[i][0].getID());
-				if(!edge){
+				if(!edge){	// if child-node hasen't been placed before, a new edge must be created
 					method2nodeEdge(parentID, this.children[i][0].getID());
-					this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() + 1);
+					this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() + 1);	// visibleParents of child-node must be incremented
 				}
-				else if(edge.style.display != 'block'){
-					this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() + 1);
+				else if(edge.style.display != 'block'){		// if child-node has already been placed, the affected edge is just turned on visible
+					this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() + 1);	// visibleParents of child-node must be incremented
 					edge.style.display = "block";
 				}
-				edge = document.getElementById(parentID + '->' + this.children[i][0].getID());
 			}
 		}
 	}
