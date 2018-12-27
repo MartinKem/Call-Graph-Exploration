@@ -48,9 +48,10 @@
 			  
 	[force, nodeSelection, linkSelection] = initForce(svgCont, nodes, links);
 	
-	let testNode = new node(0, -1, vis, "ClassNode", ["Foo.<init>","Bar.<init>","Foo.m","String.toString"]);
+	let testNode = new node(0, -1, vis, "TestNode", ["Foo.<init>","Bar.<init>","Foo.m","String.toString"]);
 	let childNode = testNode.addChild(1, 0, "ChildNode", ["Foo.<init>", "String.toString"]);
 	let secondChild = testNode.addChild(2, 0, "SecondChild", ["Foo.<init>", "String.toString"]);
+	let circle1 = secondChild.addChild(0, 0, "TestNode", ["Foo.<init>", "String.toString"]);
 	let childchildNode = childNode.addChild(3, 1, "ChildChildNode", ["foobar.m","something.anything","hello.world"]);
 	let circle = childNode.addChild(3, 1, "SecondChild", ["foobar.m","something.anything","hello.world"]);
 	let testNode1 = childchildNode.addChild(4, 2, "testNode1", ["Foo.<init>","Bar.<init>","Foo.m","String.toString"]);

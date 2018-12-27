@@ -68,7 +68,8 @@ function createEdge(svg, xStart, yStart, xDest, yDest, edgeID, label){
 		 .style("marker-end", "url(#markerArrow)")
 		 .style("marker-mid", "url(#" + label + ")")
 		 .style("opacity", "0.5")
-		 .style("display", "block");
+		 .style("display", "block")
+		 .style("visibility", "visible");
  }
  
 /*

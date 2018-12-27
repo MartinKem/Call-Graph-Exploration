@@ -26,9 +26,12 @@ class node{
 			
 			this.generation = 0;
 			this.rootNode = this;
+			this.parentIDs = [];
+		}
+		else{
+			this.parentIDs = [parentID];
 		}
 		this.nodeID = nodeID;
-		this.parentIDs = [parentID];
 		this.container = container;
 		this.name = nameVal;
 		this.content = contentVal;
@@ -154,11 +157,20 @@ class node{
 	
 	/*
 	sets all the child nodes, this node and the edge to this node (if it exists) to invisible
+	root node will always be recovered in the end
 	
 	returns: void
 	*/
 	hideNode(){
 		if(this.visible != null){
+			for(var i = 0; i < this.parentIDs.length; i++){
+				var node = document.getElementById(this.nodeID);
+				var edge = document.getElementById(this.parentIDs[i] + '->' + this.nodeID);
+				node.style.display = "none";
+				edge.style.display = "none";
+			}
+			this.visible = false;
+			if(this.visibleParentNodes >= 1) this.visibleParentNodes = 0;
 			for(var i = 0; i < this.children.length; i++){
 				if(this.children[i][0].getVisibleParentNodes() == 1) this.children[i][0].hideNode();
 				else if(this.children[i][0].getVisibleParentNodes() > 1){
@@ -167,16 +179,7 @@ class node{
 					this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() - 1);
 				}
 			}
-			for(var i = 0; i < this.parentIDs.length; i++){
-				if(parseInt(this.parentIDs[i]) >= 0){
-					var node = document.getElementById(this.nodeID);
-					var edge = document.getElementById(this.parentIDs[i] + '->' + this.nodeID);
-					node.style.display = "none";
-					edge.style.display = "none";
-				}
-			}
-			this.visible = false;
-			if(this.visibleParentNodes >= 1) this.visibleParentNodes = 0;
+			this.rootNode.showNode();
 		}
 	}
 	
@@ -216,7 +219,7 @@ class node{
 	getID(){ return this.nodeID; }
 	
 	// return the parentID of this node
-	getParentIDs(){ return this.parentIDs; } // ++++++++++++++++++++++++++++++++++++++++++++ TODO: alle dependencies zu getParentID() anpassen ++++++++++++++++++++++++++++++++++++++++
+	getParentIDs(){ return this.parentIDs; }
 	
 	/**
 	 * @returns {number} - generation = shortest path to root node
@@ -300,7 +303,8 @@ function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 			.attr("class", "methodButton")
 			.on("click", function(){
 				index = this.getAttribute("id").split('#')[1];
-				getNodeById(nodeID, testNode).showChildNodes(index); })
+				var node = getNodeById(nodeID, testNode);
+				node.showChildNodes(index); })
 			.style("width", "100%")
 			.style("border-width", "2px")
 			.style("border-top-width", (i == 0 ? "2px" : "0px"))
@@ -339,10 +343,12 @@ function getNodeById(id, sourceNode){ // circle beheben
 	if(sourceNode.getID() == id){
 		return sourceNode;
 	}
-	var result;
-	sourceNode.getChildNodes().forEach(function(element){
-		if(getNodeById(id, element[0])) result = getNodeById(id, element[0]);
-	});
+	var result = false;
+	for(var i = 0; i < sourceNode.getChildNodes().length; i++){
+		if(sourceNode.getGeneration() < sourceNode.getChildNodes()[i][0].getGeneration() && getNodeById(id, sourceNode.getChildNodes()[i][0])){
+			result = getNodeById(id, sourceNode.getChildNodes()[i][0]);
+		}
+	}
 	return result;
 }
 
@@ -360,7 +366,7 @@ function getNodeByName(name, sourceNode){ // circle beheben
 	}
 	var result;
 	sourceNode.getChildNodes().forEach(function(element){
-		if(getNodeByName(name, element[0])) result = getNodeByName(name, element[0]);
+		if(sourceNode.getGeneration() < element[0].getGeneration() && getNodeByName(name, element[0])) result = getNodeByName(name, element[0]);
 	});
 	return result;
 }
