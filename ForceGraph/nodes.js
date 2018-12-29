@@ -1,6 +1,10 @@
 
+//---------------------------------------------------------------------------------------
+//----------------------------------- model section -------------------------------------
+//---------------------------------------------------------------------------------------
+
 /**
- * 
+ * models the methods as nodes in a directed graph
  */
 class node{
 	/**
@@ -94,7 +98,7 @@ class node{
 	}
 	
 	/**
-	 * shows all child nodes of a single call site and plottes an edge to them
+	 * shows all child nodes of a single call site and displays an edge to them
 	 *
 	 * @param {number} index - index of the content array
 	 */
@@ -125,13 +129,15 @@ class node{
 			}
 		}
 	}
-	
-	/*
-	sets x and y values of all child nodes to a given content index but doesn't show these nodes yet
-	*/
+
+	/**
+	 * sets x and y values of all child nodes to a given call site index, but doesn't show these nodes yet
+	 *
+	 * @param {number} index - index of the content array
+	 */
 	placeChildNodes(index){
 		var childArray = [];
-		var idArray = [];
+		var idArray = [];	// first an array with all the child-ids is created
 		for(var i = 0; i < this.children.length; i++){
 			var childIndex = this.children[i][1];
 			if(childIndex == index && !this.children[i][0].getVisibility()){
@@ -139,51 +145,51 @@ class node{
 				idArray.push(this.children[i][0].getID());
 			}
 		}
-		var positions = addNodeToForceTree(this.nodeID, idArray);
+		var positions = addNodeToForceTree(this.nodeID, idArray);	// this function from the ForceTree.js file axtends for each node in
+																	// the idArray the invisible force graph and returns their positions
 		
-		for(var i = 0; i < childArray.length; i++){
+		for(var i = 0; i < childArray.length; i++){		// in the end the affected child-nodes are placed at the calculated positions
 			childArray[i][0].setPosition(positions[i].x, positions[i].y);
 		}
 	}
 	
-	/*
-	plottes this node
-	
-	return: void
-	*/
+	/**
+	 * displays this node
+	 */
 	showNode(){
-		if(this.visible != null){
+		if(this.visible != null){	// just changes the css-display property if the node was already placed before
 			document.getElementById(this.nodeID).style.display = "block";
 		}
-		else createSingleNode(this.nodeID, this.container, this.x, this.y, this.name, this.content, this.declaredTargets);
+		else createSingleNode(this.nodeID, this.container, this.x, this.y, this.name, this.content, this.declaredTargets);	// creates a new node otherwise
 		this.visible = true;
 	}
 	
-	/*
-	sets all the child nodes, this node and the edge to this node (if it exists) to invisible
-	root node will always be recovered in the end
-	
-	returns: void
-	*/
+	/**
+	 * hides this node, if it was already displayed before
+	 * also hides all child-nodes of this node, if they don't have another visible parent
+	 */
 	hideNode(){
 		if(this.visible != null){
-			for(var i = 0; i < this.parentIDs.length; i++){
-				var node = document.getElementById(this.nodeID);
+			for(var i = 0; i < this.parentIDs.length; i++){		// first all edges to this node become hidden
 				var edge = document.getElementById(this.parentIDs[i] + '->' + this.nodeID);
-				node.style.display = "none";
 				edge.style.display = "none";
 			}
+			
+			var node = document.getElementById(this.nodeID);	// now this node itself becomes hidden
+			node.style.display = "none";
 			this.visible = false;
-			if(this.visibleParentNodes >= 1) this.visibleParentNodes = 0;
+			this.visibleParentNodes = 0;	// visibleParentNodes is set to 0 because there is no node anymore with an edge to this node
+			
 			for(var i = 0; i < this.children.length; i++){
-				if(this.children[i][0].getVisibleParentNodes() == 1) this.children[i][0].hideNode();
-				else if(this.children[i][0].getVisibleParentNodes() > 1){
+				if(this.children[i][0].getVisibleParentNodes() == 1) this.children[i][0].hideNode();	// if this was the last visible parent-node
+																										// of a child-node, the child-node becomes hidden
+				else if(this.children[i][0].getVisibleParentNodes() > 1){	// otherwise only the edge to the child-node becomes hidden and visibleParentNodes of the child is decremented
 					var edge = document.getElementById(this.nodeID + '#' + this.children[i][1] + '->' + this.children[i][0].getID());
 					edge.style.display = 'none';
 					this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() - 1);
 				}
 			}
-			this.rootNode.showNode();
+			this.rootNode.showNode();	// the root-node shall always be visible
 		}
 	}
 	
@@ -219,10 +225,14 @@ class node{
 	 */
 	getGeneration(){ return this.generation; }
 	
-	// returns the id of this node
+	/**
+	 * @returns {string} - node-id
+	 */
 	getID(){ return this.nodeID; }
 	
-	// return the parentID of this node
+	/**
+	 * @returns {string[]} - array of parent-ids
+	 */
 	getParentIDs(){ return this.parentIDs; }
 	
 	/**
@@ -230,10 +240,16 @@ class node{
 	 */
 	getName(){ return this.name; }
 	
-	// returns the array of children of this node
+	/**
+	 * @returns {node_object[]} - array of node-instances of the child-nodes
+	 */
 	getChildNodes(){ return this.children; }
 	
-	// returns visibility of this node
+	/**
+	 * @returns {boolean or null} - null: node has never been placed or displayed; 
+	 * 								false: this node has valid x- and y-values, but is currently invisible;
+	 *								true: node has valid x- and y-values and is currently displayed
+	 */
 	getVisibility(){ return this.visible; }
 
 	/**
@@ -246,7 +262,9 @@ class node{
 	 */
 	getParameterTypes(){ return this.parameterTypes; }
 
-	// returns the returnType of this node
+	/**
+	 * @returns {string} - name of the returnType
+	 */
 	getReturnType(){ return this.returnType; }
 	
 	/**
@@ -261,7 +279,9 @@ class node{
 	 */
 	setVisibleParentNodes(number){ this.visibleParentNodes = number; }
 	
-	// reloads all call site numbers of this node
+	/**
+	 * reloads all call site numbers of this node
+	 */
 	reloadContent(){
 		if(this.visible){
 			var methodDivs = document.getElementById(this.nodeID).childNodes[1].childNodes;
@@ -272,18 +292,20 @@ class node{
 	}
 }
 
-/*
-plottes a single node with some given attributes
+//---------------------------------------------------------------------------------------
+//------------------------------- view/control section ----------------------------------
+//---------------------------------------------------------------------------------------
 
-nodeID: id of the node
-cont: foreignObject container
-x: left distance
-y: top distance
-name: node title
-content: list of methods
-
-returns: void
-*/
+/**
+ * plottes a single node with some given attributes
+ *
+ * @param {string} nodeID - HTML-id of the node-div
+ * @param {SVG-foreignObject element} cont - foreignObject-container
+ * @param {number} x - left distance
+ * @param {number} y - top distance
+ * @param {string} name - node title
+ * @param {string[]} content - array of call sites
+ */
 function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 	var node = cont.append("xhtml:div")
 			.attr("id", nodeID)
@@ -325,25 +347,25 @@ function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 	
 	//on rightclick in this node calls rightclickmenu and deactivates normal contextmenu
 	$("#" + nodeID).contextmenu(function(e) {
-    if(menuIsOpen){
-        $("#main-rightclick").remove();
-        menuIsOpen = false;
-    }
-    clickedDiv = this;
-    rightclickmenu(e);
-    return false;
-});
+		if(menuIsOpen){
+			$("#main-rightclick").remove();
+			menuIsOpen = false;
+		}
+		clickedDiv = this;
+		rightclickmenu(e);
+		return false;
+	});
 }
 
-/*
-returns the node instance to a given id
-
-id: id of the searched node
-sourceNode: node instance to start the search on
-
-returns: node instance
-*/
-function getNodeById(id, sourceNode){ // circle beheben
+/**
+ * returns the node instance to a given id
+ * 
+ * @param {string} id - id of the searched node
+ * @param {node object} sourceNode - node instance to start the search on
+ *
+ * @returns {node object} - node instance with the given id
+ */
+function getNodeById(id, sourceNode){
 	if(sourceNode.getID() == id){
 		return sourceNode;
 	}
@@ -364,7 +386,7 @@ function getNodeById(id, sourceNode){ // circle beheben
  *
  * @returns {node object} - node instance with the given name
  */
-function getNodeByName(name, sourceNode){ // circle beheben
+function getNodeByName(name, sourceNode){
 	if(sourceNode.getName() == name){
 		return sourceNode;
 	}
