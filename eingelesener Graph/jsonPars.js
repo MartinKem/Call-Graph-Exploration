@@ -90,7 +90,7 @@ function parseString() {
 	autocomplete(document.getElementById("methodInput"), methodList);
 	
 
-	console.log("fertig");
+	console.log(parsedJson);
 	return parsedJson;
 
 }

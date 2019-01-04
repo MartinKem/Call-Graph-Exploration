@@ -3,9 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.3/d3.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="Edges.js"></script>
     <script src="nodes.js"></script>
+	<script src="ForceTree.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
@@ -56,9 +57,30 @@
 			
 		svgCont.append("defs").attr("id", "definitions");
 		
-		var vis = svgCont.append("foreignObject").attr("width", "100%").attr("height", 2000).attr("position","relative");
+		var vis = svgCont.append("foreignObject").attr("width", 2000).attr("height", 2000).attr("position","relative");
 		
-		// let testNode = new node(0, -1, vis, 1200, 200, "ClassNode", ["Foo.<init>","Bar.<init>","Foo.m","String.toString"]);
+		var fill = d3.scale.category20();
+		
+		links = [];
+	
+		nodes = [
+			{index: 0, x: svgCont.attr('width')/2, y: svgCont.attr('height')/2, fixed: true, id: "0"}
+		];
+		
+		[force, nodeSelection, linkSelection] = initForce(svgCont, nodes, links);
+		
+		<!-- let testNode = new node(0, -1, vis, "TestNode", ["Foo.<init>","Bar.<init>","Foo.m","String.toString"]); -->
+		<!-- testNode.showNode(); -->
+		
+		// "rootNode" is referenced in nodes.js as the actual root-node of the whole graph
+		let rootNode = new node(0, -1, vis, "Ltmr/Demo.main", ["Ljava/lang/invoke/MethodHandle.invokeExact", "Ltmr/Demo.<init>", "Ljava/lang/invoke/MethodHandles.lookup", "Ljava/lang/invoke/MethodType.methodType", "Ljava/lang/invoke/MethodHandles$Lookup.findConstructor"]);
+		rootNode.showNode();
+		let child1 = rootNode.addChild(1, 1, "Ltmr/Demo.<init>", ["Ljava/lang/Object.<init>", "Ltmr/Demo.verifyCall"]);
+		let child2 = rootNode.addChild(2, 2, "Ljava/lang/invoke/MethodHandles.lookup", []);
+		let child3 = rootNode.addChild(3, 3, "Ljava/lang/invoke/MethodType.methodType", []);
+		let child4 = rootNode.addChild(4, 4, "Ljava/lang/invoke/MethodHandles$Lookup.findConstructor", []);
+		let childchild1 = child1.addChild(5, 1, "Ltmr/Demo.verifyCall", []);
+		// let rootNode = new node(0, -1, vis, "<init>", ["Ljava/lang/Object.<init>"]);
 		// let childNode = testNode.addChild(1, 800, 500, 0, "ChildNode", ["Foo.<init>", "String.toString"]);
 		// testNode.showChildNodes(0);
 		// childNode.showChildNodes(1);
