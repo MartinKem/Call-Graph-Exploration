@@ -319,7 +319,8 @@ function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 						
 	node.append("xhtml:h3")
 		.text(name)
-		.style("text-align", "center");
+		.style("text-align", "center")
+		.style("overflow", "auto");
 		
 	node = node.append("xhtml:div")
 				.attr("class","node_inhalt");

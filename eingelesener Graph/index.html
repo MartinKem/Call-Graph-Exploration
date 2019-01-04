@@ -53,14 +53,15 @@
 		//var rect_width = 300, rect_height = 200;
 
 		var svgCont = d3.select("#graph")
-			.append("svg");
+			.append("svg")
+			.attr("width", 2000)
+			.attr("height", 2000);
 			
 		svgCont.append("defs").attr("id", "definitions");
 		
 		var vis = svgCont.append("foreignObject").attr("width", 2000).attr("height", 2000).attr("position","relative");
 		
-		var fill = d3.scale.category20();
-		
+		// ----- needed for the invisible force graph -----
 		links = [];
 	
 		nodes = [
@@ -68,9 +69,8 @@
 		];
 		
 		[force, nodeSelection, linkSelection] = initForce(svgCont, nodes, links);
+		// -------------------------------------------------
 		
-		<!-- let testNode = new node(0, -1, vis, "TestNode", ["Foo.<init>","Bar.<init>","Foo.m","String.toString"]); -->
-		<!-- testNode.showNode(); -->
 		
 		// "rootNode" is referenced in nodes.js as the actual root-node of the whole graph
 		let rootNode = new node(0, -1, vis, "Ltmr/Demo.main", ["Ljava/lang/invoke/MethodHandle.invokeExact", "Ltmr/Demo.<init>", "Ljava/lang/invoke/MethodHandles.lookup", "Ljava/lang/invoke/MethodType.methodType", "Ljava/lang/invoke/MethodHandles$Lookup.findConstructor"]);

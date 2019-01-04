@@ -18,8 +18,7 @@ function initForce(svg, nodeArr, linkArr){
 		.data(nodeArr)
 		.enter().append("circle")
 		.attr("r", 10 - .75)
-		.style("fill", function(d) { return fill(d.group); })
-		.style("stroke", function(d) { return d3.rgb(fill(d.group)).darker(); });
+		.style("fill", "rgb(31, 119, 180)");
 	
 	width = d3.select("svg").attr("width");
 	height = d3.select("svg").attr("height");
@@ -132,8 +131,7 @@ function restart() {
 
 	nodeSelection.enter().insert("circle", ".cursor")
 		.attr("r", 10 - .75)
-		.style("fill", function(d) { return fill(d.group); })
-		.style("stroke", function(d) { return d3.rgb(fill(d.group)).darker(); })
+		.style("fill", "rgb(31, 119, 180)")
 		.call(force.drag);
 
 	linkSelection = linkSelection.data(links);
