@@ -4,9 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <script src="http://d3js.org/d3.v3.min.js"></script>
-    <script src="Edges.js"></script>
-    <script src="nodes.js"></script>
-	<script src="ForceTree.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
@@ -20,7 +17,7 @@
 			<fieldset>
 				<h2>Json File</h2>
 			  	<div id="dropZone">You can Drop files here <br />
-				<input type='file' id='fileinput' onchange="setProgBarToZero(); loadFile()">
+				<input type='file' id='fileinput' onchange="setProgBarToZero(); loadFile(); waitForJsonFinishedParsing()">
 			  	</div> <br />
 
 			  	<div id="progress_bar">
@@ -50,8 +47,6 @@
 	</div>
 
 	<script>
-		//var rect_width = 300, rect_height = 200;
-
 		var svgCont = d3.select("#graph")
 			.append("svg")
 			.attr("width", 2000)
@@ -61,29 +56,16 @@
 		
 		var vis = svgCont.append("foreignObject").attr("width", 2000).attr("height", 2000).attr("position","relative");
 		
-		// ----- needed for the invisible force graph -----
-		links = [];
-	
-		nodes = [
-			{index: 0, x: svgCont.attr('width')/2, y: svgCont.attr('height')/2, fixed: true, id: "0"}
-		];
-		
-		[force, nodeSelection, linkSelection] = initForce(svgCont, nodes, links);
-		// -------------------------------------------------
-		
+		var rootNode;	// initialized in jsonPars.js and referenced in node.js
 		
 		// "rootNode" is referenced in nodes.js as the actual root-node of the whole graph
-		let rootNode = new node(0, -1, vis, "Ltmr/Demo.main", ["Ljava/lang/invoke/MethodHandle.invokeExact", "Ltmr/Demo.<init>", "Ljava/lang/invoke/MethodHandles.lookup", "Ljava/lang/invoke/MethodType.methodType", "Ljava/lang/invoke/MethodHandles$Lookup.findConstructor"]);
+		/*let rootNode = new node(0, -1, vis, "Ltmr/Demo.main", ["Ljava/lang/invoke/MethodHandle.invokeExact", "Ltmr/Demo.<init>", "Ljava/lang/invoke/MethodHandles.lookup", "Ljava/lang/invoke/MethodType.methodType", "Ljava/lang/invoke/MethodHandles$Lookup.findConstructor"]);
 		rootNode.showNode();
 		let child1 = rootNode.addChild(1, 1, "Ltmr/Demo.<init>", ["Ljava/lang/Object.<init>", "Ltmr/Demo.verifyCall"]);
 		let child2 = rootNode.addChild(2, 2, "Ljava/lang/invoke/MethodHandles.lookup", []);
 		let child3 = rootNode.addChild(3, 3, "Ljava/lang/invoke/MethodType.methodType", []);
 		let child4 = rootNode.addChild(4, 4, "Ljava/lang/invoke/MethodHandles$Lookup.findConstructor", []);
-		let childchild1 = child1.addChild(5, 1, "Ltmr/Demo.verifyCall", []);
-		// let rootNode = new node(0, -1, vis, "<init>", ["Ljava/lang/Object.<init>"]);
-		// let childNode = testNode.addChild(1, 800, 500, 0, "ChildNode", ["Foo.<init>", "String.toString"]);
-		// testNode.showChildNodes(0);
-		// childNode.showChildNodes(1);
+		let childchild1 = child1.addChild(5, 1, "Ltmr/Demo.verifyCall", []);*/
 
 	</script>
 	<script>
@@ -115,5 +97,8 @@
 	<script src="jsonPars.js"></script>
 	<script src="../jsonQ-master/jsonQ.js"></script>
 	<script src="search.js"></script>
+	<script src="ForceTree.js"></script>
+    <script src="Edges.js"></script>
+    <script src="nodes.js"></script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 var strJson = "";
 var arr = [];
 var parsedJson;
+var nextFreeNodeId = 0;
 
 //Add the events for the drop zone
 var dropZone = document.getElementById('dropZone');
@@ -54,7 +55,6 @@ function loadFile() {
 	let input = document.getElementById('fileinput').files[0];
 	//graphJ = loadJsonFile(input);
 	parseFile(input, setString);
-
 }
 
 function parseString() {
@@ -89,8 +89,6 @@ function parseString() {
     autocomplete(document.getElementById("classInput"), classList);
 	autocomplete(document.getElementById("methodInput"), methodList);
 	
-
-	console.log(parsedJson);
 	return parsedJson;
 
 }
@@ -127,12 +125,13 @@ function parseFile(file, callback) {
 				arr = [];
 			})();
 
-
+			// console.log(parsedJson);
 			return;
 
 		}
 
 		// of to the next chunk
+		
 		chunkReaderBlock(offset, chunkSize, file);
 	}
 
@@ -258,4 +257,57 @@ function autocomplete(inp, arr) {
   document.addEventListener("click", function (e) {
     closeAllLists(e.target);
 });
+}
+
+function waitForJsonFinishedParsing(){		
+	var timeoutCounter = 0;
+	var intvl = setInterval(function() {
+		if (parsedJson == undefined){
+			console.log("Waiting for Json getting parsed");
+			timeoutCounter++;
+			if(timeoutCounter == 100){
+				console.log("Waiting for json parsing timed out! (10s)");
+				clearInterval(intvl);
+			}
+		}
+		else{	// ONLY in this else-block json file has finished parsing
+			clearInterval(intvl);
+			rootNode = createNodeInstance("Ltmr/Demo;", "main");
+			rootNode.showNode();
+		}
+	}, 100);
+}
+
+function getJsonNodeByName(declaringClass, name){	
+	var jsonData;
+	for(var i = 0; i < parsedJson.reachableMethods.length; i++){
+		if(parsedJson.reachableMethods[i].method.declaringClass == declaringClass
+			&& parsedJson.reachableMethods[i].method.name == name){
+			
+			jsonData = parsedJson.reachableMethods[i];
+			break;
+		}
+	}
+	return jsonData;
+}
+
+function createNodeInstance(declaringClass, name, parentNode, source){
+	var jsonData = getJsonNodeByName(declaringClass, name);
+	if(!jsonData) return;
+	var callSites = [];
+	for(var i = 0; i < jsonData.callSites.length; i++){
+		callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
+	}
+	if(!parentNode) return new node(nextFreeNodeId++, -1, vis, declaringClass + '.' + name, callSites);
+	else return parentNode.addChild(nextFreeNodeId++, source, declaringClass + '.' + name, callSites);
+}
+
+function createChildNodes(node){
+	var callSites = node.getContent();
+	for(var i = 0; i < callSites.length; i++){
+		var declaringClass = callSites[i].split(".")[0];
+		var name = callSites[i].split(".")[1];
+		var childNode = createNodeInstance(declaringClass, name, node, i);
+		if(childNode) createChildNodes(childNode);
+	}
 }

@@ -51,7 +51,7 @@ class node{
 								// this.visible == true: node has valid x- and y-values and is currently displayed
 		this.visibleParentNodes = 0;	// visible parent-nodes must be counted, because if one parent-node becomes hidden, this node must still be shown,
 										// if there exists another visible parent-node
-		
+		// console.log(this);
 	}
 	
 	/**
@@ -240,6 +240,11 @@ class node{
 	 * @returns {number} - generation = shortest path to root node
 	 */
 	getName(){ return this.name; }
+		
+	/**
+	 * @returns {string[]} - call sites
+	 */
+	getContent(){ return this.content; }
 	
 	/**
 	 * @returns {node_object[]} - array of node-instances of the child-nodes

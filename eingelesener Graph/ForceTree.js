@@ -1,3 +1,8 @@
+
+var links = [];
+var nodes = [{index: 0, x: svgCont.attr('width')/2, y: svgCont.attr('height')/2, fixed: true, id: "0"}];
+[force, nodeSelection, linkSelection] = initForce(svgCont, nodes, links);
+		
 /*
 initialized the force graph throw declaring a link selection, a node selection and the d3-force-layout
 also starts the force-layouting
