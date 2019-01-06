@@ -125,7 +125,7 @@ function parseFile(file, callback) {
 				arr = [];
 			})();
 
-			// console.log(parsedJson);
+			console.log(parsedJson);
 			return;
 
 		}
@@ -272,13 +272,14 @@ function waitForJsonFinishedParsing(){
 		}
 		else{	// ONLY in this else-block json file has finished parsing
 			clearInterval(intvl);
-			rootNode = createNodeInstance("Ltmr/Demo;", "main");
+			rootNode = createNodeInstance("Lorg/apache/xalan/xslt/Process;", "main"); // createNodeInstance("Ltmr/Demo;", "main");
 			rootNode.showNode();
+			createChildNodes(rootNode);
 		}
 	}, 100);
 }
 
-function getJsonNodeByName(declaringClass, name){	
+function getJsonNodeByName(declaringClass, name){
 	var jsonData;
 	for(var i = 0; i < parsedJson.reachableMethods.length; i++){
 		if(parsedJson.reachableMethods[i].method.declaringClass == declaringClass
@@ -293,7 +294,7 @@ function getJsonNodeByName(declaringClass, name){
 
 function createNodeInstance(declaringClass, name, parentNode, source){
 	var jsonData = getJsonNodeByName(declaringClass, name);
-	if(!jsonData) return;
+	if(!jsonData) return parentNode.addChild(nextFreeNodeId++, source, declaringClass + '.' + name, []);
 	var callSites = [];
 	for(var i = 0; i < jsonData.callSites.length; i++){
 		callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
@@ -303,11 +304,16 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 }
 
 function createChildNodes(node){
-	var callSites = node.getContent();
+	var declaringClass = node.getName().split(".")[0];
+	var name = node.getName().split(".")[1];
+	var jsonData = getJsonNodeByName(declaringClass, name);
+	var callSites = [];
+	if(jsonData) callSites = jsonData.callSites;
 	for(var i = 0; i < callSites.length; i++){
-		var declaringClass = callSites[i].split(".")[0];
-		var name = callSites[i].split(".")[1];
-		var childNode = createNodeInstance(declaringClass, name, node, i);
-		if(childNode) createChildNodes(childNode);
+		for(var j = 0; j < callSites[i].targets.length; j++){
+			var target = callSites[i].targets[j];
+			var childNode = createNodeInstance(target.declaringClass, target.name, node, i);
+			createChildNodes(childNode);
+		}
 	}
 }
