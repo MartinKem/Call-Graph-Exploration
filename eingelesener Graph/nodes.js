@@ -53,7 +53,7 @@ class node{
 										// if there exists another visible parent-node
 		// console.log(this);
 		createdNodes++;
-		if(createdNodes % 10000 == 0) console.log(createdNodes);
+		if(createdNodes % 100 == 0) console.log(createdNodes + " nodes created");
 	}
 	
 	/**

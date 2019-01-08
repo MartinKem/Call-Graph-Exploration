@@ -7,8 +7,8 @@ body{
     font-size: 15px;
     margin: 0;
     font-family: Helvetica;
-	width: 2000px;
-	height: 2000px;
+	/* width: 2000px; */
+	/* height: 2000px; */
 }
 
 .invis{
@@ -16,8 +16,8 @@ body{
 }
 
 #graph{
-	width: 100%;
-	height: 2000px;
+	/* width: 100%; */
+	/* height: 2000px; */
 }
 
 .div_node{
@@ -32,8 +32,8 @@ body{
 
 
 svg{
-    width: 2000px;
-    height: 2000px;
+    /* width: 2000px; */
+    /* height: 2000px; */
 }
 
 

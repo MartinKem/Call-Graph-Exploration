@@ -277,12 +277,14 @@ function waitForJsonFinishedParsing(){
 			//rootNode = createNodeInstance("Ltmr/Demo;", "main");
 			rootNode = createNodeInstance("Lorg/apache/xalan/xslt/Process;", "main");
 			rootNode.showNode();
+			document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;
+			document.getElementsByTagName('html')[0].scrollTop = parseInt(vis.attr('height'))/2 - window.innerHeight/2;
 			console.log("start creating child nodes");
 			createChildNodes(rootNode, 0);
 			console.log("finished creating child nodes");
 			console.log(createdNodes);
 		}
-	}, 100);
+	}, 100);	
 }
 
 function getJsonNodeByName(declaringClass, name){	
@@ -310,7 +312,7 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 }
 
 function createChildNodes(node, depth){
-	if(depth > 8) return;
+	if(depth > 5) return;
 	var declaringClass = node.getName().split(".")[0];
 	var name = node.getName().split(".")[1];
 	var jsonData = getJsonNodeByName(declaringClass, name);

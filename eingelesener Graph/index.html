@@ -50,12 +50,13 @@
 		var createdNodes = 0;
 		var svgCont = d3.select("#graph")
 			.append("svg")
-			.attr("width", 2000)
-			.attr("height", 2000);
+			.attr("width", 20000)
+			.attr("height", 20000);
 			
 		svgCont.append("defs").attr("id", "definitions");
 		
-		var vis = svgCont.append("foreignObject").attr("width", 2000).attr("height", 2000).attr("position","relative");
+		var vis = svgCont.append("foreignObject").attr("width", 20000).attr("height", 20000).attr("position","relative");
+		
 		
 		var rootNode;	// initialized in jsonPars.js and referenced in node.js
 		
