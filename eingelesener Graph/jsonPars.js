@@ -259,7 +259,9 @@ function autocomplete(inp, arr) {
 });
 }
 
-function waitForJsonFinishedParsing(){		
+
+function waitForJsonFinishedParsing(){	
+	console.log("start waitForJsonFinishedParsing()");	
 	var timeoutCounter = 0;
 	var intvl = setInterval(function() {
 		if (parsedJson == undefined){
@@ -272,14 +274,18 @@ function waitForJsonFinishedParsing(){
 		}
 		else{	// ONLY in this else-block json file has finished parsing
 			clearInterval(intvl);
-			rootNode = createNodeInstance("Lorg/apache/xalan/xslt/Process;", "main"); // createNodeInstance("Ltmr/Demo;", "main");
+			//rootNode = createNodeInstance("Ltmr/Demo;", "main");
+			rootNode = createNodeInstance("Lorg/apache/xalan/xslt/Process;", "main");
 			rootNode.showNode();
-			createChildNodes(rootNode);
+			console.log("start creating child nodes");
+			createChildNodes(rootNode, 0);
+			console.log("finished creating child nodes");
+			console.log(createdNodes);
 		}
 	}, 100);
 }
 
-function getJsonNodeByName(declaringClass, name){
+function getJsonNodeByName(declaringClass, name){	
 	var jsonData;
 	for(var i = 0; i < parsedJson.reachableMethods.length; i++){
 		if(parsedJson.reachableMethods[i].method.declaringClass == declaringClass
@@ -303,7 +309,8 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 	else return parentNode.addChild(nextFreeNodeId++, source, declaringClass + '.' + name, callSites);
 }
 
-function createChildNodes(node){
+function createChildNodes(node, depth){
+	if(depth > 8) return;
 	var declaringClass = node.getName().split(".")[0];
 	var name = node.getName().split(".")[1];
 	var jsonData = getJsonNodeByName(declaringClass, name);
@@ -313,7 +320,8 @@ function createChildNodes(node){
 		for(var j = 0; j < callSites[i].targets.length; j++){
 			var target = callSites[i].targets[j];
 			var childNode = createNodeInstance(target.declaringClass, target.name, node, i);
-			createChildNodes(childNode);
+			if(childNode) createChildNodes(childNode, depth+1);
 		}
 	}
+	// console.log("created child-nodes for: ", node.getName());
 }

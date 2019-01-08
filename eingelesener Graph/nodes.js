@@ -23,7 +23,7 @@ class node{
 		// Also generation is set to 0
 		if(parentID == '-1'){
 			var width = 300;
-			var height = 108 + 27 * contentVal.length;	// node-width, node-hight, and content-height are still hard coded
+			var height = Math.min(500, 108 + 27 * contentVal.length);	// node-width, node-hight, and content-height are still hard coded
 			
 			this.x = container.attr("width")/2 - width/2;
 			this.y = container.attr("height")/2 - height/2;
@@ -52,6 +52,8 @@ class node{
 		this.visibleParentNodes = 0;	// visible parent-nodes must be counted, because if one parent-node becomes hidden, this node must still be shown,
 										// if there exists another visible parent-node
 		// console.log(this);
+		createdNodes++;
+		if(createdNodes % 10000 == 0) console.log(createdNodes);
 	}
 	
 	/**
@@ -83,6 +85,10 @@ class node{
 	 * @returns {node object} - child node instance
 	 */
 	addChild(nodeID, source, nameVal, contentVal, declaringClass, parameterTypes, returnType){
+		for(var i = 0; i < this.children.length; i++){	// child-node may only be created, if there doesn't exist a child with the given name yet
+			if(this.children[i][0].getName() == nameVal) return;
+		}
+		
 		var parentID = this.nodeID + "#" + source;
 		var child = getNodeByName(nameVal, this.rootNode);
 		var alreadyExisting = true;
@@ -95,6 +101,7 @@ class node{
 		this.children.push([child, source]);
 		this.declaredTargets[source]++;
 		this.reloadContent();
+		//console.log("new child created: ", nameVal);
 		return this.children[this.children.length-1][0];
 	}
 	
@@ -319,8 +326,10 @@ function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 			.style("left", x + "px")
 			.style("top", y + "px")
 			.style("width", "300px")
+			//.style("max-height", "500px")
 			.style("padding", "20px")
-			.style("border-width", "5px") // sizes must stay in js-file for later calculations
+			.style("border-width", "5px")	// sizes must stay in js-file for later calculations
+			//.style("overflow", "auto")
 						
 	node.append("xhtml:h3")
 		.text(name)
@@ -328,7 +337,9 @@ function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 		.style("overflow", "auto");
 		
 	node = node.append("xhtml:div")
-				.attr("class","node_inhalt");
+				.attr("class","node_inhalt")
+				.style("max-height", "400px")
+				.style("overflow", "auto");
 	
 	for(var i=0; i < content.length; i++){
 		var entry = node.append("xhtml:button")

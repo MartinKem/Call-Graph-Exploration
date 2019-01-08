@@ -161,11 +161,11 @@ input[type=text] {
 }
 
 circle {
-	visibility: visible; /* visible or hidden */
+	visibility: hidden; /* visible or hidden */
 }
 
 line {
 	stroke: #d8a806;
 	stroke-width: 5px;
-	visibility: visible; /* visible or hidden */
+	visibility: hidden; /* visible or hidden */
 }
