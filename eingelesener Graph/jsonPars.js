@@ -260,8 +260,7 @@ function autocomplete(inp, arr) {
 }
 
 
-function waitForJsonFinishedParsing(){	
-	console.log("start waitForJsonFinishedParsing()");	
+function waitForJsonFinishedParsing(){
 	var timeoutCounter = 0;
 	var intvl = setInterval(function() {
 		if (parsedJson == undefined){
@@ -274,7 +273,7 @@ function waitForJsonFinishedParsing(){
 		}
 		else{	// ONLY in this else-block json file has finished parsing
 			clearInterval(intvl);
-			//rootNode = createNodeInstance("Ltmr/Demo;", "main");
+			// rootNode = createNodeInstance("Ltmr/Demo;", "main");
 			rootNode = createNodeInstance("Lorg/apache/xalan/xslt/Process;", "main");
 			rootNode.showNode();
 			document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;

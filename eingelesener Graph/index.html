@@ -47,6 +47,14 @@
 	</div>
 
 	<script>
+		/*function sumChildNodes(node){
+			var count = 0;
+			for(var i = 0; i < node.getChildNodes().length; i++){
+					if(node.getGeneration() < node.getChildNodes()[i][0].getGeneration()) count += sumChildNodes(node.getChildNodes()[i][0]);
+			}
+			return count + node.getChildNodes().length;
+		}*/
+		
 		var createdNodes = 0;
 		var svgCont = d3.select("#graph")
 			.append("svg")

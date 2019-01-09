@@ -30,7 +30,7 @@ class node{
 			
 			this.generation = 0;
 			this.rootNode = this;
-			this.parentIDs = [];	// parentIDs must be set to [], to potentially allow methods call the root node
+			this.parentIDs = [];	// parentIDs must be set to [], to potentially allow methods call the root-node
 		}
 		else{
 			this.parentIDs = [parentID];
@@ -128,10 +128,10 @@ class node{
 				var edge = document.getElementById(parentID + '->' + this.children[i][0].getID());
 				if(!edge){	// if child-node hasen't been placed before, a new edge must be created
 					method2nodeEdge(parentID, this.children[i][0].getID());
-					this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() + 1);	// visibleParents of child-node must be incremented
+					// this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() + 1);	// visibleParents of child-node must be incremented
 				}
 				else if(edge.style.display != 'block'){		// if child-node has already been placed, the affected edge is just turned on visible
-					this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() + 1);	// visibleParents of child-node must be incremented
+					// this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() + 1);	// visibleParents of child-node must be incremented
 					edge.style.display = "block";
 				}
 			}
@@ -180,7 +180,7 @@ class node{
 		if(this.visible != null){
 			for(var i = 0; i < this.parentIDs.length; i++){		// first all edges to this node become hidden
 				var edge = document.getElementById(this.parentIDs[i] + '->' + this.nodeID);
-				edge.style.display = "none";
+				if(edge) edge.style.display = "none";
 			}
 			
 			var node = document.getElementById(this.nodeID);	// now this node itself becomes hidden
@@ -189,6 +189,10 @@ class node{
 			this.visibleParentNodes = 0;	// visibleParentNodes is set to 0 because there is no node anymore with an edge to this node
 			
 			for(var i = 0; i < this.children.length; i++){
+				if(this.children[i][0].getVisibility()) this.children[i][0].hideNode();
+				
+				// this is too complicated to realise, if there exist cycles
+				/*
 				if(this.children[i][0].getVisibleParentNodes() == 1) this.children[i][0].hideNode();	// if this was the last visible parent-node
 																										// of a child-node, the child-node becomes hidden
 				else if(this.children[i][0].getVisibleParentNodes() > 1){	// otherwise only the edge to the child-node becomes hidden and visibleParentNodes of the child is decremented
@@ -196,6 +200,7 @@ class node{
 					edge.style.display = 'none';
 					this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() - 1);
 				}
+				*/
 			}
 			this.rootNode.showNode();	// the root-node shall always be visible
 		}
@@ -283,14 +288,14 @@ class node{
 	/**
 	 * @returns {number} - number of visible parent nodes
 	 */
-	getVisibleParentNodes(){ return this.visibleParentNodes; }
+	// getVisibleParentNodes(){ return this.visibleParentNodes; }
 	
 	/**
 	 * sets visibleParentNodes of this node
 	 *
 	 * @param {number} - new number of visible parent nodes
 	 */
-	setVisibleParentNodes(number){ this.visibleParentNodes = number; }
+	// setVisibleParentNodes(number){ this.visibleParentNodes = number; }
 	
 	/**
 	 * reloads all call site numbers of this node
