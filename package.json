@@ -1,0 +1,12 @@
+{
+  "name": "Call Graph Build",
+  "description": "will be used later for automated testing in the 'script'-section",
+  "author": "Martin",
+  "version": "0.0.1",
+  "devDependencies": {
+    "jshint": "^2.9.7"
+  },
+  "scripts": {
+    "test": ""
+  }
+}
