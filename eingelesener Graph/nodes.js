@@ -91,6 +91,7 @@ class node{
 		
 		var parentID = this.nodeID + "#" + source;
 		var child = getNodeByName(nameVal, this.rootNode);
+		var alreadyExisting = true;
 		if(!child){		// new node-instance is only created, if it didn't exist yet
 			child = new node(nodeID, parentID, this.container, nameVal, contentVal, declaringClass, parameterTypes, returnType);
 		}
@@ -120,7 +121,7 @@ class node{
 			}
 		}
 		// all child-nodes must be displayed right now
-		for(i = 0; i < this.children.length; i++){
+		for(var i = 0; i < this.children.length; i++){
 			if(this.children[i][1] == index){
 				this.children[i][0].showNode();
 				var parentID = this.nodeID + '#' + this.children[i][1];
@@ -303,7 +304,7 @@ class node{
 		if(this.visible){
 			var methodDivs = document.getElementById(this.nodeID).childNodes[1].childNodes;
 			for(var i = 0; i < methodDivs.length; i++){
-				methodDivs[i].childNodes[1].textContent = "(" + this.declaredTargets[i] + ")";
+				var text = methodDivs[i].childNodes[1].textContent = "(" + this.declaredTargets[i] + ")";
 			}
 		}
 	}
@@ -341,9 +342,9 @@ function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 		.style("overflow", "auto");
 		
 	node = node.append("xhtml:div")
-				.attr("class","node_inhalt")
-				.style("max-height", "400px")
-				.style("overflow", "auto");
+				.attr("class","node_inhalt");
+				//.style("max-height", "400px")
+				//.style("overflow", "auto");
 	
 	for(var i=0; i < content.length; i++){
 		var entry = node.append("xhtml:button")

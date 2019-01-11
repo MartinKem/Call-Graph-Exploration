@@ -11,7 +11,7 @@ label: declared target as arrow index
 
 returns: void
 */
-function createEdge(svg, xStart, yStart, xDest, yDest, edgeID, label){
+function createEdge(svg, xStart, yStart, xDest, yDest, edgeID, label, curved){
 	 var marker = svg;
 	 
 	 if(document.getElementById("markerArrow") == null){
@@ -58,8 +58,14 @@ function createEdge(svg, xStart, yStart, xDest, yDest, edgeID, label){
 		d3.select("#" + label + "_background").attr("x", 96-textWidth/2).attr("width", textWidth+6);
 	 }
 	 
+	 var path = "M" + xStart + "," + yStart + "L" + xDest + "," + yDest;
+	 if(curved) path = "M " + xStart + " " + (yStart+15).toString() + 
+					   " C " + (xStart-150).toString() + " " + (yStart+50).toString() + 
+					   ", " + (xStart-150).toString() + " " + (yStart-100).toString() + 
+					   ", " + (xStart-27).toString() + " " + (yStart-50).toString();
+	 
 	 svg.append("svg:path") 
-		 .attr("d", "M" + xStart + "," + yStart + "L" + xDest + "," + yDest)
+		 .attr("d", path)
 		 .attr("id", edgeID)
 		 .attr("class", "edge")
 		 .style("stroke", "black") 
@@ -229,7 +235,8 @@ returns: void
 */
 function method2nodeEdge(id1, id2){
 	var link = {source: absPosition(id1), dest: absPosition(id2)}
-	side2centerEdge(svgCont, link, id1 + "->" + id2);
+	if(id1.split("#")[0] == id2) createEdge(svgCont, link.source.x, link.source.y, -1, -1, id1 + "->" + id2, null, true);
+	else side2centerEdge(svgCont, link, id1 + "->" + id2);
 }
 
 /*
