@@ -342,9 +342,9 @@ function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 		.style("overflow", "auto");
 		
 	node = node.append("xhtml:div")
-				.attr("class","node_inhalt")
-				.style("max-height", "400px")
-				.style("overflow", "auto");
+				.attr("class","node_inhalt");
+				//.style("max-height", "400px")
+				//.style("overflow", "auto");
 	
 	for(var i=0; i < content.length; i++){
 		var entry = node.append("xhtml:button")

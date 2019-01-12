@@ -31,12 +31,6 @@ function handleFileSelect(evt) {
 	document.getElementById('fileinput').files = files; // set new file
 }
 
-
-
-
-
-
-
 var setString = function (str) {
 	strJson += str;
 	if (strJson.length >= 132217728) {//128MB
@@ -82,12 +76,12 @@ function parseString() {
 	parsedJson = { reachableMethods: finalarray };
 
 	//Initialisiere Autovervollständigung
-    var jsonQObject = jsonQ(parsedJson);
-    var methodList = jsonQ.sort(jsonQObject.find("name").unique());
-    var classList = jsonQ.sort(jsonQObject.find("declaringClass").unique());
+    // var jsonQObject = jsonQ(parsedJson);
+    // var methodList = jsonQ.sort(jsonQObject.find("name").unique());
+    // var classList = jsonQ.sort(jsonQObject.find("declaringClass").unique());
 
-    autocomplete(document.getElementById("classInput"), classList);
-	autocomplete(document.getElementById("methodInput"), methodList);
+    // autocomplete(document.getElementById("classInput"), classList);
+	// autocomplete(document.getElementById("methodInput"), methodList);
 	
 	return parsedJson;
 
@@ -311,7 +305,7 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 }
 
 function createChildNodes(node, depth){
-	if(depth > 5) return;
+	if(depth > 2) return;
 	var declaringClass = node.getName().split(".")[0];
 	var name = node.getName().split(".")[1];
 	var jsonData = getJsonNodeByName(declaringClass, name);
