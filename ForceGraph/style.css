@@ -80,9 +80,9 @@ svg{
 }
 
 circle {
-	visibility: visible; /* visible or hidden */
+	visibility: hidden; /* visible or hidden */
 }
 
 line {
-	visibility: visible; /* visible or hidden */
+	visibility: hidden; /* visible or hidden */
 }

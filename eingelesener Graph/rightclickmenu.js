@@ -31,10 +31,23 @@ $(".div_node").contextmenu(function(e) {
 function rightclickmenu(e) {
 
 
-    var x = e.pageX + "px";     // Get the horizontal coordinate
-    var y = e.pageY + "px";     // Get the vertical coordinate
-    var link = "https://raw.githubusercontent.com/MartinKem/Call-Graph-Exploration/developer's/Beispielgraph/rightclickmenu.html?token=AYfhzy2KTg8b5K0bfVB-Aqo4bfPb58BSks5cENZywA%3D%3D";
-    $("body").append($("<div id='main-rightclick'></div>").load(link +" #main-rightclick>"));
+    let x = e.pageX + "px";     // Get the horizontal coordinate
+    let y = e.pageY + "px";     // Get the vertical coordinate
+    //let link = "https://raw.githubusercontent.com/MartinKem/Call-Graph-Exploration/developer's/eingelesener%20Graph/rightclickmenu.html?token=gAYfhzzRW1xhwgU-GLzFnB5r3gtbBHuFpks5cRbzjwA%3D%3D";
+   // let counter = 0;
+    /*try{
+        //$("body").append($("<div id='main-rightclick'></div>").load(link +" #main-rightclick>"));
+
+    }catch (e) {*/
+       // counter = 1;
+       // if(counter > 0)console.log("contextmenu nicht mehr aktuell");
+        $("body").append($("<div id='main-rightclick'>        <div class=\"menuelement\" onclick=\"deleteNodes()\">Ausblenden</div>\n" +
+            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Red<div class=\"color\" style=\"background-color: #ffc6c6 \"></div> </div>\n" +
+            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Green<div class=\"color\" style=\"background-color: #beffbe\"></div></div>\n" +
+            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Blue<div class=\"color\" style=\"background-color: #abd3ff\"></div></div>\n" +
+            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Yellow<div class=\"color\" style=\"background-color: #ffff9f\"></div></div>\n" +
+            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">White<div class=\"color\" style=\"background-color: white\"></div></div></div>"));
+
     $("#main-rightclick").css({
         "position":"absolute",
         "top":y,
