@@ -59,10 +59,7 @@ function createEdge(svg, xStart, yStart, xDest, yDest, edgeID, label, curved){
 	 }
 	 
 	 var path = "M" + xStart + "," + yStart + "L" + xDest + "," + yDest;
-	 if(curved) path = "M " + xStart + " " + (yStart+15).toString() + 
-					   " C " + (xStart-150).toString() + " " + (yStart+50).toString() + 
-					   ", " + (xStart-150).toString() + " " + (yStart-100).toString() + 
-					   ", " + (xStart-27).toString() + " " + (yStart-50).toString();
+	 if(curved) path = getCurvedPath(xStart, yStart, xStart-27, yStart-50);
 	 
 	 svg.append("svg:path") 
 		 .attr("d", path)
@@ -77,6 +74,13 @@ function createEdge(svg, xStart, yStart, xDest, yDest, edgeID, label, curved){
 		 .style("display", "block")
 		 .style("visibility", "visible");
  }
+
+function getCurvedPath(xStart, yStart, xDest, yDest){
+	return "M " + xStart + " " + (yStart+15).toString() + 
+		   " C " + (xStart-150).toString() + " " + (yStart+50).toString() + 
+		   ", " + (xDest-120).toString() + " " + (yDest-50).toString() + 
+		   ", " + (xDest).toString() + " " + (yDest).toString();
+}
  
 /*
  returns the intersection between a center-to-center line of two rectangles
@@ -143,15 +147,16 @@ function borderPoint(node1, node2){
 */
 function sidePoint(node1, node2){
 	var xRes;
-	if(node2.x + node2.width/2 < node1.x){
-		xRes = node1.x;
-	}
-	else if(node2.x + node2.width/2 > node1.x + node1.width){
+	if(node2.x + node2.width/2 > node1.x + node1.width){
 		xRes = node1.x + node1.width;
 	}
-	else{
-		return borderPoint(node1, node2);
-	}
+	else xRes = node1.x;
+	// if(node2.x + node2.width/2 < node1.x){
+		// xRes = node1.x;
+	// }
+	// else{
+		// return borderPoint(node1, node2);
+	// }
 	return {x: xRes, y: node1.y + node1.height/2};
 }
 
@@ -249,18 +254,21 @@ returns: void
 function toggleToAbstract(id){
 	var edge = document.getElementById(id);
 	[sourceID, destID] = id.split("->");
-	[sourceID, __] = sourceID.split("#");
+	var sourceID = sourceID.split("#")[0];
 	var link = {source: absPosition(sourceID), dest: absPosition(destID)};
-	var n1 = borderPoint(link.source, link.dest);
-	var n2 = borderPoint(link.dest, link.source);
-	
-	/*
-	var xMid = (n2.x+n1.x)/2;  // use this to activate edge label
+	if(sourceID == destID) edge.setAttribute("d", getCurvedPath(link.source.x, link.source.y+60, link.source.x, link.source.y+30));
+	else{
+		var n1 = borderPoint(link.source, link.dest);
+		var n2 = borderPoint(link.dest, link.source);
+		if(n1.x && n2.x) edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
+	}
+		
+	/* uncomment this to activate edge labeling
+	var xMid = (n2.x+n1.x)/2;
 	var yMid = (n2.y+n1.y)/2;
 	var mid = "L" + xMid + "," + yMid;
 		
 	edge.setAttribute("d", "M" + n1.x + "," + n1.y + mid + "L" + n2.x + "," + n2.y);*/
-	if(n1.x && n2.x) edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
 }
 
 /*
@@ -275,8 +283,11 @@ function toggleToDetailed(id){
 	[sourceID, destID] = id.split("->");
 	var link = {source: absPosition(sourceID), dest: absPosition(destID)};
 	var n1 = sidePoint(link.source, link.dest);
-	var n2 = borderPoint(link.dest, link.source);
-	if(n1.x && n2.x) edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
+	if(n1.x && sourceID.split('#')[0] == destID) edge.setAttribute("d", getCurvedPath(n1.x, n1.y-15, n1.x-27, n1.y-65));
+	else{
+		var n2 = borderPoint(link.dest, link.source);
+		if(n1.x && n2.x) edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);
+	}
 }
 
 

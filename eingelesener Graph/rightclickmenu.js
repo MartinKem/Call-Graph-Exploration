@@ -67,6 +67,6 @@ function colorChosen(elem) {
 function deleteNodes() {
     var nodeId= $(clickedDiv).attr('id');
     nodeId = parseInt(nodeId);
-	var nodeInstance = getNodeById(nodeId, testNode);
+	var nodeInstance = getNodeById(nodeId, rootNode);
 	nodeInstance.hideNode();
 }
