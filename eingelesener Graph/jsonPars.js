@@ -56,6 +56,7 @@ function parseString() {
 	var rest = "";
 	var finalarray;
 
+	strJson = correctDeclaredClass(strJson);
 	arr.push(strJson);
 	arr.forEach(function (a) {
 		a = rest + a;
@@ -85,6 +86,20 @@ function parseString() {
 	
 	return parsedJson;
 
+}
+
+function correctDeclaredClass(str){
+	var length = str.length;
+	var newLength = 0;
+	
+	while(length != newLength){
+		str = str.replace("\"declaringClass\" : \"L", "\"declaringClass\" : \"");
+		str = str.replace(";\",\n", "\",\n");
+		length = newLength;
+		newLength = str.length;
+	}
+	
+	return str;
 }
 
 
@@ -267,8 +282,8 @@ function waitForJsonFinishedParsing(){
 		}
 		else{	// ONLY in this else-block json file has finished parsing
 			clearInterval(intvl);
-			// rootNode = createNodeInstance("Ltmr/Demo;", "main");
-			rootNode = createNodeInstance("Lorg/apache/xalan/xslt/Process;", "main");
+			rootNode = createNodeInstance("tmr/Demo", "main");
+			// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 			rootNode.showNode();
 			document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;
 			document.getElementsByTagName('html')[0].scrollTop = parseInt(vis.attr('height'))/2 - window.innerHeight/2;
