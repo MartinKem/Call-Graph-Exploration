@@ -36,6 +36,18 @@ svg{
     /* height: 2000px; */
 }
 
+#search {
+    float: left;
+    height: 45px;
+    border-radius: 15px;
+    background-color: #fff4e1;
+    border-color: #c28e6e;
+    color: #6d6c6a;
+    font-size: larger;
+    border-style: groove;
+    border-width: 3px;
+    box-sizing: border-box;
+}
 
 /*Style for rightclickmenu*/
 
@@ -125,8 +137,12 @@ svg{
 }
 
 input[type=text] {
-  border: 1px solid transparent;
-  background-color: #c0c0c0;
+  border-width: 3px;
+  border-style: ridge;
+  border-color: #f1c5ab;
+  border-radius: 3px;
+  box-sizing: border-box;
+  background-color: #fffefc;
   padding: 10px;
   font-size: 16px;
 }

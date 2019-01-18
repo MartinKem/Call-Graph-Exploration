@@ -26,25 +26,20 @@
 			</fieldset>
 		  </form>
 	</div>
-	<div id="search_page" class="invis">
-		<!--Seiteninhalt-->
-		<p id="demo"></p>
-		<form autocomplete="off"></form>
-			<div class="autocomplete" style="width:500px;">
-			<input type="text" name="searchMethod" id="methodInput" placeholder="Methode">
-			</div><br/><br/>
-			<div class="autocomplete" style="width:500px;">
-			<input type="text" name="searchClass" id="classInput" placeholder="Klasse">
-			</div>
-		</form><br/>
-		<button id="search" onclick="callSearch()">Get Element</button><br/><br/>
-
-	</div>
 
 	<div id="graph_page" class="invis">
 		<div id='graph' style="position: relative; font-family: Helvetica"></div>
-		<div id="top_fixed" style="position: fixed; top: 20px; left: 10px">
-			<button id="btn" onclick="open_close()">Hide Details</button>
+		<div id="top_fixed" style="position: fixed; top: 10px; left: 10px">
+			<form autocomplete="off", style="overflow: auto;">
+				<div class="autocomplete" style="float: left; margin-right: 10px">
+				<input type="text" name="searchClass" id="classInput" placeholder="Class-Path">
+				</div>
+				<div class="autocomplete" style="float: left; margin-right: 10px">
+				<input type="text" name="searchMethod" id="methodInput" placeholder="Method">
+				</div>
+				<button id="search" onclick="callSearch()">Find</button>
+			</form>
+			<button id="btn" onclick="open_close()" style="margin-top: 10px">Hide Details</button>
 		</div>
 	</div>
 
