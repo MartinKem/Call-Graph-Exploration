@@ -2,6 +2,7 @@ var strJson = "";
 var arr = [];
 var parsedJson;
 var nextFreeNodeId = 0;
+var mapUsed = 0;
 
 //Add the events for the drop zone
 var dropZone = document.getElementById('dropZone');
@@ -52,12 +53,12 @@ function loadFile() {
 }
 
 function parseString() {
-
 	var rest = "";
 	var finalarray;
 
-	strJson = correctDeclaredClass(strJson);
-	arr.push(strJson);
+	var correctJsonStr = correctDeclaredClass(strJson);
+	arr.push(correctJsonStr);
+	strJson = correctJsonStr;
 	arr.forEach(function (a) {
 		a = rest + a;
 		var first = a.indexOf("\n    \"method\" : {") - 1;
@@ -70,7 +71,7 @@ function parseString() {
 
 
 	});
-
+	
 	//console.log(finalarray)
 	// console.log(JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}"));
 	Array.prototype.push.apply(finalarray, JSON.parse("{\n  \"reachableMethods\" : [ " + rest.slice(rest.indexOf("\n    \"method\" : {") - 1, -3) + " ]\n}").reachableMethods);
@@ -89,16 +90,8 @@ function parseString() {
 }
 
 function correctDeclaredClass(str){
-	var length = str.length;
-	var newLength = 0;
-	
-	while(length != newLength){
-		str = str.replace("\"declaringClass\" : \"L", "\"declaringClass\" : \"");
-		str = str.replace(";\",\n", "\",\n");
-		length = newLength;
-		newLength = str.length;
-	}
-	
+	str = str.replace(/\"declaringClass\" : \"L/g, "\"declaringClass\" : \"");
+	str = str.replace(/;\",\n/g, "\",\n");
 	return str;
 }
 
@@ -169,7 +162,7 @@ function parseFile(file, callback) {
 }
 function changeDiv() {
 	$("#load_page").addClass("invis");
-	$("#search_page").removeClass("invis");
+	//$("#search_page").removeClass("invis");
 	$("#graph_page").removeClass("invis");
 
 }
@@ -281,9 +274,10 @@ function waitForJsonFinishedParsing(){
 			}
 		}
 		else{	// ONLY in this else-block json file has finished parsing
+			console.log("finished parsing");
 			clearInterval(intvl);
-			rootNode = createNodeInstance("tmr/Demo", "main");
-			// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
+			// rootNode = createNodeInstance("tmr/Demo", "main");
+			rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 			rootNode.showNode();
 			document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;
 			document.getElementsByTagName('html')[0].scrollTop = parseInt(vis.attr('height'))/2 - window.innerHeight/2;
@@ -291,6 +285,7 @@ function waitForJsonFinishedParsing(){
 			createChildNodes(rootNode, 0);
 			console.log("finished creating child nodes");
 			console.log(createdNodes);
+			console.log("hashmap was used", mapUsed, "times");
 		}
 	}, 100);	
 }
@@ -309,18 +304,29 @@ function getJsonNodeByName(declaringClass, name){
 }
 
 function createNodeInstance(declaringClass, name, parentNode, source){
-	var jsonData = getJsonNodeByName(declaringClass, name);
-	if(!jsonData) return parentNode.addChild(nextFreeNodeId++, source, declaringClass + '.' + name, []);
-	var callSites = [];
-	for(var i = 0; i < jsonData.callSites.length; i++){
-		callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
+	var existingNode = nodeMap.get(declaringClass+'.'+name);
+	var newNode;
+	if(existingNode){
+		newNode = parentNode.addChild(nextFreeNodeId, source, declaringClass + '.' + name, []);
+		mapUsed++;
+		return newNode;
 	}
-	if(!parentNode) return new node(nextFreeNodeId++, -1, vis, declaringClass + '.' + name, callSites);
-	else return parentNode.addChild(nextFreeNodeId++, source, declaringClass + '.' + name, callSites);
+	var jsonData = getJsonNodeByName(declaringClass, name);
+	if(!jsonData) newNode = parentNode.addChild(nextFreeNodeId++, source, declaringClass + '.' + name, []);
+	else{
+		var callSites = [];
+		for(var i = 0; i < jsonData.callSites.length; i++){
+			callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
+		}
+		if(!parentNode) newNode = new node(nextFreeNodeId++, -1, vis, declaringClass + '.' + name, callSites);
+		else newNode = parentNode.addChild(nextFreeNodeId++, source, declaringClass + '.' + name, callSites);
+	}
+	if(newNode) nodeMap.set(declaringClass + '.' + name, newNode);
+	return newNode;
 }
 
 function createChildNodes(node, depth){
-	if(depth > 2) return;
+	//if(depth > 10) return;
 	var declaringClass = node.getName().split(".")[0];
 	var name = node.getName().split(".")[1];
 	var jsonData = getJsonNodeByName(declaringClass, name);

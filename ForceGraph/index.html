@@ -58,9 +58,11 @@
 	let testNode1 = childchildNode.addChild(4, 2, "Bar.create", []);
 	let testNode2 = childchildNode.addChild(5, 2, "FooBar.create", []);
 	testNode.showNode();
-	/*testNode.showChildNodes(0);
-	childNode.showChildNodes(1);
-	childchildNode.showChildNodes(2);*/
+	
+	var nodeMap = new Map();
+	nodeMap.set("0", testNode);
+	
+	console.log(nodeMap.get("0").getName());
 
 </script>
 <script>

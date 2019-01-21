@@ -90,7 +90,8 @@ class node{
 		}
 		
 		var parentID = this.nodeID + "#" + source;
-		var child = getNodeByName(nameVal, this.rootNode);
+		// var child = getNodeByName(nameVal, this.rootNode);
+		var child = nodeMap.get(nameVal);
 		var alreadyExisting = true;
 		if(!child){		// new node-instance is only created, if it didn't exist yet
 			child = new node(nodeID, parentID, this.container, nameVal, contentVal, declaringClass, parameterTypes, returnType);

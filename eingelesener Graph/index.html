@@ -62,9 +62,9 @@
 		
 		var vis = svgCont.append("foreignObject").attr("width", 20000).attr("height", 20000).attr("position","relative");
 		
-		
 		var rootNode;	// initialized in jsonPars.js and referenced in node.js
 		
+		var nodeMap = new Map();
 		// "rootNode" is referenced in nodes.js as the actual root-node of the whole graph
 		/*let rootNode = new node(0, -1, vis, "Ltmr/Demo.main", ["Ljava/lang/invoke/MethodHandle.invokeExact", "Ltmr/Demo.<init>", "Ljava/lang/invoke/MethodHandles.lookup", "Ljava/lang/invoke/MethodType.methodType", "Ljava/lang/invoke/MethodHandles$Lookup.findConstructor"]);
 		rootNode.showNode();
