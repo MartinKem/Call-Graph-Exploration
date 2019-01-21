@@ -326,7 +326,6 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 }
 
 function createChildNodes(node, depth){
-	//if(depth > 10) return;
 	var declaringClass = node.getName().split(".")[0];
 	var name = node.getName().split(".")[1];
 	var jsonData = getJsonNodeByName(declaringClass, name);

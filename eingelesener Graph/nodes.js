@@ -90,7 +90,6 @@ class node{
 		}
 		
 		var parentID = this.nodeID + "#" + source;
-		// var child = getNodeByName(nameVal, this.rootNode);
 		var child = nodeMap.get(nameVal);
 		var alreadyExisting = true;
 		if(!child){		// new node-instance is only created, if it didn't exist yet
@@ -303,7 +302,7 @@ class node{
 	 */
 	reloadContent(){
 		if(this.visible){
-			var methodDivs = document.getElementById(this.nodeID).childNodes[1].childNodes;
+			var methodDivs = document.getElementById(this.nodeID).childNodes[2].childNodes;
 			for(var i = 0; i < methodDivs.length; i++){
 				var text = methodDivs[i].childNodes[1].textContent = "(" + this.declaredTargets[i] + ")";
 			}
@@ -336,11 +335,18 @@ function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 			.style("padding", "20px")
 			.style("border-width", "5px")	// sizes must stay in js-file for later calculations
 			//.style("overflow", "auto")
-						
+	
+	var packageStr = name.substring(0, name.lastIndexOf('/'));
+	var classStr = name.substring(name.lastIndexOf('/')+1, name.indexOf('.'));
+	var methodStr = name.substring(name.indexOf('.')+1, name.length);
 	node.append("xhtml:h3")
-		.text(name)
+		.text(packageStr)
 		.style("text-align", "center")
-		.style("overflow", "auto");
+		.style("overflow", "hidden");
+	node.append("xhtml:h3")
+		.text(classStr + "." + methodStr)
+		.style("text-align", "center")
+		.style("overflow", "hidden");
 		
 	node = node.append("xhtml:div")
 				.attr("class","node_inhalt");
@@ -410,7 +416,7 @@ function getNodeById(id, sourceNode){
  *
  * @returns {node object} - node instance with the given name
  */
-function getNodeByName(name, sourceNode){
+function getNodeByName(name, sourceNode){ // currently unused - hashMap 'nodeMap' way more efficient
 	if(sourceNode.getName() == name){
 		return sourceNode;
 	}
