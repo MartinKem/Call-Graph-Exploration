@@ -89,14 +89,31 @@ svg{
 	overflow: hidden;
 	border: solid;
 	box-sizing: border-box;
+	width: 100%;
+	left: auto;
+	white-space: nowrap;
+}
+
+.methodButton:hover div{
+	max-width: 100%;
 }
 
 .methodButton:hover{
     cursor: pointer;
+	background-color: rgba(255,255,255,1);
+	margin: auto;
+    width: max-content;
+    min-width: 100%;
 }
 
 .methodButton:active{
     background-color: #f0f0f0;
+}
+
+.contentElem{
+	max-width: 180px;
+	overflow: hidden;
+	white-space: nowrap;
 }
 
 #dropZone{
@@ -178,11 +195,11 @@ input[type=text] {
 }
 
 circle {
-	visibility: hidden; /* visible or hidden */
+	visibility: visible; /* visible or hidden */
 }
 
 line {
 	stroke: #d8a806;
 	stroke-width: 5px;
-	visibility: hidden; /* visible or hidden */
+	visibility: visible; /* visible or hidden */
 }

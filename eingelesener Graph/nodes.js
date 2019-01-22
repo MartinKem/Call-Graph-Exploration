@@ -361,12 +361,13 @@ function createSingleNode(nodeID, cont, x, y, name, content, declaredTargets){
 				index = this.getAttribute("id").split('#')[1];
 				var node = getNodeById(nodeID, rootNode);
 				node.showChildNodes(index); })
-			.style("width", "100%")
+			//.style("width", "100%")
 			.style("border-width", "2px")
 			.style("border-top-width", (i == 0 ? "2px" : "0px"))
 			.style("border-radius", "5px")
 			.style("padding", "5px")
 		entry.append("xhtaml:div")
+			.attr("class", "contentElem")
 			.text(i + ": " + content[i])
 			.style("float", "left");
 		entry.append("xhtaml:div")

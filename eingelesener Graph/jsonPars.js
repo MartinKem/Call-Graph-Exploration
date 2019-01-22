@@ -268,8 +268,8 @@ function waitForJsonFinishedParsing(){
 		if (parsedJson == undefined){
 			console.log("Waiting for Json getting parsed");
 			timeoutCounter++;
-			if(timeoutCounter == 100){
-				console.log("Waiting for json parsing timed out! (10s)");
+			if(timeoutCounter == 1000){
+				console.log("Waiting for json parsing timed out! (100s)");
 				clearInterval(intvl);
 			}
 		}
@@ -278,6 +278,7 @@ function waitForJsonFinishedParsing(){
 			clearInterval(intvl);
 			// rootNode = createNodeInstance("tmr/Demo", "main");
 			rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
+			// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
 			rootNode.showNode();
 			document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;
 			document.getElementsByTagName('html')[0].scrollTop = parseInt(vis.attr('height'))/2 - window.innerHeight/2;
@@ -326,6 +327,7 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 }
 
 function createChildNodes(node, depth){
+	// if(depth > 2) return;
 	var declaringClass = node.getName().split(".")[0];
 	var name = node.getName().split(".")[1];
 	var jsonData = getJsonNodeByName(declaringClass, name);
