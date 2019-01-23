@@ -45,10 +45,8 @@ function rightclickmenu(e) {
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Red<div class=\"color\" style=\"background-color: #ffc6c6 \"></div> </div>\n" +
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Green<div class=\"color\" style=\"background-color: #beffbe\"></div></div>\n" +
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Blue<div class=\"color\" style=\"background-color: #abd3ff\"></div></div>\n" +
-            "        <div class=\"menuelement\" onclick=\"switchContent()\">Details</div>\n" +
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Yellow<div class=\"color\" style=\"background-color: #ffff9f\"></div></div>\n" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">White<div class=\"color\" style=\"background-color: white\"></div></div></div>\n"));
-            // "        <div class=\"menuelement\" onclick=\"switchContent()\">Details</div>"));
+            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">White<div class=\"color\" style=\"background-color: white\"></div></div></div>"));
 
     $("#main-rightclick").css({
         "position":"absolute",
@@ -68,18 +66,7 @@ function colorChosen(elem) {
 
 function deleteNodes() {
     var nodeId= $(clickedDiv).attr('id');
-	var nodeInstance = nodeMap.get(nodeId);
+    nodeId = parseInt(nodeId);
+	var nodeInstance = getNodeById(nodeId, rootNode);
 	nodeInstance.hideNode();
 }
-function switchContent() {
-    let nodeName= $(clickedDiv).attr('id');
-    let node = nodeMap.get(nodeName);
-    $(clickedDiv).children(".node_inhalt").toggleClass("invis");
-    for(var i = 0; i < node.parents.length; i++){		// first all edges to this node become hidden
-        var edge = document.getElementById(node.parents[i].getName() + "#"+ node.parents[i].getMethodIndex(nodeName) + '->' + nodeName);
-        if(edge) edge.style.display = "none";
-        //method2nodeEdge(node.parents[i].getName() + "#"+ node.parents[i].getMethodIndex(nodeName),nodeName);
-    }
-
-}
-
