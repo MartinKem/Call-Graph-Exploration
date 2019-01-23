@@ -28,8 +28,8 @@
 	</div>
 
 	<div id="graph_page" class="invis">
-		<div id='graph' style="position: relative; font-family: Helvetica"></div>
-		<div id="top_fixed" style="position: fixed; top: 10px; left: 10px">
+		<div id='graph'></div>
+		<div id="top_fixed">
 			<form autocomplete="off", style="overflow: auto;">
 				<div class="autocomplete" style="float: left; margin-right: 10px">
 				<input type="text" name="searchClass" id="classInput" placeholder="Class-Path">
@@ -40,6 +40,9 @@
 				<button id="search" onclick="callSearch()">Find</button>
 			</form>
 			<button id="btn" onclick="open_close()" style="margin-top: 10px">Hide Details</button>
+		</div>
+		<div id='foot_fixed'>
+			<p id="statistics">Nodes: ... <br> Edges: ....</p>
 		</div>
 	</div>
 

@@ -16,8 +16,8 @@ body{
 }
 
 #graph{
-	/* width: 100%; */
-	/* height: 2000px; */
+    position: relative;
+    font-family: Helvetica;
 }
 
 .div_node{
@@ -202,4 +202,16 @@ line {
 	stroke: #d8a806;
 	stroke-width: 5px;
 	visibility: visible; /* visible or hidden */
+}
+
+#top_fixed {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+}
+
+#foot_fixed {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
 }
