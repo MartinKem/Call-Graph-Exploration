@@ -168,7 +168,6 @@ class node{
         //let reg = /(?<=[.])\w+/s;
         name = name.slice(name.indexOf(".")+1)
         for(let i = 0;i<this.content.length;i++){
-            console.log(this.content[i].slice(this.content[i].indexOf(".")+1),name)
             if(this.content[i].slice(this.content[i].indexOf(".")+1)===name)return i;
         }
         return -1;
