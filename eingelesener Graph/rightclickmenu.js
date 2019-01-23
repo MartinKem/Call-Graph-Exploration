@@ -45,8 +45,10 @@ function rightclickmenu(e) {
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Red<div class=\"color\" style=\"background-color: #ffc6c6 \"></div> </div>\n" +
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Green<div class=\"color\" style=\"background-color: #beffbe\"></div></div>\n" +
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Blue<div class=\"color\" style=\"background-color: #abd3ff\"></div></div>\n" +
+            "        <div class=\"menuelement\" onclick=\"switchContent()\">Details</div>\n" +
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Yellow<div class=\"color\" style=\"background-color: #ffff9f\"></div></div>\n" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">White<div class=\"color\" style=\"background-color: white\"></div></div></div>"));
+            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">White<div class=\"color\" style=\"background-color: white\"></div></div></div>\n"));
+            // "        <div class=\"menuelement\" onclick=\"switchContent()\">Details</div>"));
 
     $("#main-rightclick").css({
         "position":"absolute",
@@ -69,4 +71,10 @@ function deleteNodes() {
     nodeId = parseInt(nodeId);
 	var nodeInstance = getNodeById(nodeId, rootNode);
 	nodeInstance.hideNode();
+}
+function switchContent() {
+    var nodeId= $(clickedDiv).attr('id');
+    $(clickedDiv).children(".node_inhalt").toggleClass("invis");
+    // nodeId = parseInt(nodeId);
+    // toggleToAbstract(nodeId);
 }
