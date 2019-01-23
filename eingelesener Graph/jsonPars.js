@@ -76,7 +76,7 @@ function parseString() {
 	//console.log(finalarray)
 	// console.log(JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}"));
 	Array.prototype.push.apply(finalarray, JSON.parse("{\n  \"reachableMethods\" : [ " + rest.slice(rest.indexOf("\n    \"method\" : {") - 1, -3) + " ]\n}").reachableMethods);
-	parsedJson = { reachableMethods: finalarray };
+	let parsedJson = { reachableMethods: finalarray };
 
 	//Initialisiere Autovervollständigung
     // var jsonQObject = jsonQ(parsedJson);
@@ -115,7 +115,9 @@ function parseFile(file, callback) {
 		}
 		if (offset >= fileSize) {
 			console.log("Done reading file");
-			var parsedJson = parseString();
+			let parsedJson = parseString();
+
+			console.log(parsedJson);
 
 			//map rechableMethods to HashMap
 			parsedJsonMap = new Map();
@@ -124,7 +126,7 @@ function parseFile(file, callback) {
 			});
 
 			//progress to 100%
-			var progress = document.getElementById("progress");
+			let progress = document.getElementById("progress");
 			progress.style.width = '100%';
 			progress.textContent = '100%';
 			
@@ -132,10 +134,9 @@ function parseFile(file, callback) {
 			(function reset() {
 				strJson = "";
 				arr = [];
+				parsedJson = undefined;
 			})();
 
-
-			console.log(parsedJson);
 
 			// rootNode = createNodeInstance("tmr/Demo", "main");
 			rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
