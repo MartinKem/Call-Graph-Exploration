@@ -51,7 +51,7 @@ class node{
         // if there exists another visible parent-node
         // console.log(this);
         createdNodes++;
-        if(createdNodes % 100 == 0) console.log(createdNodes + " nodes created");
+        if(createdNodes % 1000 == 0) console.log(createdNodes + " nodes created");
     }
 
     /**
@@ -90,7 +90,7 @@ class node{
         var child = nodeMap.get(nameVal);
         var alreadyExisting = true;
         if(!child){		// new node-instance is only created, if it didn't exist yet
-            child = new node(this, this.container, nameVal, contentVal, declaringClass, parameterTypes, returnType);
+            child = new node(this, nameVal, contentVal, declaringClass, parameterTypes, returnType);
         }
         else child.addParent(this);		// if the child-node already existed, it just adds this as new parent
         child.setRootNode(this.rootNode);
@@ -168,7 +168,6 @@ class node{
         //let reg = /(?<=[.])\w+/s;
         name = name.slice(name.indexOf(".")+1)
         for(let i = 0;i<this.content.length;i++){
-            console.log(this.content[i].slice(this.content[i].indexOf(".")+1),name)
             if(this.content[i].slice(this.content[i].indexOf(".")+1)===name)return i;
         }
         return -1;

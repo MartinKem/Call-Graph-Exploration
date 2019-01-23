@@ -120,7 +120,7 @@ function parseFile(file, callback) {
 			//map rechableMethods to HashMap
 			parsedJsonMap = new Map();
 			parsedJson.reachableMethods.forEach(function(element){
-				parsedJsonMap.set(element.method.declaringClass+"."+element.method.name,element);
+				parsedJsonMap.set(element.method.declaringClass+"."+element.method.name, element);
 			});
 
 			//progress to 100%
@@ -344,7 +344,9 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 			callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
 		}
 		if(!parentNode) newNode = new node(null, declaringClass + '.' + name, callSites);
-		else newNode = parentNode.addChild(source, declaringClass + '.' + name, callSites);
+		else{
+			newNode = parentNode.addChild(source, declaringClass + '.' + name, callSites);
+		}
 	}
 	if(newNode) nodeMap.set(declaringClass + '.' + name, newNode);
 	return newNode;
