@@ -162,18 +162,20 @@ input[type=text] {
   background-color: #fffefc;
   padding: 10px;
   font-size: 16px;
+  width: 300px;
+  transition: 0.5s;
 }
 
 .autocomplete-items {
-  position: absolute;
+  position: relative;
   border: 1px solid #d4d4d4;
-  border-bottom: none;
-  border-top: none;
+  /* border-bottom: none; */
+  /* border-top: none; */
   z-index: 99;
   /*position the autocomplete items to be the same width as the container:*/
-  top: 100%;
-  left: 0;
-  right: 0;
+  /* top: 100%; */
+  /* left: 0; */
+  /* right: 0; */
 }
 
 .autocomplete-items div {

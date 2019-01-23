@@ -1,7 +1,7 @@
 var strJson = "";
 var arr = [];
 var parsedJsonMap;
-var mapUsed = 0;
+var mapUsed = 0; // only used for logging
 
 //Add the events for the drop zone
 var dropZone = document.getElementById('dropZone');
@@ -76,13 +76,10 @@ function parseString() {
 	Array.prototype.push.apply(finalarray, JSON.parse("{\n  \"reachableMethods\" : [ " + rest.slice(rest.indexOf("\n    \"method\" : {") - 1, -3) + " ]\n}").reachableMethods);
 	let parsedJson = { reachableMethods: finalarray };
 
-	//Initialisiere Autovervollständigung
+	// Initialisiere Autovervollständigung
     // var jsonQObject = jsonQ(parsedJson);
     // var methodList = jsonQ.sort(jsonQObject.find("name").unique());
     // var classList = jsonQ.sort(jsonQObject.find("declaringClass").unique());
-
-    // autocomplete(document.getElementById("classInput"), classList);
-	// autocomplete(document.getElementById("methodInput"), methodList);
 	
 	return parsedJson;
 
@@ -134,21 +131,12 @@ function parseFile(file, callback) {
 				arr = [];
 				parsedJson = undefined;
 			})();
-
-
-			// rootNode = createNodeInstance("tmr/Demo", "main");
-			rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
-			// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
-			rootNode.showNode();
-			document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;
-			document.getElementsByTagName('html')[0].scrollTop = parseInt(vis.attr('height'))/2 - window.innerHeight/2;
-			console.log("start creating child nodes");
-			createChildNodes(rootNode, 0);
-			console.log("finished creating child nodes");
-			console.log(createdNodes);
-			console.log("hashmap was used", mapUsed, "times");
-
 			
+			console.log(document.getElementById("search"));
+			document.getElementById("search").removeAttribute("disabled");
+			
+			autocomplete(document.getElementById("classInput"), Array.from(parsedJsonMap.keys()));
+			autocomplete(document.getElementById("methodInput"), Array.from(parsedJsonMap.keys()));
 			return;
 
 		}
@@ -190,6 +178,16 @@ function changeDiv() {
 
 //Eingabe bei gegebenem Texteingabefeld mit gegebenem Stringarray autovervollständigen 
 function autocomplete(inp, arr) {
+	var searchField = inp.getAttribute('id');
+	// arr.map(function(elem){ 
+		// return elem.split('.')[searchField == 'classInput' ? 0 : 1];
+		// console.log(elem);
+		// });
+	for(var i = 0; i < arr.length; i++){
+		arr[i] = arr[i].split('.')[searchField == 'classInput' ? 0 : 1];
+	}
+	arr = Array.from(new Set(arr));
+	// console.log(arr);
     //2 Parameter, Textfeld und Array mit Vervollständigungsdaten
     var currentFocus = 0;
     //Texteingabe erkennen
@@ -206,6 +204,9 @@ function autocomplete(inp, arr) {
         div.setAttribute("class", "autocomplete-items");
         //Füge das DIV Element dem Container als Kindelement hinzu
         this.parentNode.appendChild(div);
+		
+		
+		// -- this loop uses linear search
         for (i = 0; i < arr.length; i++) {
           //Prüfe, ob die eingegebenen Zeichen mit dem Anfang des Vorschlags übereinstimmen
           if (arr[i].substr(0, value.length).toUpperCase() == value.toUpperCase()) {
@@ -228,6 +229,9 @@ function autocomplete(inp, arr) {
             if (div.childElementCount >= 10) {break;}
           }
         }
+		// ---------------------------------
+		
+		
     });
     //Führe eine Funktion aus, wenn die Tastatur betätigt wird
     inp.addEventListener("keydown", function(e) {
@@ -337,7 +341,13 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 		return newNode;
 	}
 	var jsonData = getJsonNodeByName(declaringClass, name);
-	if(!jsonData) newNode = parentNode.addChild(source, declaringClass + '.' + name, []);
+	if(!jsonData){
+		if(!parentNode){
+			alert(declaringClass + '.' + name + " does not exist in the JSON-file!");
+			return;
+		}
+		newNode = parentNode.addChild(source, declaringClass + '.' + name, []);
+	}
 	else{
 		var callSites = [];
 		for(var i = 0; i < jsonData.callSites.length; i++){
@@ -367,4 +377,22 @@ function createChildNodes(node, depth){
 		}
 	}
 	// console.log("created child-nodes for: ", node.getName());
+}
+
+function createGraph(){
+	rootNode = createNodeInstance(rootNodeString[0], rootNodeString[1]);
+	// rootNode = createNodeInstance("tmr/Demo", "main");
+	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
+	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
+	document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;
+	document.getElementsByTagName('html')[0].scrollTop = parseInt(vis.attr('height'))/2 - window.innerHeight/2;
+	if(rootNode){
+		rootNode.showNode();
+		console.log("start creating child nodes");
+		createChildNodes(rootNode, 0);
+		document.getElementById("search").setAttribute("disabled", "");
+		console.log("finished creating child nodes");
+		console.log(createdNodes);
+		console.log("hashmap was used", mapUsed, "times");
+	}
 }
