@@ -112,8 +112,6 @@ function parseFile(file, callback) {
 			console.log("Done reading file");
 			let parsedJson = parseString();
 
-			console.log(parsedJson);
-
 			//map rechableMethods to HashMap
 			parsedJsonMap = new Map();
 			parsedJson.reachableMethods.forEach(function(element){
@@ -132,7 +130,6 @@ function parseFile(file, callback) {
 				parsedJson = undefined;
 			})();
 			
-			console.log(document.getElementById("search"));
 			document.getElementById("search").removeAttribute("disabled");
 			
 			autocomplete(document.getElementById("classInput"), Array.from(parsedJsonMap.keys()));
@@ -179,15 +176,10 @@ function changeDiv() {
 //Eingabe bei gegebenem Texteingabefeld mit gegebenem Stringarray autovervollständigen 
 function autocomplete(inp, arr) {
 	var searchField = inp.getAttribute('id');
-	// arr.map(function(elem){ 
-		// return elem.split('.')[searchField == 'classInput' ? 0 : 1];
-		// console.log(elem);
-		// });
 	for(var i = 0; i < arr.length; i++){
 		arr[i] = arr[i].split('.')[searchField == 'classInput' ? 0 : 1];
 	}
 	arr = Array.from(new Set(arr));
-	// console.log(arr);
     //2 Parameter, Textfeld und Array mit Vervollständigungsdaten
     var currentFocus = 0;
     //Texteingabe erkennen
@@ -376,7 +368,6 @@ function createChildNodes(node, depth){
 			if(childNode) createChildNodes(childNode, depth+1);
 		}
 	}
-	// console.log("created child-nodes for: ", node.getName());
 }
 
 function createGraph(){
