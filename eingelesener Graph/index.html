@@ -78,8 +78,9 @@
 	<script>
 		var i = 0;
 		function open_close() {
+
 			if (i===0){
-				d3.selectAll(".node_inhalt").style("display","none");
+				d3.selectAll(".node_inhalt").classed("invis",true);
 				d3.selectAll(".edge").each(function(){
 					var id = d3.select(this).attr("id");
 					toggleToAbstract(id);
@@ -88,9 +89,8 @@
 				document.getElementById("btn").innerText = "Show details";
 				i++;
 			}else {
-
-				// d3.selectAll(".node_inhalt").style("visibility","visible");
-				d3.selectAll(".node_inhalt").style("display","block");
+                
+				d3.selectAll(".node_inhalt").classed("invis",false);
 				d3.selectAll(".edge").each(function(){
 					var id = d3.select(this).attr("id");
 					toggleToDetailed(id);
