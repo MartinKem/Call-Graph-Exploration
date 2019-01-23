@@ -1,6 +1,5 @@
 var strJson = "";
 var arr = [];
-var parsedJson;
 var parsedJsonMap;
 var mapUsed = 0;
 
