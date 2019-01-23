@@ -68,13 +68,18 @@ function colorChosen(elem) {
 
 function deleteNodes() {
     var nodeId= $(clickedDiv).attr('id');
-    nodeId = parseInt(nodeId);
-	var nodeInstance = getNodeById(nodeId, rootNode);
+	var nodeInstance = nodeMap.get(nodeId);
 	nodeInstance.hideNode();
 }
 function switchContent() {
-    var nodeId= $(clickedDiv).attr('id');
+    let nodeName= $(clickedDiv).attr('id');
+    let node = nodeMap.get(nodeName);
     $(clickedDiv).children(".node_inhalt").toggleClass("invis");
-    // nodeId = parseInt(nodeId);
-    // toggleToAbstract(nodeId);
+    for(var i = 0; i < node.parents.length; i++){		// first all edges to this node become hidden
+        var edge = document.getElementById(node.parents[i].getName() + "#"+ node.parents[i].getMethodIndex(nodeName) + '->' + nodeName);
+        if(edge) edge.style.display = "none";
+        //method2nodeEdge(node.parents[i].getName() + "#"+ node.parents[i].getMethodIndex(nodeName),nodeName);
+    }
+
 }
+

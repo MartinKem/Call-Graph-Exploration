@@ -1,7 +1,7 @@
 var strJson = "";
 var arr = [];
 var parsedJson;
-var nextFreeNodeId = 0;
+
 var mapUsed = 0;
 
 //Add the events for the drop zone
@@ -276,8 +276,8 @@ function waitForJsonFinishedParsing(){
 		else{	// ONLY in this else-block json file has finished parsing
 			console.log("finished parsing");
 			clearInterval(intvl);
-			// rootNode = createNodeInstance("tmr/Demo", "main");
-			rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
+			rootNode = createNodeInstance("tmr/Demo", "main");
+			//rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 			// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
 			rootNode.showNode();
 			document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;
@@ -308,19 +308,19 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 	var existingNode = nodeMap.get(declaringClass+'.'+name);
 	var newNode;
 	if(existingNode){
-		newNode = parentNode.addChild(nextFreeNodeId, source, declaringClass + '.' + name, []);
+		newNode = parentNode.addChild(source, declaringClass + '.' + name, []);
 		mapUsed++;
 		return newNode;
 	}
 	var jsonData = getJsonNodeByName(declaringClass, name);
-	if(!jsonData) newNode = parentNode.addChild(nextFreeNodeId++, source, declaringClass + '.' + name, []);
+	if(!jsonData) newNode = parentNode.addChild(source, declaringClass + '.' + name, []);
 	else{
 		var callSites = [];
 		for(var i = 0; i < jsonData.callSites.length; i++){
 			callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
 		}
-		if(!parentNode) newNode = new node(nextFreeNodeId++, -1, vis, declaringClass + '.' + name, callSites);
-		else newNode = parentNode.addChild(nextFreeNodeId++, source, declaringClass + '.' + name, callSites);
+		if(!parentNode) newNode = new node(null, declaringClass + '.' + name, callSites);
+		else newNode = parentNode.addChild(source, declaringClass + '.' + name, callSites);
 	}
 	if(newNode) nodeMap.set(declaringClass + '.' + name, newNode);
 	return newNode;

@@ -240,6 +240,7 @@ returns: void
 */
 function method2nodeEdge(id1, id2){
 	var link = {source: absPosition(id1), dest: absPosition(id2)}
+
 	if(id1.split("#")[0] == id2) createEdge(svgCont, link.source.x, link.source.y, -1, -1, id1 + "->" + id2, null, true);
 	else side2centerEdge(svgCont, link, id1 + "->" + id2);
 }
