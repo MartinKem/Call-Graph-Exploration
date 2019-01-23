@@ -1,8 +1,12 @@
 var strJson = "";
 var arr = [];
 var parsedJson;
-var parsedJsonMap;
-var mapUsed = 0;
+var nextFreeNodeId = 0;
+var mapUsed = 0; // only used for logging
+// ----- used for calculatiin whole force graph ------
+var forceNodeMap = new Map();
+var forceLinkMap = new Map();
+var nextFreeNodeIndex = 0;
 
 //Add the events for the drop zone
 var dropZone = document.getElementById('dropZone');
@@ -75,7 +79,7 @@ function parseString() {
 	//console.log(finalarray)
 	// console.log(JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}"));
 	Array.prototype.push.apply(finalarray, JSON.parse("{\n  \"reachableMethods\" : [ " + rest.slice(rest.indexOf("\n    \"method\" : {") - 1, -3) + " ]\n}").reachableMethods);
-	let parsedJson = { reachableMethods: finalarray };
+	parsedJson = { reachableMethods: finalarray };
 
 	//Initialisiere Autovervollständigung
     // var jsonQObject = jsonQ(parsedJson);
@@ -114,18 +118,10 @@ function parseFile(file, callback) {
 		}
 		if (offset >= fileSize) {
 			console.log("Done reading file");
-			let parsedJson = parseString();
-
-			console.log(parsedJson);
-
-			//map rechableMethods to HashMap
-			parsedJsonMap = new Map();
-			parsedJson.reachableMethods.forEach(function(element){
-				parsedJsonMap.set(element.method.declaringClass+"."+element.method.name,element);
-			});
+			var parsedJson = parseString();
 
 			//progress to 100%
-			let progress = document.getElementById("progress");
+			var progress = document.getElementById("progress");
 			progress.style.width = '100%';
 			progress.textContent = '100%';
 			
@@ -133,23 +129,9 @@ function parseFile(file, callback) {
 			(function reset() {
 				strJson = "";
 				arr = [];
-				parsedJson = undefined;
 			})();
 
-
-			// rootNode = createNodeInstance("tmr/Demo", "main");
-			rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
-			// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
-			rootNode.showNode();
-			document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;
-			document.getElementsByTagName('html')[0].scrollTop = parseInt(vis.attr('height'))/2 - window.innerHeight/2;
-			console.log("start creating child nodes");
-			createChildNodes(rootNode, 0);
-			console.log("finished creating child nodes");
-			console.log(createdNodes);
-			console.log("hashmap was used", mapUsed, "times");
-
-			
+			console.log(parsedJson);
 			return;
 
 		}
@@ -284,70 +266,82 @@ function autocomplete(inp, arr) {
 }
 
 
-//function waitForJsonFinishedParsing(){
-//	var timeoutCounter = 0;
-//	var intvl = setInterval(function() {
-//		if (parsedJson == undefined){
-//			console.log("Waiting for Json getting parsed");
-//			timeoutCounter++;
-//			if(timeoutCounter == 1000){
-//				console.log("Waiting for json parsing timed out! (100s)");
-//				clearInterval(intvl);
-//			}
-//		}
-//		else{	// ONLY in this else-block json file has finished parsing
-//			console.log("finished parsing");
-//			clearInterval(intvl);
-//			// rootNode = createNodeInstance("tmr/Demo", "main");
-//			rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
-//			// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
-//			rootNode.showNode();
-//			document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;
-//			document.getElementsByTagName('html')[0].scrollTop = parseInt(vis.attr('height'))/2 - window.innerHeight/2;
-//			console.log("start creating child nodes");
-//			createChildNodes(rootNode, 0);
-//			console.log("finished creating child nodes");
-//			console.log(createdNodes);
-//			console.log("hashmap was used", mapUsed, "times");
-//		}
-//	}, 100);	
-//}
+function waitForJsonFinishedParsing(){
+	var timeoutCounter = 0;
+	var intvl = setInterval(function() {
+		if (parsedJson == undefined){
+			console.log("Waiting for Json getting parsed");
+			timeoutCounter++;
+			if(timeoutCounter == 1000){
+				console.log("Waiting for json parsing timed out! (100s)");
+				clearInterval(intvl);
+			}
+		}
+		else{	// ONLY in this else-block json file has finished parsing
+			clearInterval(intvl);
+			// rootNode = createNodeInstance("tmr/Demo", "main");
+			rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
+			// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
+			// rootNode.showNode();
+			document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;
+			document.getElementsByTagName('html')[0].scrollTop = parseInt(vis.attr('height'))/2 - window.innerHeight/2;
+			createChildNodes(rootNode, 0);
+			forceNodeArray = Array.from(forceNodeMap.values());
+			forceLinkArray = Array.from(forceLinkMap.values());
+			console.log(createdNodes);
+			[force, nodeSelection, linkSelection] = initForce(svgCont, forceNodeArray, forceLinkArray);
+			rootNode.showNode();
+			console.log("hashmap was used", mapUsed, "times");
+		}
+	}, 100);	
+}
 
 function getJsonNodeByName(declaringClass, name){	
-	//var jsonData;
-	//for(var i = 0; i < parsedJson.reachableMethods.length; i++){
-	//	if(parsedJson.reachableMethods[i].method.declaringClass == declaringClass
-	//		&& parsedJson.reachableMethods[i].method.name == name){
-	//		
-	//		jsonData = parsedJson.reachableMethods[i];
-	//		break;
-	//	}
-	//}
-	//return jsonData;
-
-	return parsedJsonMap.get(declaringClass + "." + name);
-
+	var jsonData;
+	for(var i = 0; i < parsedJson.reachableMethods.length; i++){
+		if(parsedJson.reachableMethods[i].method.declaringClass == declaringClass
+			&& parsedJson.reachableMethods[i].method.name == name){
+			
+			jsonData = parsedJson.reachableMethods[i];
+			break;
+		}
+	}
+	return jsonData;
 }
 
 function createNodeInstance(declaringClass, name, parentNode, source){
 	var existingNode = nodeMap.get(declaringClass+'.'+name);
+	var forceSource;
+	var forceTarget;
+	if(parentNode) forceSource = forceNodeMap.get(parentNode.getName());
 	var newNode;
 	if(existingNode){
-		newNode = parentNode.addChild(source, declaringClass + '.' + name, []);
+		newNode = parentNode.addChild(nextFreeNodeId, source, declaringClass + '.' + name, []);
+		forceTarget = forceNodeMap.get(declaringClass + '.' + name);
+		forceLinkMap.set(forceSource.index + '->' + forceTarget.index, {source: forceSource, target: forceTarget});
 		mapUsed++;
 		return newNode;
 	}
 	var jsonData = getJsonNodeByName(declaringClass, name);
-	if(!jsonData) newNode = parentNode.addChild(source, declaringClass + '.' + name, []);
+	if(!jsonData) newNode = parentNode.addChild(nextFreeNodeId++, source, declaringClass + '.' + name, []);
 	else{
 		var callSites = [];
 		for(var i = 0; i < jsonData.callSites.length; i++){
 			callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
 		}
-		if(!parentNode) newNode = new node(null, declaringClass + '.' + name, callSites);
-		else newNode = parentNode.addChild(source, declaringClass + '.' + name, callSites);
+		if(!parentNode) newNode = new node(nextFreeNodeId++, -1, vis, declaringClass + '.' + name, callSites);
+		else newNode = parentNode.addChild(nextFreeNodeId++, source, declaringClass + '.' + name, callSites);
 	}
 	if(newNode) nodeMap.set(declaringClass + '.' + name, newNode);
+	
+	forceTarget = {index: nextFreeNodeIndex++,
+				x: svgCont.attr('width')/2, 
+				y: svgCont.attr('height')/2, 
+				fixed: false, 
+				id: declaringClass + '.' + name};
+	forceNodeMap.set(declaringClass + '.' + name, forceTarget);
+	if(parentNode) forceLinkMap.set(forceSource.index + '->' + forceTarget.index, {source: forceSource, target: forceTarget});
+	
 	return newNode;
 }
 

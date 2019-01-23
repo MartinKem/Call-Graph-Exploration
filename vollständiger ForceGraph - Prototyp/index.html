@@ -17,7 +17,7 @@
 			<fieldset>
 				<h2>Json File</h2>
 			  	<div id="dropZone">You can Drop files here <br />
-				<input type='file' id='fileinput' onchange="setProgBarToZero(); loadFile()">
+				<input type='file' id='fileinput' onchange="setProgBarToZero(); loadFile(); waitForJsonFinishedParsing()">
 			  	</div> <br />
 
 			  	<div id="progress_bar">
@@ -55,16 +55,22 @@
 		var createdNodes = 0;
 		var svgCont = d3.select("#graph")
 			.append("svg")
-			.attr("width", 20000)
-			.attr("height", 20000);
+			.attr("width", 40000)
+			.attr("height", 40000);
 			
 		svgCont.append("defs").attr("id", "definitions");
 		
-		var vis = svgCont.append("foreignObject").attr("width", 20000).attr("height", 20000).attr("position","relative");
+		var vis = svgCont.append("foreignObject").attr("width", 40000).attr("height", 40000).attr("position","relative");
 		
 		var rootNode;	// initialized in jsonPars.js and referenced in node.js
+		var forceNodeArray;
+		var forceLinkArray;
+		var force;
+		var nodeSelection;
+		var linkSelection;
 		
 		var nodeMap = new Map();
+		var positionMap = new Map();
 		// "rootNode" is referenced in nodes.js as the actual root-node of the whole graph
 		/*let rootNode = new node(0, -1, vis, "Ltmr/Demo.main", ["Ljava/lang/invoke/MethodHandle.invokeExact", "Ltmr/Demo.<init>", "Ljava/lang/invoke/MethodHandles.lookup", "Ljava/lang/invoke/MethodType.methodType", "Ljava/lang/invoke/MethodHandles$Lookup.findConstructor"]);
 		rootNode.showNode();
@@ -78,9 +84,8 @@
 	<script>
 		var i = 0;
 		function open_close() {
-
 			if (i===0){
-				d3.selectAll(".node_inhalt").classed("invis",true);
+				d3.selectAll(".node_inhalt").style("display","none");
 				d3.selectAll(".edge").each(function(){
 					var id = d3.select(this).attr("id");
 					toggleToAbstract(id);
@@ -90,7 +95,8 @@
 				i++;
 			}else {
 
-				d3.selectAll(".node_inhalt").classed("invis",false);
+				// d3.selectAll(".node_inhalt").style("visibility","visible");
+				d3.selectAll(".node_inhalt").style("display","block");
 				d3.selectAll(".edge").each(function(){
 					var id = d3.select(this).attr("id");
 					toggleToDetailed(id);
@@ -105,7 +111,7 @@
 	<script src="jsonPars.js"></script>
 	<script src="../jsonQ-master/jsonQ.js"></script>
 	<script src="search.js"></script>
-	<script src="ForceTree.js"></script>
+	<script src="forceTree.js"></script>
     <script src="edges.js"></script>
     <script src="nodes.js"></script>
 </body>
