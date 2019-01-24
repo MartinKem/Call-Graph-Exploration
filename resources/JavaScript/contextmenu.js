@@ -41,14 +41,13 @@ function rightclickmenu(e) {
     }catch (e) {*/
        // counter = 1;
        // if(counter > 0)console.log("contextmenu nicht mehr aktuell");
-        $("body").append($("<div id='main-rightclick'>        <div class=\"menuelement\" onclick=\"deleteNodes()\">Ausblenden</div>\n" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Red<div class=\"color\" style=\"background-color: #ffc6c6 \"></div> </div>\n" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Green<div class=\"color\" style=\"background-color: #beffbe\"></div></div>\n" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Blue<div class=\"color\" style=\"background-color: #abd3ff\"></div></div>\n" +
-            "        <div class=\"menuelement\" onclick=\"switchContent()\">Details</div>\n" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Yellow<div class=\"color\" style=\"background-color: #ffff9f\"></div></div>\n" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">White<div class=\"color\" style=\"background-color: white\"></div></div></div>\n"));
-            // "        <div class=\"menuelement\" onclick=\"switchContent()\">Details</div>"));
+        $("body").append($("<div id='main-rightclick'>        <div class=\"menuelement\" onclick=\"deleteNodes()\">Ausblenden</div>" +
+            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Red<div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Green<div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Blue<div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Yellow<div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">White<div class=\"color\" style=\"background-color: white\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"switchContent()\">Details</div><div>"));
 
     $("#main-rightclick").css({
         "position":"absolute",
