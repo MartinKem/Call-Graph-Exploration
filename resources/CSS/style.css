@@ -16,8 +16,8 @@ body{
 }
 
 #graph{
-    position: relative;
-    font-family: Helvetica;
+	/* width: 100%; */
+	/* height: 2000px; */
 }
 
 .div_node{
@@ -162,20 +162,18 @@ input[type=text] {
   background-color: #fffefc;
   padding: 10px;
   font-size: 16px;
-  width: 300px;
-  transition: 0.5s;
 }
 
 .autocomplete-items {
-  position: relative;
+  position: absolute;
   border: 1px solid #d4d4d4;
-  /* border-bottom: none; */
-  /* border-top: none; */
+  border-bottom: none;
+  border-top: none;
   z-index: 99;
   /*position the autocomplete items to be the same width as the container:*/
-  /* top: 100%; */
-  /* left: 0; */
-  /* right: 0; */
+  top: 100%;
+  left: 0;
+  right: 0;
 }
 
 .autocomplete-items div {
@@ -197,23 +195,11 @@ input[type=text] {
 }
 
 circle {
-	visibility: hidden; /* visible or hidden */
+	visibility: visible; /* visible or hidden */
 }
 
 line {
 	stroke: #d8a806;
-	stroke-width: 2px;
-	visibility: hidden; /* visible or hidden */
-}
-
-#top_fixed {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-}
-
-#foot_fixed {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
+	stroke-width: 1px;
+	visibility: visible; /* visible or hidden */
 }

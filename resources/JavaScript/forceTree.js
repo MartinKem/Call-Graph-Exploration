@@ -1,7 +1,7 @@
 
 var links = [];
-var nodes = [{index: 0, x: svgCont.attr('width')/2, y: svgCont.attr('height')/2, fixed: true, id: "0"}];
-[force, nodeSelection, linkSelection] = initForce(svgCont, nodes, links);
+var nodes = [{index: 0, x: svgCont.attr('width')/2, y: svgCont.attr('height')/2, fixed: false, id: "0"}];
+// [force, nodeSelection, linkSelection] = initForce(svgCont, nodes, links);
 
 // -----------------------------------------------------------------------------------------------------
 // ---------------------------------- gesamten Call Graphen im voraus berechnen ------------------------
@@ -26,7 +26,7 @@ linkArr: array of links:{source: nodeA, target: nodeB}
 returns: [force, nodeSelection, linkSelection] initialized force instance and d3-selection of nodes and links
 */
 function initForce(svg, nodeArr, linkArr){
-
+	
 	var linkSelection = svg.selectAll("line")
 		.data(linkArr)
 		.enter().append("line");
@@ -34,26 +34,35 @@ function initForce(svg, nodeArr, linkArr){
 	var nodeSelection = svg.selectAll("circle")
 		.data(nodeArr)
 		.enter().append("circle")
-		.attr("r", 10 - .75)
+		.attr("r", 10 - .25)
 		.style("fill", "rgb(31, 119, 180)");
 	
 	width = d3.select("svg").attr("width");
 	height = d3.select("svg").attr("height");
 	
 	var force = d3.layout.force()
-		.charge(-8000)
-		.linkDistance(600)
+		.charge(-10000)
+		.linkDistance(1000)
+		.gravity(0.1)
 		.size([width, height])
 		.nodes(nodeArr)
 		.links(linkArr)
-		.on("tick", function(e){ tick(e, linkSelection, nodeSelection); })
-		.on("end", function(e){ fix(e, linkSelection); })
+		// .on("tick", function(e){ tick(e, linkSelection, nodeSelection); })
+		// .on("end", function(e){ fix(e, linkSelection); })
+		.on("end", function(e) { endFunction(e, linkSelection, nodeSelection); })
 		.start();
 
-	for(var i = 0; i < 1000; i++){
+	for(var i = 0; i < 200; i++){
+		if(i % 20 == 0) console.log("Force calculation: " + i/2 + "%");
 		force.tick();
 	}
 	force.stop();
+	
+	nodeArr.forEach(function(node){ 
+		node.fixed = true;
+		var nodeInstance = nodeMap.get(node.id);
+		nodeInstance.setPosition(node.px, node.py);
+		});
 	
 	nodeSelection.call(force.drag);
 	return [force, nodeSelection, linkSelection];
@@ -87,6 +96,18 @@ function tick(e, linkSelection, nodeSelection) {
 	nodeSelection
 		.attr("cx", function(d) { return d.x; })
 		.attr("cy", function(d) { return d.y; });
+
+}
+
+function endFunction(e, linkSelection, nodeSelection) {
+    nodeSelection.attr('r', 10)
+        .attr('cx', function(d) { return d.x; })
+        .attr('cy', function(d) { return d.y; });
+
+    linkSelection.attr('x1', function(d) { return d.source.x; })
+        .attr('y1', function(d) { return d.source.y; })
+        .attr('x2', function(d) { return d.target.x; })
+        .attr('y2', function(d) { return d.target.y; });
 
 }
 
@@ -166,3 +187,14 @@ function restart() {
 	}
 	force.stop();
 }
+
+function calcFullForceGraph(rootNode){
+	for(var i = 0; i < rootNode.getChildNodes().length; i++){
+		nodes.push({index: ++nextFreeNodeIndex, 
+					x: svgCont.attr('width')/2, 
+					y: svgCont.attr('height')/2, 
+					fixed: false, 
+					id: rootNode.getChildNodes()[i][0].getID()});
+	}
+}
+
