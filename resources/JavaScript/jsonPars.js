@@ -177,26 +177,35 @@ function autocomplete(inp, arr) {
 	arr = Array.from(new Set(arr));
     //2 Parameter, Textfeld und Array mit Vervollständigungsdaten
     var currentFocus = 0;
+	
     //Texteingabe erkennen
-    inp.addEventListener("input", function(e) {
-        var div, items, i, value = this.value;
+	
+	document.addEventListener("click", function (e) {
+		if(e.srcElement.id != "classInput" && e.srcElement.id != "methodInput") closeAllLists(e.target);
+	});
+  
+    inp.addEventListener("input", function(e) {	autocompleteEvent(e, this); });
+	
+	inp.addEventListener("focus", function(e){ autocompleteEvent(e, this); });
+	
+	function autocompleteEvent(e, inputElem){
+        var div, items, value = inputElem.value;
         //Alle offenen Listen schließen
         closeAllLists();
         //Unterbrechen, wenn das Textfeld leer ist
-        if (!value) { return false;}
+        //if (!value) { return false;}
         currentFocus = -1;
         //DIV Element erstellen, das alle Vervollständigungsvorschläge enthält
         div = document.createElement("DIV");
-        div.setAttribute("id", this.id + "autocomplete-list");
+        div.setAttribute("id", inputElem.id + "autocomplete-list");
         div.setAttribute("class", "autocomplete-items");
         //Füge das DIV Element dem Container als Kindelement hinzu
-        this.parentNode.appendChild(div);
+        inputElem.parentNode.appendChild(div);
 		
-		
-		// -- this loop uses linear search
-        for (i = 0; i < arr.length; i++) {
+        for (var i = 0; i < arr.length; i++) {
           //Prüfe, ob die eingegebenen Zeichen mit dem Anfang des Vorschlags übereinstimmen
           if (arr[i].substr(0, value.length).toUpperCase() == value.toUpperCase()) {
+			arr[i] = arr[i].replace(/</g, "&lt;").replace(/>/g, "&gt;")
             //Erstelle DIV Element für jeden übereinstimmenden Vorschlag
             items = document.createElement("DIV");
             //Hebe übereinstimmende Zeichen als fettgedruckt hervor
@@ -215,11 +224,8 @@ function autocomplete(inp, arr) {
             //Schleife unterbrechen wenn 10 Elemente gefunden wurden
             if (div.childElementCount >= 10) {break;}
           }
-        }
-		// ---------------------------------
-		
-		
-    });
+        }	
+	}
     //Führe eine Funktion aus, wenn die Tastatur betätigt wird
     inp.addEventListener("keydown", function(e) {
         var x = document.getElementById(this.id + "autocomplete-list");
@@ -236,9 +242,9 @@ function autocomplete(inp, arr) {
           addActive(x);
         } else if (e.keyCode == 13) {
           //Verhindere, dass ein Formular gesendet wird, wenn ENTER gedrückt wird
-          e.preventDefault();
           if (currentFocus > -1) {
             //Simuliere Klick auf Listenelement
+			e.preventDefault();
             if (x) x[currentFocus].click();
           }
         }
@@ -268,9 +274,6 @@ function autocomplete(inp, arr) {
       }
     }
   }
-  document.addEventListener("click", function (e) {
-    closeAllLists(e.target);
-});
 }
 
 
