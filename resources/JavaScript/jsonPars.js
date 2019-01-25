@@ -75,11 +75,6 @@ function parseString() {
 	// console.log(JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}"));
 	Array.prototype.push.apply(finalarray, JSON.parse("{\n  \"reachableMethods\" : [ " + rest.slice(rest.indexOf("\n    \"method\" : {") - 1, -3) + " ]\n}").reachableMethods);
 	let parsedJson = { reachableMethods: finalarray };
-
-	// Initialisiere Autovervollständigung
-    // var jsonQObject = jsonQ(parsedJson);
-    // var methodList = jsonQ.sort(jsonQObject.find("name").unique());
-    // var classList = jsonQ.sort(jsonQObject.find("declaringClass").unique());
 	
 	return parsedJson;
 

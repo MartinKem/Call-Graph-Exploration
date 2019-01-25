@@ -49,6 +49,12 @@ svg{
     box-sizing: border-box;
 }
 
+#search:active{
+	background-color: #efe5d6;
+	color: black;
+	outline: none;
+}
+
 /*Style for rightclickmenu*/
 
 #main-rightclick{
@@ -162,7 +168,7 @@ input[type=text] {
   background-color: #fffefc;
   padding: 10px;
   font-size: 16px;
-  width: 300px;
+  width: 400px;
   transition: 0.5s;
 }
 
