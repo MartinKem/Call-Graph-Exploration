@@ -127,8 +127,10 @@ function parseFile(file, callback) {
 			
 			document.getElementById("search").removeAttribute("disabled");
 			
-			autocomplete(document.getElementById("classInput"), Array.from(parsedJsonMap.keys()));
-			autocomplete(document.getElementById("methodInput"), Array.from(parsedJsonMap.keys()));
+			var fullMethods = getStructuredMethodList();
+			
+			autocomplete(document.getElementById("classInput"), fullMethods);
+			autocomplete(document.getElementById("methodInput"), fullMethods);
 			return;
 
 		}
@@ -160,40 +162,51 @@ function parseFile(file, callback) {
 
 	// now let's start the read with the first block
 	chunkReaderBlock(offset, chunkSize, file);
+	
+	function getStructuredMethodList(){
+		var methodList = Array.from(parsedJsonMap.keys());
+		var result = [[],[]];
+		for(var i = 0; i < methodList.length; i++){
+			result[0].push(methodList[i].split('.')[0]);
+			result[1].push(methodList[i].split('.')[1]);
+		}
+		return result;
+	}
 }
 function changeDiv() {
 	$("#load_page").addClass("invis");
-	//$("#search_page").removeClass("invis");
 	$("#graph_page").removeClass("invis");
 
 }
 
 //Eingabe bei gegebenem Texteingabefeld mit gegebenem Stringarray autovervollständigen 
 function autocomplete(inp, arr) {
-	var searchField = inp.getAttribute('id');
-	for(var i = 0; i < arr.length; i++){
-		arr[i] = arr[i].split('.')[searchField == 'classInput' ? 0 : 1];
-	}
-	arr = Array.from(new Set(arr));
+	var searchField = (inp.getAttribute('id') == 'classInput' ? 0 : 1);
     //2 Parameter, Textfeld und Array mit Vervollständigungsdaten
     var currentFocus = 0;
 	
     //Texteingabe erkennen
+	inp.addEventListener("input", function(e){ autocompleteEvent(e, this); });
+	inp.addEventListener("focus", function(e){ autocompleteEvent(e, this); });
 	
 	document.addEventListener("click", function (e) {
 		if(e.srcElement.id != "classInput" && e.srcElement.id != "methodInput") closeAllLists(e.target);
 	});
-  
-    inp.addEventListener("input", function(e) {	autocompleteEvent(e, this); });
-	
-	inp.addEventListener("focus", function(e){ autocompleteEvent(e, this); });
 	
 	function autocompleteEvent(e, inputElem){
-        var div, items, value = inputElem.value;
+        var div, items, otherValue, thisArray, reducedArray = [], value = inputElem.value;
+		thisArray = arr[searchField];
+		otherValue = (searchField == 0 ? document.getElementById("methodInput").value : document.getElementById("classInput").value);
+		
+		for(var i = 0; i < thisArray.length; i++){
+			if(arr[1-searchField][i] === otherValue) reducedArray.push(thisArray[i]);
+		}
+		if(reducedArray.length == 0) reducedArray = thisArray;
+		
+		reducedArray = Array.from(new Set(reducedArray));
         //Alle offenen Listen schließen
         closeAllLists();
         //Unterbrechen, wenn das Textfeld leer ist
-        //if (!value) { return false;}
         currentFocus = -1;
         //DIV Element erstellen, das alle Vervollständigungsvorschläge enthält
         div = document.createElement("DIV");
@@ -202,17 +215,17 @@ function autocomplete(inp, arr) {
         //Füge das DIV Element dem Container als Kindelement hinzu
         inputElem.parentNode.appendChild(div);
 		
-        for (var i = 0; i < arr.length; i++) {
+        for (var i = 0; i < reducedArray.length; i++) {
           //Prüfe, ob die eingegebenen Zeichen mit dem Anfang des Vorschlags übereinstimmen
-          if (arr[i].substr(0, value.length).toUpperCase() == value.toUpperCase()) {
-			arr[i] = arr[i].replace(/</g, "&lt;").replace(/>/g, "&gt;")
+          if (reducedArray[i].substr(0, value.length).toUpperCase() == value.toUpperCase()) {
+			reducedArray[i] = reducedArray[i].replace(/</g, "&lt;").replace(/>/g, "&gt;")
             //Erstelle DIV Element für jeden übereinstimmenden Vorschlag
             items = document.createElement("DIV");
             //Hebe übereinstimmende Zeichen als fettgedruckt hervor
-            items.innerHTML = "<strong>" + arr[i].substr(0, value.length) + "</strong>";
-            items.innerHTML += arr[i].substr(value.length);
+            items.innerHTML = "<strong>" + reducedArray[i].substr(0, value.length) + "</strong>";
+            items.innerHTML += reducedArray[i].substr(value.length);
             //Erstelle INPUT Feld, das den aktuellen Wert der Vorschlags enthält
-            items.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+            items.innerHTML += "<input type='hidden' value='" + reducedArray[i] + "'>";
             //Führe die übergebene Funktion bei Knopfdruck des Elements aus
                 items.addEventListener("click", function(e) {
                 //Füge den Vervollständigungsvorschlag in das Textfeld ein
@@ -333,7 +346,7 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 	var jsonData = getJsonNodeByName(declaringClass, name);
 	if(!jsonData){
 		if(!parentNode){
-			alert(declaringClass + '.' + name + " does not exist in the JSON-file!");
+			alert("\"" + declaringClass + '.' + name + "\" does not exist in the JSON-file!");
 			return;
 		}
 		newNode = parentNode.addChild(source, declaringClass + '.' + name, []);
