@@ -8,14 +8,6 @@ var nodes = [{index: 0, x: svgCont.attr('width')/2, y: svgCont.attr('height')/2,
 // -----------------------------------------------------------------------------------------------------
 
 /*
-1. alle Knoten in nodes- und links-Array einfügen
-2. svgCont vergrößern
-3. Force-Graph berechnen lassen
-4. in node-Instanzen die x,y-Werte einfügen
-5. Positionsberechnung bei addChild auskommentieren
-*/
-
-/*
 initialized the force graph throw declaring a link selection, a node selection and the d3-force-layout
 also starts the force-layouting
 
