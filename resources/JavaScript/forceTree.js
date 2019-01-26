@@ -41,8 +41,8 @@ function initForce(svg, nodeArr, linkArr){
 	height = d3.select("svg").attr("height");
 	
 	var force = d3.layout.force()
-		.charge(-8000)
-		.linkDistance(600)
+		.charge(-20000)
+		.linkDistance(1500)
 		.size([width, height])
 		.nodes(nodeArr)
 		.links(linkArr)

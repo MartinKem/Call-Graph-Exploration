@@ -55,9 +55,7 @@ function parseString() {
 	var rest = "";
 	var finalarray;
 
-	var correctJsonStr = correctDeclaredClass(strJson);
-	arr.push(correctJsonStr);
-	strJson = correctJsonStr;
+	arr.push(strJson);
 	arr.forEach(function (a) {
 		a = rest + a;
 		var first = a.indexOf("\n    \"method\" : {") - 1;
@@ -80,10 +78,22 @@ function parseString() {
 
 }
 
-function correctDeclaredClass(str){
-	str = str.replace(/\"declaringClass\" : \"L/g, "\"declaringClass\" : \"");
-	str = str.replace(/;\",\n/g, "\",\n");
-	return str;
+function correctClassNames(methods){
+	for(var i = 0; i < methods.reachableMethods.length; i++){
+		correctSingleMethod(methods.reachableMethods[i].method);
+		methods.reachableMethods[i].callSites.forEach(function(site){ correctSingleMethod(site.declaredTarget); });
+	}
+	
+	function correctSingleMethod(method){
+		method.declaringClass = truncateString(method.declaringClass);
+		method.returnType = truncateString(method.returnType);
+		method.parameterTypes = method.parameterTypes.map(truncateString);
+	}
+	
+	function truncateString(str){
+		if(str[0] == 'L' && str[str.length-1] == ';') { return str.substring(1, str.length-1); }
+		else return str;
+	}
 }
 
 
@@ -106,6 +116,8 @@ function parseFile(file, callback) {
 		if (offset >= fileSize) {
 			console.log("Done reading file");
 			let parsedJson = parseString();
+			
+			correctClassNames(parsedJson); // remove 'L' and ';' out of the class names
 
 			//map rechableMethods to HashMap
 			parsedJsonMap = new Map();
@@ -289,52 +301,6 @@ function autocomplete(inp, arr) {
   }
 }
 
-
-//function waitForJsonFinishedParsing(){
-//	var timeoutCounter = 0;
-//	var intvl = setInterval(function() {
-//		if (parsedJson == undefined){
-//			console.log("Waiting for Json getting parsed");
-//			timeoutCounter++;
-//			if(timeoutCounter == 1000){
-//				console.log("Waiting for json parsing timed out! (100s)");
-//				clearInterval(intvl);
-//			}
-//		}
-//		else{	// ONLY in this else-block json file has finished parsing
-//			console.log("finished parsing");
-//			clearInterval(intvl);
-//			// rootNode = createNodeInstance("tmr/Demo", "main");
-//			rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
-//			// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
-//			rootNode.showNode();
-//			document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;
-//			document.getElementsByTagName('html')[0].scrollTop = parseInt(vis.attr('height'))/2 - window.innerHeight/2;
-//			console.log("start creating child nodes");
-//			createChildNodes(rootNode, 0);
-//			console.log("finished creating child nodes");
-//			console.log(createdNodes);
-//			console.log("hashmap was used", mapUsed, "times");
-//		}
-//	}, 100);	
-//}
-
-function getJsonNodeByName(declaringClass, name){	
-	//var jsonData;
-	//for(var i = 0; i < parsedJson.reachableMethods.length; i++){
-	//	if(parsedJson.reachableMethods[i].method.declaringClass == declaringClass
-	//		&& parsedJson.reachableMethods[i].method.name == name){
-	//		
-	//		jsonData = parsedJson.reachableMethods[i];
-	//		break;
-	//	}
-	//}
-	//return jsonData;
-
-	return parsedJsonMap.get(declaringClass + "." + name);
-
-}
-
 function createNodeInstance(declaringClass, name, parentNode, source){
 	var existingNode = nodeMap.get(declaringClass+'.'+name);
 	var newNode;
@@ -343,7 +309,7 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 		mapUsed++;
 		return newNode;
 	}
-	var jsonData = getJsonNodeByName(declaringClass, name);
+	var jsonData = parsedJsonMap.get(declaringClass + "." + name);
 	if(!jsonData){
 		if(!parentNode){
 			alert("\"" + declaringClass + '.' + name + "\" does not exist in the JSON-file!");
@@ -369,7 +335,7 @@ function createChildNodes(node, depth){
 	// if(depth > 2) return;
 	var declaringClass = node.getName().split(".")[0];
 	var name = node.getName().split(".")[1];
-	var jsonData = getJsonNodeByName(declaringClass, name);
+	var jsonData = parsedJsonMap.get(declaringClass + "." + name);
 	var callSites = [];
 	if(jsonData) callSites = jsonData.callSites;
 	for(var i = 0; i < callSites.length; i++){
@@ -390,11 +356,9 @@ function createGraph(){
 	document.getElementsByTagName('html')[0].scrollTop = parseInt(vis.attr('height'))/2 - window.innerHeight/2;
 	if(rootNode){
 		rootNode.showNode();
-		console.log("start creating child nodes");
 		createChildNodes(rootNode, 0);
 		document.getElementById("search").setAttribute("disabled", "");
-		console.log("finished creating child nodes");
-		console.log(createdNodes);
+		console.log(createdNodes + " nodes created");
 		console.log("hashmap was used", mapUsed, "times");
 	}
 }
