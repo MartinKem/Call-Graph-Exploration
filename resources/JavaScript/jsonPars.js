@@ -213,11 +213,13 @@ function autocomplete(inp, arr) {
         var div, items, otherValue, thisArray, reducedArray = [], value = inputElem.value;
 		thisArray = arr[searchField];
 		otherValue = (searchField == 0 ? document.getElementById("methodInput").value : document.getElementById("classInput").value);
-		
-		for(var i = 0; i < thisArray.length; i++){
-			if(arr[1-searchField][i] === otherValue) reducedArray.push(thisArray[i]);
-		}
-		if(reducedArray.length == 0) reducedArray = thisArray;
+
+		if(otherValue != ""){
+            for(var i = 0; i < thisArray.length; i++){
+                if(arr[1-searchField][i] === otherValue) reducedArray.push(thisArray[i]);
+            }
+        }
+		else reducedArray = arr[searchField];
 		
 		reducedArray = Array.from(new Set(reducedArray));
         //Alle offenen Listen schließen
