@@ -206,12 +206,14 @@ function absPosition(id){
 	var heightVal = element.offsetHeight;
 	var xVal = 0, yVal = 0;
     do {
+		// if(id === "tmr/Demo.main#4") console.log(xVal, yVal);
 		var borderwidth = 0;
 		if(element != document.getElementById(id)) borderwidth = parseInt(element.style.borderWidth, 10) || 0;
         yVal += element.offsetTop + borderwidth || 0;
         xVal += element.offsetLeft + borderwidth || 0;
         element = element.offsetParent;
     } while(element);
+    // console.log("xy", id, xVal, yVal);
 	return {x: xVal, y: yVal, width: widthVal, height: heightVal}
 }
 
@@ -252,11 +254,11 @@ id: id of the edge
 
 returns: void
 */
-function toggleToAbstract(id){
+function toggleToAbstract(id, link){
 	var edge = document.getElementById(id);
-	[sourceID, destID] = id.split("->");
-	var sourceID = sourceID.split("#")[0];
-	var link = {source: absPosition(sourceID), dest: absPosition(destID)};
+	let destID = id.split("->")[1];
+	let sourceID = id.split("#")[0];
+	if(!link) link = {source: absPosition(sourceID), dest: absPosition(destID)};
 	if(sourceID == destID) edge.setAttribute("d", getCurvedPath(link.source.x, link.source.y+60, link.source.x, link.source.y+30));
 	else{
 		var n1 = borderPoint(link.source, link.dest);
@@ -279,10 +281,11 @@ id: id of the edge
 
 returns: void
 */
-function toggleToDetailed(id){
+function toggleToDetailed(id, link){
+	console.log(link);
 	var edge = document.getElementById(id);
 	[sourceID, destID] = id.split("->");
-	var link = {source: absPosition(sourceID), dest: absPosition(destID)};
+	if(!link) link = {source: absPosition(sourceID), dest: absPosition(destID)};
 	var n1 = sidePoint(link.source, link.dest);
 	if(n1.x && sourceID.split('#')[0] == destID) edge.setAttribute("d", getCurvedPath(n1.x, n1.y-15, n1.x-27, n1.y-65));
 	else{

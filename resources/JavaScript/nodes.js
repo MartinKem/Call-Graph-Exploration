@@ -2,7 +2,13 @@
 //---------------------------------------------------------------------------------------
 //----------------------------------- model section -------------------------------------
 //---------------------------------------------------------------------------------------
-var container = vis;
+let container = vis;
+const nodeWidth = 300;
+const nodeHeightEmpty = 144;
+const callSiteWidth = 250;
+const callSiteHeight = 27;
+const callSiteTopOffset = 120;
+
 /**
  * models the methods as nodes in a directed graph
  */
@@ -23,8 +29,9 @@ class node{
         // Only if this is the root node, this node is placed right now. Otherwise it is placed by setPosition(x, y).
         // Also generation is set to 0
         if(parent == null){
-            var width = 300;
-            var height = Math.min(500, 108 + 27 * contentVal.length);	// node-width, node-hight, and content-height are still hard coded
+            var width = nodeWidth;
+            // var height = Math.min(500, 108 + 27 * contentVal.length);	// node-width, node-hight, and content-height are still hard coded
+            let height = nodeHeightEmpty + callSiteHeight*contentVal.length;
 
             this.x = container.attr("width")/2 - width/2;
             this.y = container.attr("height")/2 - height/2;
@@ -219,15 +226,15 @@ class node{
         let thisNode = this;
         this.children.forEach(function(child){
             let edgeID = thisNode.name + '#' + child.index + '->' + child.node.getName();
-            handleSingleEdge(edgeID, thisNode, child.node);
+            handleSingleEdge(edgeID, thisNode, child.node, child.index);
         });
 
         this.parents.forEach(function(parent){
             let edgeID = parent.node.getName() + '#' + parent.index + '->' + thisNode.name;
-            handleSingleEdge(edgeID, parent.node, thisNode);
+            handleSingleEdge(edgeID, parent.node, thisNode, parent.index);
         });
 
-        function handleSingleEdge(edgeID, parentNode, childNode){
+        function handleSingleEdge(edgeID, parentNode, childNode, index){
             let edge = document.getElementById(edgeID);
             if(!parentNode.getVisibility() || !childNode.getVisibility()) {
                 if(edge){ edge.style.display = 'none'; }
@@ -237,9 +244,19 @@ class node{
                     method2nodeEdge(edgeID.split('->')[0], edgeID.split('->')[1]);
                     edge = document.getElementById(edgeID);
                 }
-                if(parentNode.getDetailed()){ console.log("switched to detailed");toggleToDetailed(edgeID); }
-                else{ toggleToAbstract(edgeID); }
+                if(parentNode.getDetailed()){ toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)}); }
+                else{ toggleToAbstract(edgeID, {source: divPosition(parentNode), dest: divPosition(childNode)}); }
                 edge.style.display = 'block';
+            }
+        }
+
+        function divPosition(node, index){
+            if(!index) return {x: node.x, y: node.y, width: nodeWidth, height: nodeHeightEmpty};
+            else{
+                return {x: node.x + (nodeWidth-callSiteWidth)/2,
+                            y: node.y + callSiteTopOffset + callSiteHeight*index,
+                            width: callSiteWidth,
+                            height: callSiteHeight};
             }
         }
     }
@@ -397,8 +414,6 @@ function createSingleNode(cont, x, y, name, content, declaredTargets){
 
     node = node.append("xhtml:div")
         .attr("class","node_inhalt");
-    //.style("max-height", "400px")
-    //.style("overflow", "auto");
 
     for(var i=0; i < content.length; i++){
         var entry = node.append("xhtml:button")
@@ -408,7 +423,6 @@ function createSingleNode(cont, x, y, name, content, declaredTargets){
                 let index = this.getAttribute("id").split('#')[1];
                 var node = nodeMap.get(name);
                 node.showChildNodes(index); })
-            //.style("width", "100%")
             .style("border-width", "2px")
             .style("border-top-width", (i == 0 ? "2px" : "0px"))
             .style("border-radius", "5px")

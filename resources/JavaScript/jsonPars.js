@@ -354,8 +354,8 @@ function createChildNodes(node, depth){
 }
 
 function createGraph(){
-	rootNode = createNodeInstance(rootNodeString[0], rootNodeString[1]);
-	// rootNode = createNodeInstance("tmr/Demo", "main");
+	// rootNode = createNodeInstance(rootNodeString[0], rootNodeString[1]);
+	rootNode = createNodeInstance("tmr/Demo", "main");
 	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
 	document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;
