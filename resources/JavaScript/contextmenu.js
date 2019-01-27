@@ -73,12 +73,13 @@ function deleteNodes() {
 function switchContent() {
     let nodeName= $(clickedDiv).attr('id');
     let node = nodeMap.get(nodeName);
+    node.toggleDetailed();
     $(clickedDiv).children(".node_inhalt").toggleClass("invis");
-    for(var i = 0; i < node.parents.length; i++){		// first all edges to this node become hidden
-        var edge = document.getElementById(node.parents[i].getName() + "#"+ node.parents[i].getMethodIndex(nodeName) + '->' + nodeName);
-        if(edge) edge.style.display = "none";
+    // for(var i = 0; i < node.parents.length; i++){		// first all edges to this node become hidden
+    //     var edge = document.getElementById(node.parents[i].node.getName() + "#" + node.parents[i].index + '->' + nodeName);
+    //     if(edge) edge.style.display = "none";
         //method2nodeEdge(node.parents[i].getName() + "#"+ node.parents[i].getMethodIndex(nodeName),nodeName);
-    }
+    // }
 
 }
 
