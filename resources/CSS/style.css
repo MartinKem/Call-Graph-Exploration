@@ -49,6 +49,10 @@ svg{
     box-sizing: border-box;
 }
 
+#search:hover{
+    cursor: pointer;
+}
+
 #search:active{
 	background-color: #efe5d6;
 	color: black;

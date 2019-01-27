@@ -81,7 +81,10 @@ function parseString() {
 function correctClassNames(methods){
 	for(var i = 0; i < methods.reachableMethods.length; i++){
 		correctSingleMethod(methods.reachableMethods[i].method);
-		methods.reachableMethods[i].callSites.forEach(function(site){ correctSingleMethod(site.declaredTarget); });
+		methods.reachableMethods[i].callSites.forEach(function(site){
+		    correctSingleMethod(site.declaredTarget);
+		    site.targets.forEach(correctSingleMethod);
+		});
 	}
 	
 	function correctSingleMethod(method){
@@ -91,7 +94,8 @@ function correctClassNames(methods){
 	}
 	
 	function truncateString(str){
-		if(str[0] == 'L' && str[str.length-1] == ';') { return str.substring(1, str.length-1); }
+		if(str[0] === 'L' && str[str.length-1] === ';') { return str.substring(1, str.length-1); }
+		else if(str[1] === 'L') { return str.substring(2, str.length-1); }
 		else return str;
 	}
 }
@@ -118,7 +122,7 @@ function parseFile(file, callback) {
 			let parsedJson = parseString();
 			
 			correctClassNames(parsedJson); // remove 'L' and ';' out of the class names
-
+			console.log(parsedJson);
 			//map rechableMethods to HashMap
 			parsedJsonMap = new Map();
 			parsedJson.reachableMethods.forEach(function(element){
