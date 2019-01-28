@@ -125,7 +125,7 @@ class node{
             if(this.children[i].index == index){
                 if(this.children[i].node.getVisibility() == null){ // if null, child-node has never been placed
                     this.placeChildNodes(index);
-                    // break;
+                    break;
                 }
             }
         }
@@ -145,6 +145,7 @@ class node{
             //     }
             }
         }
+        this.reloadEdges(index, true);
     }
 
     /**
@@ -179,7 +180,6 @@ class node{
         }
         else createSingleNode(this.container, this.x, this.y, this.name, this.content, this.declaredTargets);	// creates a new node otherwise
         this.visible = true;
-        this.reloadEdges();
     }
 
 
@@ -195,13 +195,15 @@ class node{
             //     if(edge) edge.style.display = "none";
             // }
 
-            var node = document.getElementById(this.name);	// now this node itself becomes hidden
+            let node = document.getElementById(this.name);	// now this node itself becomes hidden
             node.style.display = "none";
             this.visible = false;
             // this.visibleParentNodes = 0;	// visibleParentNodes is set to 0 because there is no node anymore with an edge to this node
 
             for(var i = 0; i < this.children.length; i++){
-                if(this.children[i].node.getVisibility()) this.children[i].node.hideNode();
+                let edgeID = this.name + '#' + this.children[i].index + '->' + this.children[i].node.getName();
+                let edge = document.getElementById(edgeID);
+                if(edge != undefined && edge.style.display == 'block') this.children[i].node.hideNode();
 
                 // this is too complicated to realise, if there exist cycles
                 /*
@@ -216,34 +218,35 @@ class node{
             }
             this.rootNode.showNode();	// the root-node shall always be visible
         }
-        this.reloadEdges();
+        this.reloadEdges(null);
     }
 
     /**
      * repositions all in- and outgoing edges of this node
      */
-    reloadEdges(){
+    reloadEdges(callSiteIndex, create){
         let thisNode = this;
         this.children.forEach(function(child){
             let edgeID = thisNode.name + '#' + child.index + '->' + child.node.getName();
-            handleSingleEdge(edgeID, thisNode, child.node, child.index);
+            if(callSiteIndex === null || callSiteIndex == child.index) handleSingleEdge(edgeID, thisNode, child.node, child.index, create);
         });
 
         this.parents.forEach(function(parent){
             let edgeID = parent.node.getName() + '#' + parent.index + '->' + thisNode.name;
-            handleSingleEdge(edgeID, parent.node, thisNode, parent.index);
+            handleSingleEdge(edgeID, parent.node, thisNode, parent.index, false);
         });
 
-        function handleSingleEdge(edgeID, parentNode, childNode, index){
+        function handleSingleEdge(edgeID, parentNode, childNode, index, create){
             let edge = document.getElementById(edgeID);
             if(!parentNode.getVisibility() || !childNode.getVisibility()) {
                 if(edge){ edge.style.display = 'none'; }
             }
             else{
-                if(!edge){
+                if(!edge && create){
                     method2nodeEdge(edgeID.split('->')[0], edgeID.split('->')[1]);
                     edge = document.getElementById(edgeID);
                 }
+                if(!edge || edge.style.display === 'none'){ return; }
                 if(parentNode.getDetailed()){ toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)}); }
                 else{ toggleToAbstract(edgeID, {source: divPosition(parentNode), dest: divPosition(childNode)}); }
                 edge.style.display = 'block';
@@ -251,12 +254,17 @@ class node{
         }
 
         function divPosition(node, index){
-            if(!index) return {x: node.x, y: node.y, width: nodeWidth, height: nodeHeightEmpty};
+            if(index === undefined){
+                let height = nodeHeightEmpty;
+                if(node.getDetailed()) height += callSiteHeight*node.getContent().length;
+                return {x: node.x, y: node.y, width: nodeWidth, height: height};
+            }
             else{
-                return {x: node.x + (nodeWidth-callSiteWidth)/2,
+                let first = {x: node.x + (nodeWidth-callSiteWidth)/2,
                             y: node.y + callSiteTopOffset + callSiteHeight*index,
                             width: callSiteWidth,
                             height: callSiteHeight};
+                return first;
             }
         }
     }
@@ -266,7 +274,7 @@ class node{
      */
     toggleDetailed(){
         this.detailed = !this.detailed;
-        this.reloadEdges();
+        this.reloadEdges(null);
     }
 
     /**

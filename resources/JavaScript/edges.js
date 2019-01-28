@@ -282,7 +282,6 @@ id: id of the edge
 returns: void
 */
 function toggleToDetailed(id, link){
-	console.log(link);
 	var edge = document.getElementById(id);
 	[sourceID, destID] = id.split("->");
 	if(!link) link = {source: absPosition(sourceID), dest: absPosition(destID)};
