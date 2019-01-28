@@ -73,7 +73,8 @@ function switchContent() {
     let nodeName= $(clickedDiv).attr('id');
     let node = nodeMap.get(nodeName);
     $(clickedDiv).children(".node_inhalt").toggleClass("invis");
-    node.toggleDetailed();
+    if($(clickedDiv).children(".node_inhalt").hasClass("invis")){ node.toggleToAbstract(); }
+    else{ node.toggleToDetailed(); }
     // for(var i = 0; i < node.parents.length; i++){		// first all edges to this node become hidden
     //     var edge = document.getElementById(node.parents[i].node.getName() + "#" + node.parents[i].index + '->' + nodeName);
     //     if(edge) edge.style.display = "none";
