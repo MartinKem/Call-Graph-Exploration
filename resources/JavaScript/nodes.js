@@ -57,10 +57,6 @@ class node{
                                 // this.visible == false: this node has valid x- and y-values, but is currently invisible
                                 // this.visible == true: node has valid x- and y-values and is currently displayed
 
-        // this.visibleParentNodes = 0;	// visible parent-nodes must be counted, because if one parent-node becomes hidden, this node must still be shown,
-        // if there exists another visible parent-node
-        // console.log(this);
-
         // this is only for logging
         createdNodes++;
         if(createdNodes % 1000 == 0) console.log(createdNodes + " nodes created");
@@ -133,16 +129,6 @@ class node{
         for(var i = 0; i < this.children.length; i++){
             if(this.children[i].index == index){
                 this.children[i].node.showNode();
-            //     var parentID = this.name + '#' + this.children[i].index;
-            //     var edge = document.getElementById(parentID + '->' + this.children[i].node.getName());
-            //     if(!edge){	// if child-node hasn't been placed before, a new edge must be created
-            //         method2nodeEdge(parentID, this.children[i].node.getName());
-            //         // this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() + 1);	// visibleParents of child-node must be incremented
-            //     }
-            //     else if(edge.style.display != 'block'){		// if child-node has already been placed, the affected edge is just turned on visible
-            //         // this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() + 1);	// visibleParents of child-node must be incremented
-            //         edge.style.display = "block";
-            //     }
             }
         }
         this.reloadEdges("showChildNodes", index);
@@ -190,10 +176,6 @@ class node{
      */
     hideNode(){
         if(this.visible != null){
-            // for(var i = 0; i < this.parents.length; i++){		// first all edges to this node become hidden
-            //     var edge = document.getElementById(this.parents[i].node.getName() + "#"+ this.parents[i].index + '->' + this.name);
-            //     if(edge) edge.style.display = "none";
-            // }
 
             let node = document.getElementById(this.name);	// now this node itself becomes hidden
             node.style.display = "none";
@@ -206,17 +188,6 @@ class node{
                 if(edge != undefined
                     && edge.style.display == 'block'
                     && this.children[i].node.getName() !== this.name) this.children[i].node.hideNode();
-
-                // this is too complicated to realise, if there exist cycles
-                /*
-                if(this.children[i][0].getVisibleParentNodes() == 1) this.children[i][0].hideNode();	// if this was the last visible parent-node
-                                                                                                        // of a child-node, the child-node becomes hidden
-                else if(this.children[i][0].getVisibleParentNodes() > 1){	// otherwise only the edge to the child-node becomes hidden and visibleParentNodes of the child is decremented
-                    var edge = document.getElementById(this.name + '#' + this.children[i][1] + '->' + this.children[i][0].getID());
-                    edge.style.display = 'none';
-                    this.children[i][0].setVisibleParentNodes(this.children[i][0].getVisibleParentNodes() - 1);
-                }
-                */
             }
             this.rootNode.showNode();	// the root-node shall always be visible
         }
@@ -224,46 +195,44 @@ class node{
     }
 
     /**
-     * repositions all in- and outgoing edges of this node
+     * repositions all in- and outgoing edges of this node.
+     * if in "showChildNodes"-mode, only handles outgoing edges for a given call-site-index
+     *
+     * @param{string} mode - declares which and how edges shall be reloaded
+     * @param{number} callSiteIndex - function will only outgoing edges of the given call site
      */
     reloadEdges(mode, callSiteIndex){
         let thisNode = this;
         this.children.forEach(function(child){
             let edgeID = thisNode.name + '#' + child.index + '->' + child.node.getName();
-            if(mode !== "showChildNodes" || callSiteIndex == child.index){
+            if(mode !== "showChildNodes" || callSiteIndex == child.index){  // if mode is "showChildNodes", the child must have the correct call-site-index
                 handleSingleEdge(edgeID, thisNode, child.node, child.index, mode);
             }
         });
 
-        if(mode !== "showChildNodes"){
+        if(mode !== "showChildNodes"){  // if mode is "showChildNodes" parent nodes are not affected
             this.parents.forEach(function(parent){
+                // if edges shall just change their positions, it is necessary to adapt the mode to the parent's current detailed value
                 if(mode === "toDetailed" || mode === "toAbstract"){ mode = parent.node.getDetailed() ? "toDetailed" : "toAbstract"}
                 let edgeID = parent.node.getName() + '#' + parent.index + '->' + thisNode.name;
                 handleSingleEdge(edgeID, parent.node, thisNode, parent.index, mode);
             });
         }
 
-        // function handleSingleEdge(edgeID, parentNode, childNode, index, create){
-        //     let edge = document.getElementById(edgeID);
-        //     if(!parentNode.getVisibility() || !childNode.getVisibility()) {
-        //         if(edge){ edge.style.display = 'none'; }
-        //     }
-        //     else{
-        //         if(!edge && create){
-        //             method2nodeEdge(edgeID.split('->')[0], edgeID.split('->')[1]);
-        //             edge = document.getElementById(edgeID);
-        //         }
-        //         if(!edge || edge.style.display === 'none'){ return; }
-        //         if(parentNode.getDetailed()){ toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)}); }
-        //         else{ toggleToAbstract(edgeID, {source: divPosition(parentNode), dest: divPosition(childNode)}); }
-        //         edge.style.display = 'block';
-        //     }
-        // }
-
+        /**
+         * handles a single edge for reloadEdges()
+         *
+         * @param{string} edgeID - id of the affected edge
+         * @param{node} parentNode - start of the edge
+         * @param{node} childNode - destination of the edge
+         * @param{number} index - child's call-site-index
+         * @param{string} mode - declares how the edge shall be manipulated
+         */
         function handleSingleEdge(edgeID, parentNode, childNode, index, mode){
             let edge = document.getElementById(edgeID);
 
             if(mode === "showChildNodes"){
+                //  a new edge is only created, if it didn't exist yet
                 if(!edge){
                     method2nodeEdge(edgeID.split('->')[0], edgeID.split('->')[1]);
                     toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)});
@@ -277,27 +246,31 @@ class node{
             else if(mode === "toDetailed"){
                 if(edge){
                     toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)});
-                    // if(parentNode.getDetailed()) toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)});
-                    // else toggleToDetailed(edgeID, {source: divPosition(parentNode), dest: divPosition(childNode)});
                 }
             }
             else if(mode === "toAbstract"){
                 if(edge){
                     toggleToAbstract(edgeID, {source: divPosition(parentNode), dest: divPosition(childNode)});
-                    // if(parentNode.getDetailed()) toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)});
-                    // else toggleToAbstract(edgeID, {source: divPosition(parentNode), dest: divPosition(childNode)});
                 }
             }
 
         }
 
+        /**
+         * calculates the sizes of a given div, which can be a whole node or just a single call site
+         *
+         * @param{node} node - node instance, that represents the div
+         * @param{number} index - call-site-index
+         * @returns {{x: number, width: number, y: number, height: number}} sizes of the given div
+         */
         function divPosition(node, index){
-            if(index === undefined){
+            if(index === undefined){    // if undefined the sizes of the whole node shall be returned
                 let height = nodeHeightEmpty;
+                // height variates, if node is currently in detailed mode or not
                 if(node.getDetailed()) height += callSiteHeight*node.getContent().length;
                 return {x: node.x, y: node.y, width: nodeWidth, height: height};
             }
-            else{
+            else{   // in else block, the size of a single call site shall be returned
                 return {x: node.x + (nodeWidth-callSiteWidth)/2,
                             y: node.y + callSiteTopOffset + callSiteHeight*index,
                             width: callSiteWidth,
