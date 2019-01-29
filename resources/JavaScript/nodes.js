@@ -237,6 +237,7 @@ class node{
 
         if(mode !== "showChildNodes"){
             this.parents.forEach(function(parent){
+                if(mode === "toDetailed" || mode === "toAbstract"){ mode = parent.node.getDetailed() ? "toDetailed" : "toAbstract"}
                 let edgeID = parent.node.getName() + '#' + parent.index + '->' + thisNode.name;
                 handleSingleEdge(edgeID, parent.node, thisNode, parent.index, mode);
             });
@@ -275,14 +276,16 @@ class node{
             }
             else if(mode === "toDetailed"){
                 if(edge){
-                    if(parentNode.getDetailed()) toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)});
-                    else toggleToDetailed(edgeID, {source: divPosition(parentNode), dest: divPosition(childNode)});
+                    toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)});
+                    // if(parentNode.getDetailed()) toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)});
+                    // else toggleToDetailed(edgeID, {source: divPosition(parentNode), dest: divPosition(childNode)});
                 }
             }
             else if(mode === "toAbstract"){
                 if(edge){
-                    if(parentNode.getDetailed()) toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)});
-                    else toggleToAbstract(edgeID, {source: divPosition(parentNode), dest: divPosition(childNode)});
+                    toggleToAbstract(edgeID, {source: divPosition(parentNode), dest: divPosition(childNode)});
+                    // if(parentNode.getDetailed()) toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)});
+                    // else toggleToAbstract(edgeID, {source: divPosition(parentNode), dest: divPosition(childNode)});
                 }
             }
 
