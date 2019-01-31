@@ -150,13 +150,12 @@ function sidePoint(node1, node2){
 	if(node2.x + node2.width/2 > node1.x + node1.width){
 		xRes = node1.x + node1.width;
 	}
-	else xRes = node1.x;
-	// if(node2.x + node2.width/2 < node1.x){
-		// xRes = node1.x;
-	// }
-	// else{
-		// return borderPoint(node1, node2);
-	// }
+	else if(node2.x + node2.width/2 < node1.x){
+		xRes = node1.x;
+	}
+	else{
+		return borderPoint(node1, node2);
+	}
 	return {x: xRes, y: node1.y + node1.height/2};
 }
 
@@ -286,7 +285,10 @@ function toggleToDetailed(id, link){
 	[sourceID, destID] = id.split("->");
 	if(!link) link = {source: absPosition(sourceID), dest: absPosition(destID)};
 	var n1 = sidePoint(link.source, link.dest);
-	if(n1.x && sourceID.split('#')[0] == destID) edge.setAttribute("d", getCurvedPath(n1.x, n1.y-15, n1.x-27, n1.y-65));
+	if(n1.x && sourceID.split('#')[0] == destID){
+		n1 = {x: link.source.x, y: link.source.y + link.source.height/2};
+		edge.setAttribute("d", getCurvedPath(n1.x, n1.y-15, n1.x-27, n1.y-65));
+	}
 	else{
 		var n2 = borderPoint(link.dest, link.source);
 		if(n1.x && n2.x) edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);

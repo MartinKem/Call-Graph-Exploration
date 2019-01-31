@@ -3,9 +3,9 @@
 //----------------------------------- model section -------------------------------------
 //---------------------------------------------------------------------------------------
 let container = vis;
-const nodeWidth = 300;
+const nodeWidth = 400;
 const nodeHeightEmpty = 144;
-const callSiteWidth = 250;
+const callSiteWidth = nodeWidth-53;
 const callSiteHeight = 27;
 const callSiteTopOffset = 120;
 
@@ -19,11 +19,11 @@ class node{
      * @param {HTML svg object} container - svg
      * @param {string} nameVal - name of the method name
      * @param {string[]} contentVal - string array with the name of the targets
-     * @param {string} declaringClass - dclaring Class of the mehtod
+     * @param {number[]} lines - line number, where this method is called
      * @param {string[]} parameterTypes - string array with the types of the parameters
      * @param {string} returnType - name of the returnType
      */
-    constructor(parent, nameVal, contentVal, declaringClass, parameterTypes, returnType){
+    constructor(parent, nameVal, contentVal, callSiteStats, parameterTypes, returnType){
         this.parents = [];
 
         // Only if this is the root node, this node is placed right now. Otherwise it is placed by setPosition(x, y).
@@ -45,14 +45,14 @@ class node{
         this.container = container;
         this.name = nameVal;
         this.content = contentVal;
-        this.declaringClass = declaringClass;
+        this.declaringClass = name.split('.')[0];
         this.parameterTypes = parameterTypes;
         this.returnType = returnType;
         this.children = [];		// target nodes
-        this.declaredTargets = [];
-        var length = contentVal.length;
+        this.callSiteStats = callSiteStats;
+        // let length = contentVal.length;
+        // while(length-- > 0) this.callSiteStats.push({numberOfTargets: 0, line: lines[contentVal.length-length]});	// callSiteStats holds the number of child nodes to a given content element
         this.detailed = true;
-        while(length-- > 0) this.declaredTargets.push(0);	// declaredTargets holds the number of child nodes to a given content element
         this.visible = null;	// this.visible == null: node has never been placed or displayed;
                                 // this.visible == false: this node has valid x- and y-values, but is currently invisible
                                 // this.visible == true: node has valid x- and y-values and is currently displayed
@@ -78,34 +78,35 @@ class node{
 
     /**
      * adds a child node to the current node where parent and container are given by this node
-     * this node also sets the child's rootNode, it's generation and updates his own children and declaredTargets
+     * this node also sets the child's rootNode, it's generation and updates his own children and callSiteStats
      *
 
      * @param {number} index - call-site-index-index of parent-node
      * @param {string} nameVal - child's title
      * @param {string[]} contentVal - string array with the name of the targets
-     * @param {string} declaringClass - declaring class of the method
+     * @param {string[]} declaringClass - declaring class of the method
      * @param {string[]} parameterTypes - string array with the types of the parameters
      * @param {string} returnType - name of the returnType
      *
      * @returns {node object} - child node instance
      */
-    addChild(index, nameVal, contentVal, declaringClass, parameterTypes, returnType){
+    addChild(index, nameVal, contentVal, callSiteStats, parameterTypes, returnType){
         for(var i = 0; i < this.children.length; i++){	// child-node may only be created, if there doesn't exist a child with the given name yet
             if(this.children[i].node.getName() == nameVal) return;
         }
+        if(index == null) console.log("null:", nameVal);
 
-        var child = nodeMap.get(nameVal);
+        let child = nodeMap.get(nameVal);
 
         if(!child){		// new node-instance is only created, if it didn't exist yet
-            child = new node({node: this, index: index}, nameVal, contentVal, declaringClass, parameterTypes, returnType);
+            child = new node({node: this, index: index}, nameVal, contentVal, callSiteStats, parameterTypes, returnType);
         }
         else child.addParent(this, index);		// if the child-node already existed, it just adds this as new parent
 
         child.setRootNode(this.rootNode);
         child.setGeneration(this.generation + 1);
         this.children.push({node: child, index: index});
-        this.declaredTargets[index]++;
+        // this.callSiteStats[index].numberOfTargets++;
         this.reloadContent();
         return this.children[this.children.length-1].node;
     }
@@ -164,7 +165,7 @@ class node{
         if(this.visible != null){	// just changes the css-display property if the node was already placed before
             document.getElementById(this.name).style.display = "block";
         }
-        else createSingleNode(this.container, this.x, this.y, this.name, this.content, this.declaredTargets);	// creates a new node otherwise
+        else createSingleNode(this.x, this.y, this.name, this.content, this.callSiteStats);	// creates a new node otherwise
         this.visible = true;
     }
 
@@ -392,7 +393,7 @@ class node{
         if(this.visible){
             var methodDivs = document.getElementById(this.name).childNodes[2].childNodes;
             for(var i = 0; i < methodDivs.length; i++){
-                methodDivs[i].childNodes[1].textContent = "(" + this.declaredTargets[i] + ")";
+                methodDivs[i].childNodes[1].textContent = "(" + this.callSiteStats[i].numberOfTargets + ")";
             }
         }
     }
@@ -403,25 +404,24 @@ class node{
 //---------------------------------------------------------------------------------------
 
 /**
- * plottes a single node with some given attributes
+ * plots a single node with some given attributes
  *
  * @param {SVG-foreignObject element} cont - foreignObject-container
  * @param {number} x - left distance
  * @param {number} y - top distance
  * @param {string} name - node title
  * @param {string[]} content - array of call sites
+ * @param {{numberOfTargets: number, line: number}} callSiteStats - some information about each call-site
  */
-function createSingleNode(cont, x, y, name, content, declaredTargets){
-    var node = cont.append("xhtml:div")
+function createSingleNode(x, y, name, content, callSiteStats){
+    var node = container.append("xhtml:div")
         .attr("id", name)
         .attr("class","div_node")
         .style("left", x + "px")
         .style("top", y + "px")
-        .style("width", "300px")
-        //.style("max-height", "500px")
+        .style("width", nodeWidth + "px")
         .style("padding", "20px")
-        .style("border-width", "5px")	// sizes must stay in js-file for later calculations
-    //.style("overflow", "auto")
+        .style("border-width", "5px");	// sizes must stay in js-file for later calculations
 
     var packageStr = name.substring(0, name.lastIndexOf('/'));
     var classStr = name.substring(name.lastIndexOf('/')+1, name.indexOf('.'));
@@ -447,15 +447,15 @@ function createSingleNode(cont, x, y, name, content, declaredTargets){
                 var node = nodeMap.get(name);
                 node.showChildNodes(index); })
             .style("border-width", "2px")
-            .style("border-top-width", (i == 0 ? "2px" : "0px"))
+            .style("border-top-width", (i === 0 ? "2px" : "0px"))
             .style("border-radius", "5px")
-            .style("padding", "5px")
-        entry.append("xhtaml:div")
+            .style("padding", "5px");
+        entry.append("xhtml:div")
             .attr("class", "contentElem")
-            .text(i + ": " + content[i])
+            .text(callSiteStats[i].line + ": " + content[i])
             .style("float", "left");
         entry.append("xhtaml:div")
-            .text("(" + declaredTargets[i] + ")")
+            .text("(" + callSiteStats[i].numberOfTargets + ")")
             .style("float", "right")
             .style("color", "#b0b0b0");
     }

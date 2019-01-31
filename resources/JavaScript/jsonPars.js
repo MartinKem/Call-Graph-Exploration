@@ -308,14 +308,16 @@ function autocomplete(inp, arr) {
 }
 
 function createNodeInstance(declaringClass, name, parentNode, source){
+    // if(declaringClass+'.'+name == "org/apache/xalan/res/XSLMessages.createMessage") console.log("found");
 	var existingNode = nodeMap.get(declaringClass+'.'+name);
 	var newNode;
 	if(existingNode){
-		newNode = parentNode.addChild(source, declaringClass + '.' + name, []);
+		newNode = parentNode.addChild(source, declaringClass + '.' + name, null);
 		mapUsed++;
 		return newNode;
 	}
 	var jsonData = parsedJsonMap.get(declaringClass + "." + name);
+    if(declaringClass+'.'+name == "org/apache/xalan/res/XSLMessages.createMessage") console.log("Hallo", jsonData);
 	if(!jsonData){
 		if(!parentNode){
 			alert("\"" + declaringClass + '.' + name + "\" does not exist in the JSON-file!");
@@ -324,13 +326,19 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 		newNode = parentNode.addChild(source, declaringClass + '.' + name, []);
 	}
 	else{
-		var callSites = [];
+		let callSites = [];
+		let callSiteStats = [];
 		for(var i = 0; i < jsonData.callSites.length; i++){
 			callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
+			callSiteStats.push({numberOfTargets: jsonData.callSites[i].targets.length, line: jsonData.callSites[i].line});
 		}
-		if(!parentNode) newNode = new node(null, declaringClass + '.' + name, callSites);
+		if(!parentNode){
+		    // console.log(jsonData, callSiteStats);
+		    newNode = new node(null, declaringClass + '.' + name, callSites, callSiteStats);
+        }
 		else{
-			newNode = parentNode.addChild(source, declaringClass + '.' + name, callSites);
+			newNode = parentNode.addChild(source, declaringClass + '.' + name, callSites, callSiteStats);
+            if(declaringClass+'.'+name == "org/apache/xalan/res/XSLMessages.createMessage") console.log("Hallo", newNode);
 		}
 	}
 	if(newNode) nodeMap.set(declaringClass + '.' + name, newNode);
