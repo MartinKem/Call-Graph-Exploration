@@ -29,7 +29,7 @@ function initForce(svg, nodeArr, linkArr){
 	height = d3.select("svg").attr("height");
 	
 	var force = d3.layout.force()
-		.charge(-20000)
+		.charge(-50000)
 		.linkDistance(1500)
 		.size([width, height])
 		.nodes(nodeArr)
@@ -43,7 +43,6 @@ function initForce(svg, nodeArr, linkArr){
 	}
 	force.stop();
 	
-	nodeSelection.call(force.drag);
 	return [force, nodeSelection, linkSelection];
 }
 
@@ -117,10 +116,10 @@ function addNodeToForceTree(sourceNodeID, targetNodeIDs){
 		nodes.push({index: idx, id: targetNodeIDs[targetNodeIDs.length - count]})
 		links.push({source: sourceNode, target: idx})
 	} while(--count > 0);
-	restart();
+	restartForceLayouting();
 	var positions = [];
 	for(var i = firstIdx; i < nodes.length; i++){
-		positions.push({x: nodes[i].x, y: nodes[i].y});
+		positions.push({x: nodes[i].x, y: nodes[i].y, index: i});
 	}
 	return positions;
 }
@@ -131,13 +130,12 @@ also starts the force-layouting
 
 returns: void
 */
-function restart() {
+function restartForceLayouting(ticks){
 	nodeSelection = nodeSelection.data(nodes);
 
 	nodeSelection.enter().insert("circle", ".cursor")
 		.attr("r", 10 - .75)
-		.style("fill", "rgb(31, 119, 180)")
-		.call(force.drag);
+		.style("fill", "rgb(31, 119, 180)");
 
 	linkSelection = linkSelection.data(links);
 
@@ -149,7 +147,8 @@ function restart() {
 		.on("tick", function(e){ tick(e, linkSelection, nodeSelection); })
 		.on("end", function(e){ fix(e, linkSelection); })
 		.start();
-	for(var i = 0; i < 500; i++){
+
+	for(var i = 0; i < (ticks ? ticks : 500); i++){
 		force.tick();
 	}
 	force.stop();

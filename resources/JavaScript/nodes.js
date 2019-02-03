@@ -2,7 +2,7 @@
 //---------------------------------------------------------------------------------------
 //----------------------------------- model section -------------------------------------
 //---------------------------------------------------------------------------------------
-let container = vis;
+let container = svgCont;
 const nodeWidth = 400;
 const nodeHeightEmpty = 144;
 const callSiteWidth = nodeWidth-53;
@@ -16,7 +16,6 @@ class node{
     /**
      *
      * @param {{node: node, index: number}} parent - parent-node, callsite-index of parent-node
-     * @param {HTML svg object} container - svg
      * @param {string} nameVal - name of the method name
      * @param {string[]} contentVal - string array with the name of the targets
      * @param {number[]} lines - line number, where this method is called
@@ -38,6 +37,7 @@ class node{
 
             this.generation = 0;
             this.rootNode = this;
+            this.forceNodeIndex = 0;
         }
         else{
             this.parents.push(parent);
@@ -69,11 +69,13 @@ class node{
      * @param {number} y - new y-value
      */
     setPosition(x, y){
-        var width = 300;
-        var height = 108 + 27 * this.content.length;
-
-        this.x = x - width/2;
-        this.y = y - height/2;
+        // var width = 300;
+        // var height = 108 + 27 * this.content.length;
+        //
+        // this.x = x - width/2;
+        // this.y = y - height/2;
+        this.x = x;
+        this.y = y;
     }
 
     /**
@@ -154,7 +156,10 @@ class node{
         // the idArray the invisible force graph and returns their positions
 
         for(var i = 0; i < childArray.length; i++){		// in the end the affected child-nodes are placed at the calculated positions
-            childArray[i].node.setPosition(positions[i].x, positions[i].y);
+            let centerX = positions[i].x - nodeWidth/2;
+            let centerY = positions[i].y - (nodeHeightEmpty + callSiteHeight*childArray[i].node.getContent().length)/2;
+            childArray[i].node.setPosition(centerX, centerY);
+            childArray[i].node.setForceNodeIndex(positions[i].index);
         }
     }
 
@@ -281,16 +286,39 @@ class node{
     }
 
     /**
-     * toggles this detailed attribute
+     * toggles this detailed-attribute to true and reloads this node's edges
      */
     toggleToDetailed(){
         this.detailed = true;
         this.reloadEdges("toDetailed", null);
     }
 
+    /**
+     * toggles this detailed attribute to false and reloads this node's edges
+     */
     toggleToAbstract(){
         this.detailed = false;
         this.reloadEdges("toAbstract", null);
+    }
+
+    /**
+     * uses toggleToDetailed() for this and all child nodes
+     */
+    allToDetailed(){
+        this.toggleToDetailed();
+        this.children.forEach(function(child){
+            if(!child.node.getDetailed()) child.node.allToDetailed();
+        });
+    }
+
+    /**
+     * uses toggleToAbstract() for this and all child nodes
+     */
+    allToAbstract(){
+        this.toggleToAbstract();
+        this.children.forEach(function(child){
+            if(!child.node.getDetailed()) child.node.allToAbstract();
+        });
     }
 
     /**
@@ -326,6 +354,25 @@ class node{
      */
     getGeneration(){ return this.generation; }
 
+    /**
+     * @returns {number} - this nodes's x position
+     */
+    getX(){ return this.x; }
+
+    /**
+     * @returns {number} - this nodes's y position
+     */
+    getY(){ return this.y; }
+
+    /**
+     * @param {number} index - array index of the corresponding node in the force-graph
+     */
+    setForceNodeIndex(index){ this.forceNodeIndex = index; }
+
+    /**
+     * @returns {number} - array index of the corresponding node in the force-graph
+     */
+    getForceNodeIndex(){ return this.forceNodeIndex; }
 
     /**
      * @returns {[node, number][]} - array of [parent, call-site-index]
@@ -414,18 +461,65 @@ class node{
  * @param {{numberOfTargets: number, line: number}} callSiteStats - some information about each call-site
  */
 function createSingleNode(x, y, name, content, callSiteStats){
-    var node = container.append("xhtml:div")
+
+    let lock = false;
+
+    var drag = d3.behavior.drag()
+        .on("dragstart", function(){
+            if(d3.event.sourceEvent.path[0].nodeName === "BUTTON"
+                || d3.event.sourceEvent.path[1].nodeName === "BUTTON") {
+                lock = true;
+            }
+        })
+        .on("dragend", function() {
+            if (!lock){
+                let node = nodeMap.get(this.childNodes[0].id);
+                let xCenter = parseInt(node.getX()) + nodeWidth / 2;
+                let yCenter = parseInt(node.getY()) + (nodeHeightEmpty + callSiteHeight * node.getContent().length) / 2;
+
+                nodes[node.getForceNodeIndex()].x = xCenter;
+                nodes[node.getForceNodeIndex()].y = yCenter;
+                nodes[node.getForceNodeIndex()].fixed = false;
+
+                // nodeSelection[0][node.getForceNodeIndex()].setAttribute("cx", xCenter);
+                // nodeSelection[0][node.getForceNodeIndex()].setAttribute("cy", yCenter);
+
+                restartForceLayouting(1);
+            }
+
+            lock = false;
+        })
+        .on("drag", function() {
+            if(!lock){
+                let newX = parseInt(this.getAttribute("x")) + parseInt(d3.event.dx);
+                let newY = parseInt(this.getAttribute("y")) + parseInt(d3.event.dy);
+
+                this.setAttribute("x", newX);
+                this.setAttribute("y", newY);
+
+                let node = nodeMap.get(this.childNodes[0].id);
+                node.setPosition(newX, newY);
+                node.reloadEdges(node.getDetailed() ? "toDetailed" : "toAbstract");
+
+            }
+        });
+
+    var node = svgCont.append("foreignObject")
+        .attr("x", x)
+        .attr("y", y)
+        .attr("width", nodeWidth)
+        .call(drag)
+        .append("xhtml:div")
         .attr("id", name)
         .attr("class","div_node")
-        .style("left", x + "px")
-        .style("top", y + "px")
         .style("width", nodeWidth + "px")
         .style("padding", "20px")
-        .style("border-width", "5px");	// sizes must stay in js-file for later calculations
+        .style("border-width", "5px");	// sizes must stay in js-file for later calculations;
 
     var packageStr = name.substring(0, name.lastIndexOf('/'));
     var classStr = name.substring(name.lastIndexOf('/')+1, name.indexOf('.'));
     var methodStr = name.substring(name.indexOf('.')+1, name.length);
+
     node.append("xhtml:h3")
         .text(packageStr)
         .style("text-align", "center")

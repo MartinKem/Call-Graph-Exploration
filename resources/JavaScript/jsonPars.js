@@ -308,7 +308,6 @@ function autocomplete(inp, arr) {
 }
 
 function createNodeInstance(declaringClass, name, parentNode, source){
-    // if(declaringClass+'.'+name == "org/apache/xalan/res/XSLMessages.createMessage") console.log("found");
 	var existingNode = nodeMap.get(declaringClass+'.'+name);
 	var newNode;
 	if(existingNode){
@@ -317,7 +316,6 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 		return newNode;
 	}
 	var jsonData = parsedJsonMap.get(declaringClass + "." + name);
-    if(declaringClass+'.'+name == "org/apache/xalan/res/XSLMessages.createMessage") console.log("Hallo", jsonData);
 	if(!jsonData){
 		if(!parentNode){
 			alert("\"" + declaringClass + '.' + name + "\" does not exist in the JSON-file!");
@@ -333,12 +331,10 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 			callSiteStats.push({numberOfTargets: jsonData.callSites[i].targets.length, line: jsonData.callSites[i].line});
 		}
 		if(!parentNode){
-		    // console.log(jsonData, callSiteStats);
 		    newNode = new node(null, declaringClass + '.' + name, callSites, callSiteStats);
         }
 		else{
 			newNode = parentNode.addChild(source, declaringClass + '.' + name, callSites, callSiteStats);
-            if(declaringClass+'.'+name == "org/apache/xalan/res/XSLMessages.createMessage") console.log("Hallo", newNode);
 		}
 	}
 	if(newNode) nodeMap.set(declaringClass + '.' + name, newNode);
@@ -346,7 +342,6 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 }
 
 function createChildNodes(node, depth){
-	// if(depth > 2) return;
 	var declaringClass = node.getName().split(".")[0];
 	var name = node.getName().split(".")[1];
 	var jsonData = parsedJsonMap.get(declaringClass + "." + name);
@@ -366,8 +361,8 @@ function createGraph(){
 	// rootNode = createNodeInstance("tmr/Demo", "main");
 	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
-	document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;
-	document.getElementsByTagName('html')[0].scrollTop = parseInt(vis.attr('height'))/2 - window.innerHeight/2;
+	document.getElementsByTagName('html')[0].scrollLeft = parseInt(svgCont.attr('width'))/2 - window.innerWidth/2;
+	document.getElementsByTagName('html')[0].scrollTop = parseInt(svgCont.attr('height'))/2 - window.innerHeight/2;
 	if(rootNode){
 		rootNode.showNode();
 		createChildNodes(rootNode, 0);
