@@ -86,7 +86,7 @@ class node{
      * @param {number} index - call-site-index-index of parent-node
      * @param {string} nameVal - child's title
      * @param {string[]} contentVal - string array with the name of the targets
-     * @param {string[]} declaringClass - declaring class of the method
+     * @param {{numberOfTargets: number, line: number}[]} callSiteStats - holds an array with the number of targets and the line number for each call site
      * @param {string[]} parameterTypes - string array with the types of the parameters
      * @param {string} returnType - name of the returnType
      *

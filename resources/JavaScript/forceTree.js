@@ -42,7 +42,7 @@ function initForce(svg, nodeArr, linkArr){
 		force.tick();
 	}
 	force.stop();
-	
+
 	return [force, nodeSelection, linkSelection];
 }
 
