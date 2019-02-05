@@ -5,7 +5,7 @@ Call-Graph-Exploration ist eine Webanwendung zu Exploration von Call Graphen
 ## Usage
 Die [Webanwendung](https://martinkem.github.io/Call-Graph-Exploration/) ist den Graphen in Form einer JSON Datei ein. 
 
-###JSON
+### JSON
 Die JSON Datei muss zum aktuellem Stand einige Bedingungen erfüllen.
 
 * Das erste Attribut des Knoten muss "method" sein
