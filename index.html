@@ -44,13 +44,7 @@
 	</div>
 
 	<script>
-		/*function sumChildNodes(node){
-			var count = 0;
-			for(var i = 0; i < node.getChildNodes().length; i++){
-					if(node.getGeneration() < node.getChildNodes()[i][0].getGeneration()) count += sumChildNodes(node.getChildNodes()[i][0]);
-			}
-			return count + node.getChildNodes().length;
-		}*/
+		let f = d3.layout.force;
 		
 		var createdNodes = 0;
 		var svgCont = d3.select("#graph")
@@ -58,22 +52,13 @@
 			.attr("width", 40000)
 			.attr("height", 40000);
 			
-		svgCont.append("defs").attr("id", "definitions");
-		
-		var vis = svgCont.append("foreignObject").attr("width", 40000).attr("height", 40000).attr("position","relative");
+		var defsCont = svgCont.append("defs").attr("id", "definitions");
 		
 		var rootNodeString;
 		var rootNode;	// initialized in jsonPars.js and referenced in node.js
 		
 		var nodeMap = new Map();
-		// "rootNode" is referenced in nodes.js as the actual root-node of the whole graph
-		/*let rootNode = new node(0, -1, vis, "Ltmr/Demo.main", ["Ljava/lang/invoke/MethodHandle.invokeExact", "Ltmr/Demo.<init>", "Ljava/lang/invoke/MethodHandles.lookup", "Ljava/lang/invoke/MethodType.methodType", "Ljava/lang/invoke/MethodHandles$Lookup.findConstructor"]);
-		rootNode.showNode();
-		let child1 = rootNode.addChild(1, 1, "Ltmr/Demo.<init>", ["Ljava/lang/Object.<init>", "Ltmr/Demo.verifyCall"]);
-		let child2 = rootNode.addChild(2, 2, "Ljava/lang/invoke/MethodHandles.lookup", []);
-		let child3 = rootNode.addChild(3, 3, "Ljava/lang/invoke/MethodType.methodType", []);
-		let child4 = rootNode.addChild(4, 4, "Ljava/lang/invoke/MethodHandles$Lookup.findConstructor", []);
-		let childchild1 = child1.addChild(5, 1, "Ltmr/Demo.verifyCall", []);*/
+
 
 	</script>
 	<script>
@@ -82,20 +67,13 @@
 
 			if (i===0){
 				d3.selectAll(".node_inhalt").classed("invis",true);
-				d3.selectAll(".edge").each(function(){
-					var id = d3.select(this).attr("id");
-					toggleToAbstract(id);
-				});
-				// d3.selectAll(".node_inhalt").style("visibility","hidden");
+				rootNode.allToAbstract();
 				document.getElementById("btn").innerText = "Show details";
 				i++;
 			}else {
 
 				d3.selectAll(".node_inhalt").classed("invis",false);
-				d3.selectAll(".edge").each(function(){
-					var id = d3.select(this).attr("id");
-					toggleToDetailed(id);
-				});
+				rootNode.allToDetailed();
 				document.getElementById("btn").innerText = "Hide details";
 				i=0;
 			}

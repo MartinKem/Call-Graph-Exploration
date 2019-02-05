@@ -309,25 +309,39 @@ function autocomplete(inp, arr) {
   }
 }
 
-function createNodeInstance(declaringClass, name, parentNode, source){
-    // if(declaringClass+'.'+name == "org/apache/xalan/res/XSLMessages.createMessage") console.log("found");
+/**
+ * creates a new node object, if there didn't exist one with given class and name before
+ *
+ * @param {string} declaringClass - package and class of the method
+ * @param {string} name - name of the method
+ * @param {node} parentNode - node object the new node shall become a child of
+ * @param {number} index - call-site-index of the child
+ * @returns {node | null} - returns null, if node already existed, returns the new node otherwise
+ */
+function createNodeInstance(declaringClass, name, parentNode, index){
 	var existingNode = nodeMap.get(declaringClass+'.'+name);
 	var newNode;
+
 	if(existingNode){
-		newNode = parentNode.addChild(source, declaringClass + '.' + name, null);
+		/* The node has already been created before, so it is just added as child to the parent node and the function returns null,
+           if the node already existed as child of the parent node. Otherwise it returns the added node.
+         */
+		newNode = parentNode.addChild(index, declaringClass + '.' + name, null);
 		mapUsed++;
 		return newNode;
 	}
 	var jsonData = parsedJsonMap.get(declaringClass + "." + name);
-    if(declaringClass+'.'+name == "org/apache/xalan/res/XSLMessages.createMessage") console.log("Hallo", jsonData);
 	if(!jsonData){
+		// If there doesn't exist an entry in the json-map, the function just creates an empty node without call-sites.
 		if(!parentNode){
+			// In case that parentNode doesn't exist too, the user tries to find a not existing node through the search field.
 			alert("\"" + declaringClass + '.' + name + "\" does not exist in the JSON-file!");
 			return;
 		}
-		newNode = parentNode.addChild(source, declaringClass + '.' + name, []);
+		newNode = parentNode.addChild(index, declaringClass + '.' + name, []);
 	}
 	else{
+		// In else case, the jsonData exists and the function always creates a new node. Now the call-site-information is copied for the new node.
 		let callSites = [];
 		let callSiteStats = [];
 		for(var i = 0; i < jsonData.callSites.length; i++){
@@ -335,41 +349,49 @@ function createNodeInstance(declaringClass, name, parentNode, source){
 			callSiteStats.push({numberOfTargets: jsonData.callSites[i].targets.length, line: jsonData.callSites[i].line});
 		}
 		if(!parentNode){
-		    // console.log(jsonData, callSiteStats);
+			// If parentNode doesn't exist, the user generates a new node through the search field.
 		    newNode = new node(null, declaringClass + '.' + name, callSites, callSiteStats);
         }
 		else{
 			newNode = parentNode.addChild(source, declaringClass + '.' + name, callSites, callSiteStats);
-            if(declaringClass+'.'+name == "org/apache/xalan/res/XSLMessages.createMessage") console.log("Hallo", newNode);
 		}
 	}
-	if(newNode) nodeMap.set(declaringClass + '.' + name, newNode);
+	if(newNode) nodeMap.set(declaringClass + '.' + name, newNode); // now the node object is added to the nodeMap
 	return newNode;
 }
 
-function createChildNodes(node, depth){
-	// if(depth > 2) return;
+/**
+ * builds a graph of node objects based on the information of the json file
+ *
+ * @param {node} node - node object, where the creating build starts
+ */
+function createChildNodes(node){
 	var declaringClass = node.getName().split(".")[0];
 	var name = node.getName().split(".")[1];
 	var jsonData = parsedJsonMap.get(declaringClass + "." + name);
 	var callSites = [];
 	if(jsonData) callSites = jsonData.callSites;
+
+	// for all targets of all call sites this function is called recursively, to create the nodes of the lower children generations too
 	for(var i = 0; i < callSites.length; i++){
 		for(var j = 0; j < callSites[i].targets.length; j++){
 			var target = callSites[i].targets[j];
 			var childNode = createNodeInstance(target.declaringClass, target.name, node, i);
-			if(childNode) createChildNodes(childNode, depth+1);
+			if(childNode) createChildNodes(childNode);
 		}
 	}
 }
 
+/**
+ * initiates the generation of the graph through parsing the input of the search field and starting the node creation
+ */
 function createGraph(){
 	rootNode = createNodeInstance(rootNodeString[0], rootNodeString[1]);
 	// rootNode = createNodeInstance("tmr/Demo", "main");
 	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
-	document.getElementsByTagName('html')[0].scrollLeft = parseInt(vis.attr('width'))/2 - window.innerWidth/2;
-	document.getElementsByTagName('html')[0].scrollTop = parseInt(vis.attr('height'))/2 - window.innerHeight/2;
+	document.getElementsByTagName('html')[0].scrollLeft = parseInt(svgCont.attr('width'))/2 - window.innerWidth/2;
+	document.getElementsByTagName('html')[0].scrollTop = parseInt(svgCont.attr('height'))/2 - window.innerHeight/2;
 	if(rootNode){
 		rootNode.showNode();
 		createChildNodes(rootNode, 0);
