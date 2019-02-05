@@ -1,6 +1,6 @@
 
 var links = [];
-var nodes = [{index: 0, x: svgCont.attr('width')/2, y: svgCont.attr('height')/2, fixed: true, id: "0"}];
+var nodes = [/*{index: 0, x: svgCont.attr('width')/2, y: svgCont.attr('height')/2, fixed: true, id: "0"}*/];
 [force, nodeSelection, linkSelection] = initForce(svgCont, nodes, links);
 
 /*
@@ -101,6 +101,11 @@ targetNodeIDs: array of ids of all the target nodes
 returns: positions: array of positions:{x: a, y: b} for each of the target nodes
 */
 function addNodeToForceTree(sourceNodeID, targetNodeIDs){
+    if(!targetNodeIDs){
+        nodes.push({index: nodes.length, id: sourceNodeID});
+        restartForceLayouting();
+        return {x: nodes[nodes.length-1].x, y: nodes[nodes.length-1].y, index: nodes.length-1};
+    }
 	sourceNode = 0;
 	for(var i = 0; i < nodes.length; i++){
 		if(sourceNodeID == nodes[i].id){

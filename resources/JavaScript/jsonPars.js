@@ -351,7 +351,7 @@ function createNodeInstance(declaringClass, name, parentNode, index){
 		    newNode = new node(null, declaringClass + '.' + name, callSites, callSiteStats);
         }
 		else{
-			newNode = parentNode.addChild(source, declaringClass + '.' + name, callSites, callSiteStats);
+			newNode = parentNode.addChild(index, declaringClass + '.' + name, callSites, callSiteStats);
 		}
 	}
 	if(newNode) nodeMap.set(declaringClass + '.' + name, newNode); // now the node object is added to the nodeMap
@@ -388,10 +388,11 @@ function createGraph(){
 	// rootNode = createNodeInstance("tmr/Demo", "main");
 	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
-	document.getElementsByTagName('html')[0].scrollLeft = parseInt(svgCont.attr('width'))/2 - window.innerWidth/2;
-	document.getElementsByTagName('html')[0].scrollTop = parseInt(svgCont.attr('height'))/2 - window.innerHeight/2;
+	// document.getElementsByTagName('html')[0].scrollLeft = parseInt(svgCont.attr('width'))/2 - window.innerWidth/2;
+	// document.getElementsByTagName('html')[0].scrollTop = parseInt(svgCont.attr('height'))/2 - window.innerHeight/2;
 	if(rootNode){
 		rootNode.showNode();
+		document.getElementById(rootNode.getName()).focus();
 		createChildNodes(rootNode, 0);
 		document.getElementById("search").setAttribute("disabled", "");
 		console.log(createdNodes + " nodes created");

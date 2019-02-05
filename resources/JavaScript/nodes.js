@@ -18,7 +18,7 @@ class node{
      * @param {{node: node, index: number}} parent - parent-node, callsite-index of parent-node
      * @param {string} nameVal - name of the method name
      * @param {string[]} contentVal - string array with the name of the targets
-     * @param {number[]} lines - line number, where this method is called
+     * @param {{numberOfTargets: number, line: number}[]} callSiteStats - holds for each callsite to number of targets and the line, where the site is called
      * @param {string[]} parameterTypes - string array with the types of the parameters
      * @param {string} returnType - name of the returnType
      */
@@ -28,16 +28,21 @@ class node{
         // Only if this is the root node, this node is placed right now. Otherwise it is placed by setPosition(x, y).
         // Also generation is set to 0
         if(parent == null){
-            var width = nodeWidth;
+            // var width = nodeWidth;
             // var height = Math.min(500, 108 + 27 * contentVal.length);	// node-width, node-hight, and content-height are still hard coded
-            let height = nodeHeightEmpty + callSiteHeight*contentVal.length;
+            // let height = nodeHeightEmpty + callSiteHeight*contentVal.length;
 
-            this.x = container.attr("width")/2 - width/2;
-            this.y = container.attr("height")/2 - height/2;
+            // this.x = container.attr("width")/2 - width/2;
+            // this.y = container.attr("height")/2 - height/2;
+            // TODO center positions
+            let position = addNodeToForceTree(nameVal);
+            this.x = position.x;
+            this.y = position.y;
+            this.forceNodeIndex = position.index;
+
 
             this.generation = 0;
             this.rootNode = this;
-            this.forceNodeIndex = 0;
         }
         else{
             this.parents.push(parent);
@@ -443,6 +448,13 @@ class node{
                 methodDivs[i].childNodes[1].textContent = "(" + this.callSiteStats[i].numberOfTargets + ")";
             }
         }
+    }
+
+    /**
+     * sets scrollbar that this node is in the center of the display
+     */
+    focus(){
+        // TODO
     }
 }
 
