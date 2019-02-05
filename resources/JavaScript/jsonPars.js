@@ -122,12 +122,14 @@ function parseFile(file, callback) {
 			let parsedJson = parseString();
 			
 			correctClassNames(parsedJson); // remove 'L' and ';' out of the class names
+			console.log("Done parsing file");
 			console.log(parsedJson);
 			//map rechableMethods to HashMap
 			parsedJsonMap = new Map();
 			parsedJson.reachableMethods.forEach(function(element){
 				parsedJsonMap.set(element.method.declaringClass+"."+element.method.name, element);
 			});
+			console.log("Done map json");
 
 			//progress to 100%
 			let progress = document.getElementById("progress");
