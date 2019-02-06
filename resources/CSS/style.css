@@ -7,8 +7,6 @@ body{
     font-size: 15px;
     margin: 0;
     font-family: Helvetica;
-	/* width: 2000px; */
-	/* height: 2000px; */
 }
 
 .invis{
@@ -26,7 +24,6 @@ body{
     border: solid;
 	border-color: black;
     display: block;
-    padding: 10px;
     box-sizing: border-box;
 }
 
@@ -49,9 +46,19 @@ svg{
     box-sizing: border-box;
 }
 
+#search:hover{
+    cursor: pointer;
+}
+
+#search:active{
+	background-color: #efe5d6;
+	color: black;
+	outline: none;
+}
+
 /*Style for rightclickmenu*/
 
-#main-rightclick{
+#contextmenuNode, #contextmenuEdge{
     z-index: 1000;
     width:100px;
     background-color: #ececec;
@@ -89,9 +96,10 @@ svg{
 	overflow: hidden;
 	border: solid;
 	box-sizing: border-box;
-	width: 100%;
 	left: auto;
 	white-space: nowrap;
+    text-align: left;
+    min-width: 100%;
 }
 
 .methodButton:hover div{
@@ -103,7 +111,6 @@ svg{
 	background-color: rgba(255,255,255,1);
 	margin: auto;
     width: max-content;
-    min-width: 100%;
 }
 
 .methodButton:active{
@@ -111,7 +118,7 @@ svg{
 }
 
 .contentElem{
-	max-width: 180px;
+	max-width: 300px;
 	overflow: hidden;
 	white-space: nowrap;
 }
@@ -162,18 +169,20 @@ input[type=text] {
   background-color: #fffefc;
   padding: 10px;
   font-size: 16px;
+  width: 400px;
+  transition: 0.5s;
 }
 
 .autocomplete-items {
-  position: absolute;
+  position: relative;
   border: 1px solid #d4d4d4;
-  border-bottom: none;
-  border-top: none;
+  /* border-bottom: none; */
+  /* border-top: none; */
   z-index: 99;
   /*position the autocomplete items to be the same width as the container:*/
-  top: 100%;
-  left: 0;
-  right: 0;
+  /* top: 100%; */
+  /* left: 0; */
+  /* right: 0; */
 }
 
 .autocomplete-items div {
@@ -195,13 +204,13 @@ input[type=text] {
 }
 
 circle {
-	visibility: visible; /* visible or hidden */
+	visibility: hidden; /* visible or hidden */
 }
 
 line {
 	stroke: #d8a806;
-	stroke-width: 5px;
-	visibility: visible; /* visible or hidden */
+	stroke-width: 2px;
+	visibility: hidden; /* visible or hidden */
 }
 
 #top_fixed {

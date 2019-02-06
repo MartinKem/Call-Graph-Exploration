@@ -7,7 +7,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-    <link href="eingelesener Graph/style.css" rel="stylesheet" type="text/css">
+    <link href="resources/CSS/style.css" rel="stylesheet" type="text/css">
     <title>D3 Graph</title>
 </head>
 <body>
@@ -17,7 +17,7 @@
 			<fieldset>
 				<h2>Json File</h2>
 			  	<div id="dropZone">You can Drop files here <br />
-				<input type='file' id='fileinput' onchange="setProgBarToZero(); loadFile(); waitForJsonFinishedParsing()">
+				<input type='file' id='fileinput' onchange="setProgBarToZero(); loadFile()">
 			  	</div> <br />
 
 			  	<div id="progress_bar">
@@ -26,90 +26,65 @@
 			</fieldset>
 		  </form>
 	</div>
-	<div id="search_page" class="invis">
-		<!--Seiteninhalt-->
-		<p id="demo"></p>
-		<form autocomplete="off"></form>
-			<div class="autocomplete" style="width:500px;">
-			<input type="text" name="searchMethod" id="methodInput" placeholder="Methode">
-			</div><br/><br/>
-			<div class="autocomplete" style="width:500px;">
-			<input type="text" name="searchClass" id="classInput" placeholder="Klasse">
-			</div>
-		</form><br/>
-		<button id="search" onclick="callSearch()">Get Element</button><br/><br/>
-
-	</div>
 
 	<div id="graph_page" class="invis">
-		<button id="btn" onclick="open_close()">Hide Details</button>
 		<div id='graph' style="position: relative; font-family: Helvetica"></div>
+		<div id="top_fixed" style="position: fixed; top: 10px; left: 10px">
+			<form autocomplete="off" onsubmit="return false" style="overflow: auto;">
+				<div class="autocomplete" style="float: left; margin-right: 10px">
+				<input type="text" name="searchClass" id="classInput" placeholder="Class-Path">
+				</div>
+				<div class="autocomplete" style="float: left; margin-right: 10px">
+				<input type="text" name="searchMethod" id="methodInput" placeholder="Method">
+				</div>
+				<input type="submit" id="search" disabled value="Generate" onclick="callSearch(); createGraph()">
+			</form>
+			<button id="btn" onclick="open_close()" style="margin-top: 10px">Hide Details</button>
+		</div>
 	</div>
 
 	<script>
-		/*function sumChildNodes(node){
-			var count = 0;
-			for(var i = 0; i < node.getChildNodes().length; i++){
-					if(node.getGeneration() < node.getChildNodes()[i][0].getGeneration()) count += sumChildNodes(node.getChildNodes()[i][0]);
-			}
-			return count + node.getChildNodes().length;
-		}*/
+		let f = d3.layout.force;
 		
 		var createdNodes = 0;
 		var svgCont = d3.select("#graph")
 			.append("svg")
-			.attr("width", 20000)
-			.attr("height", 20000);
+			.attr("width", 40000)
+			.attr("height", 40000);
 			
-		svgCont.append("defs").attr("id", "definitions");
+		var defsCont = svgCont.append("defs").attr("id", "definitions");
 		
-		var vis = svgCont.append("foreignObject").attr("width", 20000).attr("height", 20000).attr("position","relative");
-		
-		
+		var rootNodeString;
 		var rootNode;	// initialized in jsonPars.js and referenced in node.js
 		
-		// "rootNode" is referenced in nodes.js as the actual root-node of the whole graph
-		/*let rootNode = new node(0, -1, vis, "Ltmr/Demo.main", ["Ljava/lang/invoke/MethodHandle.invokeExact", "Ltmr/Demo.<init>", "Ljava/lang/invoke/MethodHandles.lookup", "Ljava/lang/invoke/MethodType.methodType", "Ljava/lang/invoke/MethodHandles$Lookup.findConstructor"]);
-		rootNode.showNode();
-		let child1 = rootNode.addChild(1, 1, "Ltmr/Demo.<init>", ["Ljava/lang/Object.<init>", "Ltmr/Demo.verifyCall"]);
-		let child2 = rootNode.addChild(2, 2, "Ljava/lang/invoke/MethodHandles.lookup", []);
-		let child3 = rootNode.addChild(3, 3, "Ljava/lang/invoke/MethodType.methodType", []);
-		let child4 = rootNode.addChild(4, 4, "Ljava/lang/invoke/MethodHandles$Lookup.findConstructor", []);
-		let childchild1 = child1.addChild(5, 1, "Ltmr/Demo.verifyCall", []);*/
+		var nodeMap = new Map();
+
 
 	</script>
 	<script>
 		var i = 0;
 		function open_close() {
+
 			if (i===0){
-				d3.selectAll(".node_inhalt").style("display","none");
-				d3.selectAll(".edge").each(function(){
-					var id = d3.select(this).attr("id");
-					toggleToAbstract(id);
-				});
-				// d3.selectAll(".node_inhalt").style("visibility","hidden");
+				d3.selectAll(".node_inhalt").classed("invis",true);
+				rootNode.allToAbstract();
 				document.getElementById("btn").innerText = "Show details";
 				i++;
 			}else {
 
-				// d3.selectAll(".node_inhalt").style("visibility","visible");
-				d3.selectAll(".node_inhalt").style("display","block");
-				d3.selectAll(".edge").each(function(){
-					var id = d3.select(this).attr("id");
-					toggleToDetailed(id);
-				});
+				d3.selectAll(".node_inhalt").classed("invis",false);
+				rootNode.allToDetailed();
 				document.getElementById("btn").innerText = "Hide details";
 				i=0;
 			}
 			return;
 		}
 	</script>
-	<script src="eingelesener Graph/rightclickmenu.js"></script>
-	<script src="eingelesener Graph/jsonPars.js"></script>
-	<script src="jsonQ-master/jsonQ.js"></script>
-	<script src="eingelesener Graph/search.js"></script>
-	<script src="eingelesener Graph/ForceTree.js"></script>
-    <script src="eingelesener Graph/edges.js"></script>
-    <script src="eingelesener Graph/nodes.js"></script>
+	<script src="resources/JavaScript/contextmenu.js"></script>
+	<script src="resources/JavaScript/jsonPars.js"></script>
+	<script src="resources/JavaScript/search.js"></script>
+	<script src="resources/JavaScript/forceTree.js"></script>
+    <script src="resources/JavaScript/edges.js"></script>
+    <script src="resources/JavaScript/nodes.js"></script>
 </body>
 </html>
