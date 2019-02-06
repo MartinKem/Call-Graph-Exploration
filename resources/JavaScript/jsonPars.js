@@ -403,6 +403,8 @@ function createGraph(){
 		document.getElementById(rootNode.getName()).focus();
 		createChildNodes(rootNode, 0);
 		console.log(createdNodes + " additional nodes created");
+		//update createdNodes in Graph Data
+		estGraphData();
 		createdNodes = 0;
 	}
 }

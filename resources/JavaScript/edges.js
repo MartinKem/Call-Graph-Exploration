@@ -73,8 +73,6 @@ function createEdge(svg, xStart, yStart, xDest, yDest, edgeID, label, curved){
 		 .style("opacity", "0.5")
 		 .style("display", "block")
 		 .style("visibility", "visible");
-	currentEdges++;
-	refreshGraphData();
  }
 
 function getCurvedPath(xStart, yStart, xDest, yDest){
