@@ -323,12 +323,11 @@ function createNodeInstance(declaringClass, name, parentNode, index){
 	var newNode;
 
 	if(existingNode){
-		/* The node has already been created before, so it is just added as child to the parent node and the function returns null,
-           if the node already existed as child of the parent node. Otherwise it returns the added node.
+		/* The node has already been created before, so it is just added as child to the parent node.
          */
 		newNode = parentNode.addChild(index, declaringClass + '.' + name, null);
 		mapUsed++;
-		return newNode;
+		return undefined;
 	}
 	var jsonData = parsedJsonMap.get(declaringClass + "." + name);
 	if(!jsonData){
