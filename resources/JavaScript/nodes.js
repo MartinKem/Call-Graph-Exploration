@@ -27,6 +27,9 @@ class node{
 
         // Only if this is the root node, this node is placed right now. Otherwise it is placed by setPosition(x, y).
         // Also generation is set to 0
+        this.container = container;
+        this.name = nameVal;
+        this.content = contentVal;
         if(parent == null){
             // var width = nodeWidth;
             // var height = Math.min(500, 108 + 27 * contentVal.length);	// node-width, node-hight, and content-height are still hard coded
@@ -34,12 +37,7 @@ class node{
 
             // this.x = container.attr("width")/2 - width/2;
             // this.y = container.attr("height")/2 - height/2;
-            // TODO center positions
-            let position = addNodeToForceTree(nameVal);
-            this.x = position.x;
-            this.y = position.y;
-            this.forceNodeIndex = position.index;
-
+            // this.placeCentrally();
 
             this.generation = 0;
             this.rootNode = this;
@@ -47,9 +45,6 @@ class node{
         else{
             this.parents.push(parent);
         }
-        this.container = container;
-        this.name = nameVal;
-        this.content = contentVal;
         this.declaringClass = name.split('.')[0];
         this.parameterTypes = parameterTypes;
         this.returnType = returnType;
@@ -95,7 +90,7 @@ class node{
      * @param {string[]} parameterTypes - string array with the types of the parameters
      * @param {string} returnType - name of the returnType
      *
-     * @returns {node object} - child node instance
+     * @returns {node} - child node instance
      */
     addChild(index, nameVal, contentVal, callSiteStats, parameterTypes, returnType){
         for(var i = 0; i < this.children.length; i++){	// child-node may only be created, if there doesn't exist a child with the given name yet
@@ -166,6 +161,16 @@ class node{
             childArray[i].node.setPosition(centerX, centerY);
             childArray[i].node.setForceNodeIndex(positions[i].index);
         }
+    }
+
+    /**
+     * places this node in the center of the svg container, but takes care of existing nodes
+     */
+    placeCentrally(){
+        let position = addNodeToForceTree(this.name);
+        this.x = position.x - nodeWidth/2;
+        this.y = position.y - (nodeHeightEmpty + callSiteHeight*this.content.length)/2;
+        this.forceNodeIndex = position.index;
     }
 
     /**
@@ -454,7 +459,10 @@ class node{
      * sets scrollbar that this node is in the center of the display
      */
     focus(){
-        // TODO
+        let xCenter = this.x + nodeWidth/2;
+        let yCenter = this.y + (nodeHeightEmpty + callSiteHeight*this.content.length)/2;
+        document.getElementsByTagName('html')[0].scrollLeft = parseInt(xCenter - window.innerWidth/2);
+        document.getElementsByTagName('html')[0].scrollTop = parseInt(yCenter - window.innerHeight/2);
     }
 }
 
@@ -478,6 +486,7 @@ function createSingleNode(x, y, name, content, callSiteStats){
 
     var drag = d3.behavior.drag()
         .on("dragstart", function(){
+            // closeAllContextmenus();
             if(d3.event.sourceEvent.path[0].nodeName === "BUTTON"
                 || d3.event.sourceEvent.path[1].nodeName === "BUTTON") {
                 lock = true;
@@ -491,12 +500,13 @@ function createSingleNode(x, y, name, content, callSiteStats){
 
                 nodes[node.getForceNodeIndex()].x = xCenter;
                 nodes[node.getForceNodeIndex()].y = yCenter;
-                nodes[node.getForceNodeIndex()].fixed = false;
+                nodes[node.getForceNodeIndex()].px = xCenter;
+                nodes[node.getForceNodeIndex()].py = yCenter;
 
-                // nodeSelection[0][node.getForceNodeIndex()].setAttribute("cx", xCenter);
-                // nodeSelection[0][node.getForceNodeIndex()].setAttribute("cy", yCenter);
+                // nodeSelection.attr("cx", xCenter);
+                // nodeSelection.attr("cy", yCenter);
 
-                restartForceLayouting(1);
+                // restartForceLayouting(1);
             }
 
             lock = false;
@@ -567,13 +577,13 @@ function createSingleNode(x, y, name, content, callSiteStats){
     }
 
     //on rightclick in this node calls rightclickmenu and deactivates normal contextmenu
-    $("[id='" + name + "']").contextmenu(function(e) {
-        if(menuIsOpen){
-            $("#main-rightclick").remove();
-            menuIsOpen = false;
+/*    $("[id='" + name + "']").contextmenu(function(e) {
+        if(nodeMenuIsOpen){
+            $("#contextmenuNode").remove();
+            nodeMenuIsOpen = false;
         }
-        clickedDiv = this;
-        rightclickmenu(e);
+        clickedNode = this;
+        createNodeContextmenu(e);
         return false;
-    });
+    });*/
 }

@@ -37,7 +37,7 @@
 				<div class="autocomplete" style="float: left; margin-right: 10px">
 				<input type="text" name="searchMethod" id="methodInput" placeholder="Method">
 				</div>
-				<input type="submit" id="search" disabled value="Generate" onclick="callSearch(); createGraph()">
+				<input type="submit" id="search" disabled value="Find" onclick="callSearch(); createGraph()">
 			</form>
 			<button id="btn" onclick="open_close()" style="margin-top: 10px">Hide Details</button>
 		</div>
@@ -56,6 +56,7 @@
 		
 		var rootNodeString;
 		var rootNode;	// initialized in jsonPars.js and referenced in node.js
+		var rootNodes = [];
 		
 		var nodeMap = new Map();
 
@@ -67,13 +68,13 @@
 
 			if (i===0){
 				d3.selectAll(".node_inhalt").classed("invis",true);
-				rootNode.allToAbstract();
+				rootNodes.forEach(allToAbstract);
 				document.getElementById("btn").innerText = "Show details";
 				i++;
 			}else {
 
 				d3.selectAll(".node_inhalt").classed("invis",false);
-				rootNode.allToDetailed();
+				rootNodes.forEach(allToDetailed);
 				document.getElementById("btn").innerText = "Hide details";
 				i=0;
 			}

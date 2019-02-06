@@ -334,7 +334,6 @@ function createNodeInstance(declaringClass, name, parentNode, index){
 		/* The node has already been created before, so it is just added as child to the parent node.
          */
 		newNode = parentNode.addChild(index, declaringClass + '.' + name, null);
-		mapUsed++;
 		return undefined;
 	}
 	var jsonData = parsedJsonMap.get(declaringClass + "." + name);
@@ -393,18 +392,18 @@ function createChildNodes(node){
  * initiates the generation of the graph through parsing the input of the search field and starting the node creation
  */
 function createGraph(){
-	rootNode = createNodeInstance(rootNodeString[0], rootNodeString[1]);
+	rootNode = nodeMap.get(rootNodeString[0] + '.' + rootNodeString[1]);
+	if(!rootNode) rootNode = createNodeInstance(rootNodeString[0], rootNodeString[1]);
 	// rootNode = createNodeInstance("tmr/Demo", "main");
 	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
-	// document.getElementsByTagName('html')[0].scrollLeft = parseInt(svgCont.attr('width'))/2 - window.innerWidth/2;
-	// document.getElementsByTagName('html')[0].scrollTop = parseInt(svgCont.attr('height'))/2 - window.innerHeight/2;
 	if(rootNode){
+		if(!rootNode.getX()) rootNode.placeCentrally();
 		rootNode.showNode();
+		rootNode.focus();
 		document.getElementById(rootNode.getName()).focus();
 		createChildNodes(rootNode, 0);
-		document.getElementById("search").setAttribute("disabled", "");
-		console.log(createdNodes + " nodes created");
-		console.log("hashmap was used", mapUsed, "times");
+		console.log(createdNodes + " additional nodes created");
+		createdNodes = 0;
 	}
 }
