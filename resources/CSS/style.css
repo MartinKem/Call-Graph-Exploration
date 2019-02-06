@@ -58,7 +58,7 @@ svg{
 
 /*Style for rightclickmenu*/
 
-#main-rightclick{
+#contextmenuNode, #contextmenuEdge{
     z-index: 1000;
     width:100px;
     background-color: #ececec;
@@ -223,4 +223,13 @@ line {
     position: fixed;
     bottom: 10px;
     right: 10px;
+}
+
+.lastClickedNode{
+    border-color: red !important;
+}
+.lastClickedEdge{
+    stroke-width: 7px!important;
+    opacity: 1 !important;
+    stroke: red !important;
 }

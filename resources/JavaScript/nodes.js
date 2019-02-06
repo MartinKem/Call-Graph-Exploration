@@ -577,13 +577,13 @@ function createSingleNode(x, y, name, content, callSiteStats){
     }
 
     //on rightclick in this node calls rightclickmenu and deactivates normal contextmenu
-    $("[id='" + name + "']").contextmenu(function(e) {
-        if(menuIsOpen){
-            $("#main-rightclick").remove();
-            menuIsOpen = false;
+/*    $("[id='" + name + "']").contextmenu(function(e) {
+        if(nodeMenuIsOpen){
+            $("#contextmenuNode").remove();
+            nodeMenuIsOpen = false;
         }
-        clickedDiv = this;
-        rightclickmenu(e);
+        clickedNode = this;
+        createNodeContextmenu(e);
         return false;
-    });
+    });*/
 }

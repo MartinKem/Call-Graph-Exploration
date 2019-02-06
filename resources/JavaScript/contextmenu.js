@@ -1,34 +1,60 @@
 
-var clickedDiv;
-var menuIsOpen = false;
+var clickedNode;
+var nodeMenuIsOpen = false;
+var clickedEdge;
+var edgeMenuIsOpen = false;
+var markedNode
+var markedEdge
+var lastMarkedNode;
+var lastMarkedEdge;
 
-//eventhandler for normal leftclick, deaktivates rightclickmenu
+//eventhandler for normal leftclick, deaktivates the contextmenu for nodes
 $("html").on("click", function(e){
-    if(menuIsOpen){
-        $("#main-rightclick").remove();
-        menuIsOpen = false;
-    }
+    closeAllContextmenus();
 });
-//eventhandler for rightclick, deactivates rightclickmenu (not in .div_node)
+//eventhandler for rightclick, closes the contextmenu for nodes(not in .div_node)
 $("html:not(.div_node)").on("contextmenu",function(e){
-    if(menuIsOpen){
-        $("#main-rightclick").remove();
-        menuIsOpen = false;
-    }
+    closeEdgeContextmenu();
 });
-//on rightclick in .div_node calls rightclickmenu and deactivates normal contextmenu
+//on rightclick in .div_node calls nodeContextmenu and deactivates normal contextmenu
 //not used anymore
-$(".div_node").contextmenu(function(e) {
-    if(menuIsOpen){
-        $("#main-rightclick").remove();
-        menuIsOpen = false;
-    }
-    clickedDiv = this;
-    rightclickmenu(e);
+// $(".div_node").contextmenu(function(e) {
+$("body").on("contextmenu",".div_node",function (e) {
+    closeAllContextmenus();
+    clickedNode = this;
+
+    createNodeContextmenu(e);
     return false;
 });
+$("body").on("contextmenu","svg path",function (e) {
+    closeAllContextmenus();
+    clickedEdge = this;
+    createEdgeContextmenu(e);
+    return false;
+});
+$("body").on("contextmenu","html:not(path)",function () {
+    closeEdgeContextmenu();
+});
+
+//mark last clicked
+$("body").on("click",".div_node",function () {
+    markedNode = this;
+    if(lastMarkedNode !== markedNode){
+        markLastClickedNode();
+    }
+});
+$("body").on("click","svg path",function () {
+    markedEdge = this;
+    if(lastMarkedEdge !== markedEdge){
+        markLastClickedEdge();
+    }
+});
+
+
+
+
 //loads rightclickmenu.html on current mouse position
-function rightclickmenu(e) {
+function createNodeContextmenu(e) {
 
 
     let x = e.pageX + "px";     // Get the horizontal coordinate
@@ -41,39 +67,39 @@ function rightclickmenu(e) {
     }catch (e) {*/
        // counter = 1;
        // if(counter > 0)console.log("contextmenu nicht mehr aktuell");
-        $("body").append($("<div id='main-rightclick'>        <div class=\"menuelement\" onclick=\"deleteNodes()\">Ausblenden</div>" +
+        $("body").append($("<div id='contextmenuNode'>        <div class=\"menuelement\" onclick=\"deleteNodes()\">Ausblenden</div>" +
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Red<div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Green<div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Blue<div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Yellow<div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">White<div class=\"color\" style=\"background-color: white\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">White<div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"switchContent()\">Details</div><div>"));
 
-    $("#main-rightclick").css({
+    $("#contextmenuNode").css({
         "position":"absolute",
         "top":y,
         "left":x,});
 
 
-    menuIsOpen = true;
+    nodeMenuIsOpen = true;
 
 }
 //changes color to the backgroundcolor of elem
 function colorChosen(elem) {
     var color = $(elem).find(".color").css('backgroundColor');
-    $(clickedDiv).css('background-color', color);
+    $(clickedNode).css('background-color', color);
 }
 
 function deleteNodes() {
-    var nodeId= $(clickedDiv).attr('id');
+    var nodeId= $(clickedNode).attr('id');
 	var nodeInstance = nodeMap.get(nodeId);
 	nodeInstance.hideNode();
 }
 function switchContent() {
-    let nodeName= $(clickedDiv).attr('id');
+    let nodeName= $(clickedNode).attr('id');
     let node = nodeMap.get(nodeName);
-    $(clickedDiv).children(".node_inhalt").toggleClass("invis");
-    if($(clickedDiv).children(".node_inhalt").hasClass("invis")){ node.toggleToAbstract(); }
+    $(clickedNode).children(".node_inhalt").toggleClass("invis");
+    if($(clickedNode).children(".node_inhalt").hasClass("invis")){ node.toggleToAbstract(); }
     else{ node.toggleToDetailed(); }
     // for(var i = 0; i < node.parents.length; i++){		// first all edges to this node become hidden
     //     var edge = document.getElementById(node.parents[i].node.getName() + "#" + node.parents[i].index + '->' + nodeName);
@@ -82,4 +108,68 @@ function switchContent() {
     // }
 
 }
+function createEdgeContextmenu(e) {
+    let x = e.pageX + "px";     // Get the horizontal coordinate
+    let y = e.pageY + "px";     // Get the vertical coordinate
 
+
+
+    $("body").append("<div id='contextmenuEdge'>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Red<div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Green<div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Blue<div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Yellow<div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Normal<div class=\"color\" style=\"background-color: #000000\"></div></div>" +
+    "</div>")
+
+    $("#contextmenuEdge").css({
+        "position":"absolute",
+        "top":y,
+        "left":x,});
+
+
+    edgeMenuIsOpen = true;
+}
+
+function changeColorEdge(elem) {
+    var color = $(elem).find(".color").css('backgroundColor');
+    if(color === "rgb(0, 0, 0)"){
+        $(clickedEdge).css('opacity', 0.5);
+    }else{
+        $(clickedEdge).css('opacity', 1);
+    }
+    $(clickedEdge).css('stroke', color);
+}
+
+function closeAllContextmenus() {
+    closeNodeContextmenu();
+    closeEdgeContextmenu();
+}
+function closeNodeContextmenu() {
+    if(nodeMenuIsOpen){
+        $("#contextmenuNode").remove();
+        nodeMenuIsOpen = false;
+    }
+}
+function closeEdgeContextmenu() {
+    if(edgeMenuIsOpen){
+        $("#contextmenuEdge").remove();
+        edgeMenuIsOpen = false;
+    }
+}
+function markLastClickedNode() {
+    console.log("0")
+    if(lastMarkedNode !== null){
+        $(lastMarkedNode).removeClass("lastClickedNode");
+    }
+    $(markedNode).addClass("lastClickedNode");
+    lastMarkedNode = markedNode;
+}
+function markLastClickedEdge() {
+    console.log("1",markedEdge)
+    if(lastMarkedEdge !== null){
+        $(lastMarkedEdge).removeClass("lastClickedEdge");
+    }
+    $(markedEdge).addClass("lastClickedEdge");
+    lastMarkedEdge = markedEdge;
+}
