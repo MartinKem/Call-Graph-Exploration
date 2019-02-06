@@ -1,7 +1,6 @@
 var strJson = "";
 var arr = [];
 var parsedJsonMap;
-var mapUsed = 0; // only used for logging
 var isLoading = false;
 
 //Add the events for the drop zone
