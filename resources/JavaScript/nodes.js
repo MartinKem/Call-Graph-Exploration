@@ -131,7 +131,9 @@ class node{
         // all child-nodes must be displayed right now
         for(var i = 0; i < this.children.length; i++){
             if(this.children[i].index == index){
-                this.children[i].node.showNode();
+				if(!this.children[i].node.visible){
+					this.children[i].node.showNode();
+				}
             }
         }
         this.reloadEdges("showChildNodes", index);
@@ -182,6 +184,9 @@ class node{
         }
         else createSingleNode(this.x, this.y, this.name, this.content, this.callSiteStats);	// creates a new node otherwise
         this.visible = true;
+		// updates the graph data with new number of nodes
+		currentNodes++;
+		refreshGraphData();
     }
 
 
