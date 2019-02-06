@@ -17,7 +17,7 @@
 			<fieldset>
 				<h2>Json File</h2>
 			  	<div id="dropZone">You can Drop files here <br />
-				<input type='file' id='fileinput' onchange="setProgBarToZero(); loadFile()">
+				<input type='file' id='fileinput' onchange="loadFile()">
 			  	</div> <br />
 
 			  	<div id="progress_bar">
@@ -37,71 +37,24 @@
 				<div class="autocomplete" style="float: left; margin-right: 10px">
 				<input type="text" name="searchMethod" id="methodInput" placeholder="Method">
 				</div>
-				<button id="search" disabled onclick="callSearch(); createGraph()">Generate</button>
+				<input type="submit" id="search" disabled value="Find" onclick="callSearch(); createGraph()">
 			</form>
 			<button id="btn" onclick="open_close()" style="margin-top: 10px">Hide Details</button>
 		</div>
+		<div id="bottom_fixed" style="position: fixed; bottom: 10px; left 10px; margin-left: 5px">
+			<div id="totalNodes";>Total Nodes:
+			</div>
+			<div id="totalEdges">Total Edges:
+			</div>
+			<div id="currentVisibleNodes">Current Nodes:
+			</div>
+			<div id="currentVisibleEdges">Current Edges:
+			</div>
+		</div>
 	</div>
 
-	<script>
-		/*function sumChildNodes(node){
-			var count = 0;
-			for(var i = 0; i < node.getChildNodes().length; i++){
-					if(node.getGeneration() < node.getChildNodes()[i][0].getGeneration()) count += sumChildNodes(node.getChildNodes()[i][0]);
-			}
-			return count + node.getChildNodes().length;
-		}*/
-		
-		var createdNodes = 0;
-		var svgCont = d3.select("#graph")
-			.append("svg")
-			.attr("width", 20000)
-			.attr("height", 20000);
-			
-		svgCont.append("defs").attr("id", "definitions");
-		
-		var vis = svgCont.append("foreignObject").attr("width", 20000).attr("height", 20000).attr("position","relative");
-		
-		var rootNodeString;
-		var rootNode;	// initialized in jsonPars.js and referenced in node.js
-		
-		var nodeMap = new Map();
-		// "rootNode" is referenced in nodes.js as the actual root-node of the whole graph
-		/*let rootNode = new node(0, -1, vis, "Ltmr/Demo.main", ["Ljava/lang/invoke/MethodHandle.invokeExact", "Ltmr/Demo.<init>", "Ljava/lang/invoke/MethodHandles.lookup", "Ljava/lang/invoke/MethodType.methodType", "Ljava/lang/invoke/MethodHandles$Lookup.findConstructor"]);
-		rootNode.showNode();
-		let child1 = rootNode.addChild(1, 1, "Ltmr/Demo.<init>", ["Ljava/lang/Object.<init>", "Ltmr/Demo.verifyCall"]);
-		let child2 = rootNode.addChild(2, 2, "Ljava/lang/invoke/MethodHandles.lookup", []);
-		let child3 = rootNode.addChild(3, 3, "Ljava/lang/invoke/MethodType.methodType", []);
-		let child4 = rootNode.addChild(4, 4, "Ljava/lang/invoke/MethodHandles$Lookup.findConstructor", []);
-		let childchild1 = child1.addChild(5, 1, "Ltmr/Demo.verifyCall", []);*/
-
-	</script>
-	<script>
-		var i = 0;
-		function open_close() {
-
-			if (i===0){
-				d3.selectAll(".node_inhalt").classed("invis",true);
-				d3.selectAll(".edge").each(function(){
-					var id = d3.select(this).attr("id");
-					toggleToAbstract(id);
-				});
-				// d3.selectAll(".node_inhalt").style("visibility","hidden");
-				document.getElementById("btn").innerText = "Show details";
-				i++;
-			}else {
-
-				d3.selectAll(".node_inhalt").classed("invis",false);
-				d3.selectAll(".edge").each(function(){
-					var id = d3.select(this).attr("id");
-					toggleToDetailed(id);
-				});
-				document.getElementById("btn").innerText = "Hide details";
-				i=0;
-			}
-			return;
-		}
-	</script>
+	<script src="resources/JavaScript/index.js"></script>
+	<script src="resources/JavaScript/refresh.js"></script>
 	<script src="resources/JavaScript/contextmenu.js"></script>
 	<script src="resources/JavaScript/jsonPars.js"></script>
 	<script src="resources/JavaScript/search.js"></script>

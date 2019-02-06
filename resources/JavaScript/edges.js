@@ -150,13 +150,12 @@ function sidePoint(node1, node2){
 	if(node2.x + node2.width/2 > node1.x + node1.width){
 		xRes = node1.x + node1.width;
 	}
-	else xRes = node1.x;
-	// if(node2.x + node2.width/2 < node1.x){
-		// xRes = node1.x;
-	// }
-	// else{
-		// return borderPoint(node1, node2);
-	// }
+	else if(node2.x + node2.width/2 < node1.x){
+		xRes = node1.x;
+	}
+	else{
+		return borderPoint(node1, node2);
+	}
 	return {x: xRes, y: node1.y + node1.height/2};
 }
 
@@ -206,12 +205,14 @@ function absPosition(id){
 	var heightVal = element.offsetHeight;
 	var xVal = 0, yVal = 0;
     do {
+		// if(id === "tmr/Demo.main#4") console.log(xVal, yVal);
 		var borderwidth = 0;
 		if(element != document.getElementById(id)) borderwidth = parseInt(element.style.borderWidth, 10) || 0;
         yVal += element.offsetTop + borderwidth || 0;
         xVal += element.offsetLeft + borderwidth || 0;
         element = element.offsetParent;
     } while(element);
+    // console.log("xy", id, xVal, yVal);
 	return {x: xVal, y: yVal, width: widthVal, height: heightVal}
 }
 
@@ -252,11 +253,11 @@ id: id of the edge
 
 returns: void
 */
-function toggleToAbstract(id){
+function toggleToAbstract(id, link){
 	var edge = document.getElementById(id);
-	[sourceID, destID] = id.split("->");
-	var sourceID = sourceID.split("#")[0];
-	var link = {source: absPosition(sourceID), dest: absPosition(destID)};
+	let destID = id.split("->")[1];
+	let sourceID = id.split("#")[0];
+	if(!link) link = {source: absPosition(sourceID), dest: absPosition(destID)};
 	if(sourceID == destID) edge.setAttribute("d", getCurvedPath(link.source.x, link.source.y+60, link.source.x, link.source.y+30));
 	else{
 		var n1 = borderPoint(link.source, link.dest);
@@ -279,12 +280,15 @@ id: id of the edge
 
 returns: void
 */
-function toggleToDetailed(id){
+function toggleToDetailed(id, link){
 	var edge = document.getElementById(id);
 	[sourceID, destID] = id.split("->");
-	var link = {source: absPosition(sourceID), dest: absPosition(destID)};
+	if(!link) link = {source: absPosition(sourceID), dest: absPosition(destID)};
 	var n1 = sidePoint(link.source, link.dest);
-	if(n1.x && sourceID.split('#')[0] == destID) edge.setAttribute("d", getCurvedPath(n1.x, n1.y-15, n1.x-27, n1.y-65));
+	if(n1.x && sourceID.split('#')[0] == destID){
+		n1 = {x: link.source.x, y: link.source.y + link.source.height/2};
+		edge.setAttribute("d", getCurvedPath(n1.x, n1.y-15, n1.x-27, n1.y-65));
+	}
 	else{
 		var n2 = borderPoint(link.dest, link.source);
 		if(n1.x && n2.x) edge.setAttribute("d", "M" + n1.x + "," + n1.y + "L" + n2.x + "," + n2.y);

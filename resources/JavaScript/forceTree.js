@@ -1,19 +1,7 @@
 
 var links = [];
-var nodes = [{index: 0, x: svgCont.attr('width')/2, y: svgCont.attr('height')/2, fixed: true, id: "0"}];
+var nodes = [/*{index: 0, x: svgCont.attr('width')/2, y: svgCont.attr('height')/2, fixed: true, id: "0"}*/];
 [force, nodeSelection, linkSelection] = initForce(svgCont, nodes, links);
-
-// -----------------------------------------------------------------------------------------------------
-// ---------------------------------- gesamten Call Graphen im voraus berechnen ------------------------
-// -----------------------------------------------------------------------------------------------------
-
-/*
-1. alle Knoten in nodes- und links-Array einfügen
-2. svgCont vergrößern
-3. Force-Graph berechnen lassen
-4. in node-Instanzen die x,y-Werte einfügen
-5. Positionsberechnung bei addChild auskommentieren
-*/
 
 /*
 initialized the force graph throw declaring a link selection, a node selection and the d3-force-layout
@@ -41,21 +29,22 @@ function initForce(svg, nodeArr, linkArr){
 	height = d3.select("svg").attr("height");
 	
 	var force = d3.layout.force()
-		.charge(-8000)
-		.linkDistance(600)
+		.charge(-100000)
+		.linkDistance(1500)
+		.gravity(0.005)
+		// .linkStrength(0.001)
 		.size([width, height])
 		.nodes(nodeArr)
 		.links(linkArr)
-		.on("tick", function(e){ tick(e, linkSelection, nodeSelection); })
-		.on("end", function(e){ fix(e, linkSelection); })
+		// .on("tick", function(e){ tick(e, linkSelection, nodeSelection); })
+		.on("end", function(e){ fix(e, linkSelection, nodeSelection); })
 		.start();
 
 	for(var i = 0; i < 1000; i++){
 		force.tick();
 	}
 	force.stop();
-	
-	nodeSelection.call(force.drag);
+
 	return [force, nodeSelection, linkSelection];
 }
 
@@ -68,27 +57,27 @@ nodeSelection: d3-selection of nodes
 
 returns void
 */
-function tick(e, linkSelection, nodeSelection) {
-	var k = 0.1 * e.alpha;
-	// push targets away from center
-	linkSelection.each(function(d) {
-		if(!d.target.fixed || !d.source.fixed){
-			var diffx = d.target.x - nodes[0].x;
-			var diffy = d.target.y - nodes[0].y;
-			d.target.x += k*diffx;
-			d.target.y += k*diffy;
-		}
-		})
-		.attr("x1", function(d) { return d.source.x; })
-		.attr("y1", function(d) { return d.source.y; })
-		.attr("x2", function(d) { return d.target.x; })
-		.attr("y2", function(d) { return d.target.y; });
-
-	nodeSelection
-		.attr("cx", function(d) { return d.x; })
-		.attr("cy", function(d) { return d.y; });
-
-}
+// function tick(e, linkSelection, nodeSelection) {
+// 	var k = 0.1 * e.alpha;
+// 	// push targets away from center
+// 	linkSelection.each(function(d) {
+// 		if(!d.target.fixed || !d.source.fixed){
+// 			var diffx = d.target.x - nodes[0].x;
+// 			var diffy = d.target.y - nodes[0].y;
+// 			d.target.x += k*diffx;
+// 			d.target.y += k*diffy;
+// 		}
+// 		})
+// 		.attr("x1", function(d) { return d.source.x; })
+// 		.attr("y1", function(d) { return d.source.y; })
+// 		.attr("x2", function(d) { return d.target.x; })
+// 		.attr("y2", function(d) { return d.target.y; });
+//
+// 	nodeSelection
+// 		.attr("cx", function(d) { return d.x; })
+// 		.attr("cy", function(d) { return d.y; });
+//
+// }
 
 /*
 fixes all plotted nodes
@@ -98,7 +87,17 @@ linkSelection: d3 selection of links
 
 returns: void
 */
-function fix(e, linkSelection){
+function fix(e, linkSelection, nodeSelection){
+
+	nodeSelection.attr('r', 10)
+		.attr('cx', function(d) { return d.x; })
+		.attr('cy', function(d) { return d.y; });
+
+	linkSelection.attr('x1', function(d) { return d.source.x; })
+		.attr('y1', function(d) { return d.source.y; })
+		.attr('x2', function(d) { return d.target.x; })
+		.attr('y2', function(d) { return d.target.y; });
+
 	linkSelection.each(function(d) {
 		d.source.fixed = true;
 		d.target.fixed = true;
@@ -114,6 +113,14 @@ targetNodeIDs: array of ids of all the target nodes
 returns: positions: array of positions:{x: a, y: b} for each of the target nodes
 */
 function addNodeToForceTree(sourceNodeID, targetNodeIDs){
+    if(!targetNodeIDs){
+        nodes.push({index: nodes.length, id: sourceNodeID});
+        force.gravity(0.1);
+        restartForceLayouting();
+        force.gravity(0.005);
+        nodes[nodes.length-1].fixed = true;
+        return {x: nodes[nodes.length-1].x, y: nodes[nodes.length-1].y, index: nodes.length-1};
+    }
 	sourceNode = 0;
 	for(var i = 0; i < nodes.length; i++){
 		if(sourceNodeID == nodes[i].id){
@@ -126,13 +133,13 @@ function addNodeToForceTree(sourceNodeID, targetNodeIDs){
 	var count = targetNodeIDs.length;
 	do {
 		var idx = nodes.length;
-		nodes.push({index: idx, id: targetNodeIDs[targetNodeIDs.length - count]})
-		links.push({source: sourceNode, target: idx})
+		nodes.push({index: idx, id: targetNodeIDs[targetNodeIDs.length - count]});
+		links.push({source: sourceNode, target: idx});
 	} while(--count > 0);
-	restart();
+	restartForceLayouting();
 	var positions = [];
 	for(var i = firstIdx; i < nodes.length; i++){
-		positions.push({x: nodes[i].x, y: nodes[i].y});
+		positions.push({x: nodes[i].x, y: nodes[i].y, index: i});
 	}
 	return positions;
 }
@@ -143,13 +150,12 @@ also starts the force-layouting
 
 returns: void
 */
-function restart() {
+function restartForceLayouting(ticks){
 	nodeSelection = nodeSelection.data(nodes);
 
 	nodeSelection.enter().insert("circle", ".cursor")
 		.attr("r", 10 - .75)
-		.style("fill", "rgb(31, 119, 180)")
-		.call(force.drag);
+		.style("fill", "rgb(31, 119, 180)");
 
 	linkSelection = linkSelection.data(links);
 
@@ -158,10 +164,11 @@ function restart() {
 
 	force.nodes(nodes)
 		.links(links)
-		.on("tick", function(e){ tick(e, linkSelection, nodeSelection); })
-		.on("end", function(e){ fix(e, linkSelection); })
+		// .on("tick", function(e){ tick(e, linkSelection, nodeSelection); })
+		.on("end", function(e){ fix(e, linkSelection, nodeSelection); })
 		.start();
-	for(var i = 0; i < 500; i++){
+
+	for(var i = 0; i < (ticks ? ticks : 500); i++){
 		force.tick();
 	}
 	force.stop();
