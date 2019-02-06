@@ -191,7 +191,7 @@ class node{
      * also hides all child-nodes of this node, if they don't have another visible parent
      */
     hideNode(){
-        if(this.visible != null){
+        if(this.visible === true){
 
             let node = document.getElementById(this.name);	// now this node itself becomes hidden
             node.style.display = "none";
