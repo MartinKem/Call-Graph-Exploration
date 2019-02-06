@@ -58,7 +58,7 @@ svg{
 
 /*Style for rightclickmenu*/
 
-#main-rightclick{
+#contextmenuNode, #contextmenuEdge{
     z-index: 1000;
     width:100px;
     background-color: #ececec;
