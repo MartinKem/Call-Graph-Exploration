@@ -1,19 +1,22 @@
 var strJson = "";
 var arr = [];
 var parsedJsonMap;
-var mapUsed = 0; // only used for logging
+var isLoading = false;
 
 //Add the events for the drop zone
 var dropZone = document.getElementById('dropZone');
 dropZone.addEventListener('dragover', handleDragOver, false);
 dropZone.addEventListener('drop', handleFileSelect, false);
 
-
-function setProgBarToZero() {
-	//get progress element from html and set it to 0
-	var progress = document.getElementById("progress");
-	progress.style.width = '0%';
-	progress.textContent = '0%';
+/**
+ * 
+ * @param {string} percent - a string or number from 0 to 100, that is to be set
+ */
+function setProgBar(percent){
+	//get progress element from html
+	let progress = document.getElementById("progress");
+	progress.style.width = percent + '%';
+	progress.textContent = percent + '%';
 }
 
 function handleDragOver(evt) {
@@ -46,8 +49,14 @@ function loadFile() {
 		return;
 	}
 
+	if(isLoading){
+		alert("Please reload page for new load.");
+		return;
+	}
+
+	isLoading = true;
+	setProgBar(0);
 	let input = document.getElementById('fileinput').files[0];
-	//graphJ = loadJsonFile(input);
 	parseFile(input, setString);
 }
 
@@ -132,10 +141,9 @@ function parseFile(file, callback) {
 			console.log("Done map json");
 
 			//progress to 100%
-			let progress = document.getElementById("progress");
-			progress.style.width = '100%';
-			progress.textContent = '100%';
-			
+			setProgBar('100');
+			isLoading = false;
+
 			changeDiv();
 			(function reset() {
 				strJson = "";
@@ -168,8 +176,7 @@ function parseFile(file, callback) {
 				var percentLoaded = Math.round(((offset + evt.loaded) / fileSize) * 100);
 				// Increase the progress bar length.
 				if (percentLoaded < 100) {
-					progress.style.width = percentLoaded + '%';
-					progress.textContent = percentLoaded + '%';
+					setProgBar(percentLoaded);
 				}
 			}
 		};
@@ -326,7 +333,6 @@ function createNodeInstance(declaringClass, name, parentNode, index){
 		/* The node has already been created before, so it is just added as child to the parent node.
          */
 		newNode = parentNode.addChild(index, declaringClass + '.' + name, null);
-		mapUsed++;
 		return undefined;
 	}
 	var jsonData = parsedJsonMap.get(declaringClass + "." + name);
@@ -385,18 +391,18 @@ function createChildNodes(node){
  * initiates the generation of the graph through parsing the input of the search field and starting the node creation
  */
 function createGraph(){
-	rootNode = createNodeInstance(rootNodeString[0], rootNodeString[1]);
+	rootNode = nodeMap.get(rootNodeString[0] + '.' + rootNodeString[1]);
+	if(!rootNode) rootNode = createNodeInstance(rootNodeString[0], rootNodeString[1]);
 	// rootNode = createNodeInstance("tmr/Demo", "main");
 	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
-	// document.getElementsByTagName('html')[0].scrollLeft = parseInt(svgCont.attr('width'))/2 - window.innerWidth/2;
-	// document.getElementsByTagName('html')[0].scrollTop = parseInt(svgCont.attr('height'))/2 - window.innerHeight/2;
 	if(rootNode){
+		if(!rootNode.getX()) rootNode.placeCentrally();
 		rootNode.showNode();
+		rootNode.focus();
 		document.getElementById(rootNode.getName()).focus();
 		createChildNodes(rootNode, 0);
-		document.getElementById("search").setAttribute("disabled", "");
-		console.log(createdNodes + " nodes created");
-		console.log("hashmap was used", mapUsed, "times");
+		console.log(createdNodes + " additional nodes created");
+		createdNodes = 0;
 	}
 }

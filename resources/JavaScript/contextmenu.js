@@ -3,6 +3,10 @@ var clickedNode;
 var nodeMenuIsOpen = false;
 var clickedEdge;
 var edgeMenuIsOpen = false;
+var markedNode
+var markedEdge
+var lastMarkedNode;
+var lastMarkedEdge;
 
 //eventhandler for normal leftclick, deaktivates the contextmenu for nodes
 $("html").on("click", function(e){
@@ -10,28 +14,41 @@ $("html").on("click", function(e){
 });
 //eventhandler for rightclick, closes the contextmenu for nodes(not in .div_node)
 $("html:not(.div_node)").on("contextmenu",function(e){
-    closeNodeContextmenu();
+    closeEdgeContextmenu();
 });
 //on rightclick in .div_node calls nodeContextmenu and deactivates normal contextmenu
 //not used anymore
-$(".div_node").contextmenu(function(e) {
-    closeNodeContextmenu();
+// $(".div_node").contextmenu(function(e) {
+$("body").on("contextmenu",".div_node",function (e) {
+    closeAllContextmenus();
     clickedNode = this;
+
     createNodeContextmenu(e);
     return false;
 });
 $("body").on("contextmenu","svg path",function (e) {
-    closeEdgeContextmenu()
+    closeAllContextmenus();
     clickedEdge = this;
     createEdgeContextmenu(e);
     return false;
 });
 $("body").on("contextmenu","html:not(path)",function () {
     closeEdgeContextmenu();
-    console("edgeTEST")
-})
+});
 
-
+//mark last clicked
+$("body").on("click",".div_node",function () {
+    markedNode = this;
+    if(lastMarkedNode !== markedNode){
+        markLastClickedNode();
+    }
+});
+$("body").on("click","svg path",function () {
+    markedEdge = this;
+    if(lastMarkedEdge !== markedEdge){
+        markLastClickedEdge();
+    }
+});
 
 
 
@@ -139,4 +156,20 @@ function closeEdgeContextmenu() {
         $("#contextmenuEdge").remove();
         edgeMenuIsOpen = false;
     }
+}
+function markLastClickedNode() {
+    console.log("0")
+    if(lastMarkedNode !== null){
+        $(lastMarkedNode).removeClass("lastClickedNode");
+    }
+    $(markedNode).addClass("lastClickedNode");
+    lastMarkedNode = markedNode;
+}
+function markLastClickedEdge() {
+    console.log("1",markedEdge)
+    if(lastMarkedEdge !== null){
+        $(lastMarkedEdge).removeClass("lastClickedEdge");
+    }
+    $(markedEdge).addClass("lastClickedEdge");
+    lastMarkedEdge = markedEdge;
 }
