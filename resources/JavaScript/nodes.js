@@ -5,7 +5,6 @@
 */
 if (typeof module !== 'undefined') {
     var index = require("./index");
-    var f = index.f;
 	var createdNodes = index.createdNodes;
 	var svgCont = index.svgCont;
 	var defsCont = index.defsCont;
@@ -23,6 +22,12 @@ if (typeof module !== 'undefined') {
     var currentEdges = refresh.currentEdges;
     var refreshGraphData = refresh.refreshGraphData;
     var estGraphData = refresh.estGraphData;
+
+    var forceTree = require("./forceTree");
+    var addNodeToForceTree = forceTree.addNodeToForceTree;
+
+    var edges = require("./edges");
+    var method2nodeEdge = edges.method2nodeEdge;
 }
 
 

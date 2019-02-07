@@ -1,4 +1,15 @@
 
+/**
+* (only for testing)
+* IMPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+    var index = require("./index");
+	var svgCont = index.svgCont;
+    var d3 = index.d3;
+}
+
 var links = [];
 var nodes = [/*{index: 0, x: svgCont.attr('width')/2, y: svgCont.attr('height')/2, fixed: true, id: "0"}*/];
 [force, nodeSelection, linkSelection] = initForce(svgCont, nodes, links);
@@ -172,4 +183,14 @@ function restartForceLayouting(ticks){
 		force.tick();
 	}
 	force.stop();
+}
+
+
+/**
+* (only for testing)
+* EXPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+	module.exports.addNodeToForceTree = addNodeToForceTree;
 }

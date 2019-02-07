@@ -1,3 +1,16 @@
+/**
+* (only for testing)
+* IMPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+    var index = require("./index");
+	var svgCont = index.svgCont;
+	var d3 = index.d3;
+}
+
+
+
 /*
 insertes an arrow from (xStart, yStart) to (xDest, yDest) into an svg-container
 
@@ -293,3 +306,11 @@ function toggleToDetailed(id, link){
 }
 
 
+/**
+* (only for testing)
+* EXPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+	module.exports.method2nodeEdge = method2nodeEdge;
+}

@@ -5,7 +5,6 @@
 */
 if (typeof module !== 'undefined') {
 	const index = require("./index");
-	var f = index.f;
 	var createdNodes = index.createdNodes;
 	var svgCont = index.svgCont;
 	var defsCont = index.defsCont;
