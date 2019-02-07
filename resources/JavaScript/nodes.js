@@ -270,10 +270,14 @@ class node{
                     method2nodeEdge(edgeID.split('->')[0], edgeID.split('->')[1]);
                     toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)});
                     edge = document.getElementById(edgeID);
+					currentEdges++;   //updating Graph stats
+					refreshGraphData();
                 }
-                edge.style.display = 'block';
-				currentEdges++;
-				refreshGraphData();
+				if(edge.style.display !== "block"){ 		//updating Graph stats
+					currentEdges++;
+					refreshGraphData();
+				}
+				edge.style.display = 'block';
             }
             else if(mode === "hideNode"){
                 if(edge){
