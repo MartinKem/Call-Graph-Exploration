@@ -1,6 +1,4 @@
 
-const $ = require('jquery');
-const d3 = require('d3');
 
 document.body.innerHTML =
     '<div id="load_page"><form id="jsonFile" name="jsonFile" enctype="multipart/form-data" method="post"><fieldset>	<h2>Json File</h2> 	<div id="dropZone">You can Drop files here <br />' +

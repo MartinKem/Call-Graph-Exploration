@@ -1,3 +1,13 @@
+/**
+* (only for testing)
+* IMPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+	var $ = require('jquery');
+	var d3 = require('d3');
+}
+
 let f = d3.layout.force;
 		
 		var createdNodes = 0;
@@ -35,3 +45,23 @@ let f = d3.layout.force;
 			}
 			return;
 		}
+
+
+
+/**
+* EXPORT:
+* *******
+*/
+if(typeof module !== 'undefined'){
+	//module.exports.f = f;
+	module.exports.createdNodes = createdNodes;
+	module.exports.svgCont = svgCont;
+	module.exports.defsCont = defsCont;
+	module.exports.rootNodeString = rootNodeString;
+	module.exports.rootNode = rootNode;
+	module.exports.rootNodes = rootNodes;
+	module.exports.nodeMap = nodeMap;
+	module.exports.open_close = open_close;
+	module.exports.i = i;
+	module.exports.d3 = d3;
+}

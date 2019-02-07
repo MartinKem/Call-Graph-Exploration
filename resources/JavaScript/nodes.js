@@ -1,3 +1,23 @@
+/**
+* (only for testing)
+* IMPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+    const index = require("./index");
+    var f = index.f;
+	var createdNodes = index.createdNodes;
+	var svgCont = index.svgCont;
+	var defsCont = index.defsCont;
+	var rootNodeString = index.rootNodeString;
+	var rootNode = index.rootNode;
+	var rootNodes = index.rootNodes;
+	var nodeMap = index.nodeMap;
+	var open_close = index.open_close;
+    var i = index.i;
+    var d3 = index.d3;
+}
+
 
 //---------------------------------------------------------------------------------------
 //----------------------------------- model section -------------------------------------
@@ -611,4 +631,14 @@ function createSingleNode(x, y, name, content, callSiteStats){
         createNodeContextmenu(e);
         return false;
     });*/
+}
+
+
+/**
+* (only for testing)
+* EXPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+	module.exports.node = node;
 }
