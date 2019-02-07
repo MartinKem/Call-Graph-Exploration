@@ -108,7 +108,8 @@ class node{
         child.setRootNode(this.rootNode);
         child.setGeneration(this.generation + 1);
         this.children.push({node: child, index: index});
-        // this.callSiteStats[index].numberOfTargets++;
+        createdEdges += this.callSiteStats[index].numberOfTargets++;
+		estGraphData();
         this.reloadContent();
         return this.children[this.children.length-1].node;
     }
@@ -219,7 +220,6 @@ class node{
             }
 			if(!this.rootNode.visible){
 				this.rootNode.showNode();	// the root-node shall always be visible
-				currentEdges++
 			}
         }
         this.reloadEdges("hideNode", null);
@@ -270,18 +270,18 @@ class node{
                     method2nodeEdge(edgeID.split('->')[0], edgeID.split('->')[1]);
                     toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)});
                     edge = document.getElementById(edgeID);
-					currentEdges++;
-					refreshGraphData();
                 }
                 edge.style.display = 'block';
+				currentEdges++;
+				refreshGraphData();
             }
             else if(mode === "hideNode"){
                 if(edge){
-					edge.style.display = 'none';
-					if(edge.style.display == "none"){
+					if(edge.style.display !== "none"){
 						currentEdges--;
 						refreshGraphData();
 					}
+					edge.style.display = 'none';
 				}
             }
             else if(mode === "toDetailed"){
