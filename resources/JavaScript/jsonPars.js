@@ -408,3 +408,12 @@ function createGraph(){
 		createdNodes = 0;
 	}
 }
+
+
+/**
+* EXPORT:
+* *******
+*/
+if(typeof module !== 'undefined'){
+	module.exports.setProgBar = setProgBar;
+}

@@ -1,12 +1,20 @@
 {
-  "name": "CallGraphBuild",
+  "name": "callgraphbuild",
   "description": "will be used later for automated testing in the 'script'-section",
   "author": "Martin",
   "version": "0.0.1",
   "devDependencies": {
-    "jshint": "^2.9.7"
+    "jest": "^24.1.0",
+    "jshint": "^2.9.7",
+    "webpack": "^4.29.0"
   },
   "scripts": {
-    "test": ""
+    "test": "jest",
+    "build": "webpack resources/JavaScript/jsonPars.js bundle.js",
+    "build:prod": "webpack resources/JavaScript/jsonPars.js bundle.js -p"
+  },
+  "dependencies": {
+    "d3": "^5.8.2",
+    "jquery": "^3.3.1"
   }
 }
