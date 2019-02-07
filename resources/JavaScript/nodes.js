@@ -131,12 +131,14 @@ class node{
         // all child-nodes must be displayed right now
         for(var i = 0; i < this.children.length; i++){
             if(this.children[i].index == index){
+				//only call showNode if node is not already visible
 				if(!this.children[i].node.visible){
 					this.children[i].node.showNode();
 				}
             }
         }
         this.reloadEdges("showChildNodes", index);
+		
     }
 
     /**
@@ -184,7 +186,7 @@ class node{
         }
         else createSingleNode(this.x, this.y, this.name, this.content, this.callSiteStats);	// creates a new node otherwise
         this.visible = true;
-		// updates the graph data with new number of nodes
+		// updates the graph data with new number of shown nodes
 		currentNodes++;
 		refreshGraphData();
     }
@@ -201,18 +203,27 @@ class node{
             let node = document.getElementById(this.name);	// now this node itself becomes hidden
             node.style.display = "none";
             this.visible = false;
+			//updates number of current shown nodes and edges
+			currentNodes--;
+			refreshGraphData();
             // this.visibleParentNodes = 0;	// visibleParentNodes is set to 0 because there is no node anymore with an edge to this node
-
             for(var i = 0; i < this.children.length; i++){
                 let edgeID = this.name + '#' + this.children[i].index + '->' + this.children[i].node.getName();
                 let edge = document.getElementById(edgeID);
                 if(edge != undefined
                     && edge.style.display == 'block'
-                    && this.children[i].node.getName() !== this.name) this.children[i].node.hideNode();
+                    && this.children[i].node.getName() !== this.name){
+						this.children[i].node.hideNode();
+						//updates number of current shown nodes
+					}
             }
-            this.rootNode.showNode();	// the root-node shall always be visible
+			if(!this.rootNode.visible){
+				this.rootNode.showNode();	// the root-node shall always be visible
+				currentEdges++
+			}
         }
         this.reloadEdges("hideNode", null);
+		//updates the graph data with new number of shown nodes
     }
 
     /**
@@ -228,6 +239,7 @@ class node{
             let edgeID = thisNode.name + '#' + child.index + '->' + child.node.getName();
             if(mode !== "showChildNodes" || callSiteIndex == child.index){  // if mode is "showChildNodes", the child must have the correct call-site-index
                 handleSingleEdge(edgeID, thisNode, child.node, child.index, mode);
+				
             }
         });
 
@@ -258,11 +270,19 @@ class node{
                     method2nodeEdge(edgeID.split('->')[0], edgeID.split('->')[1]);
                     toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)});
                     edge = document.getElementById(edgeID);
+					currentEdges++;
+					refreshGraphData();
                 }
                 edge.style.display = 'block';
             }
             else if(mode === "hideNode"){
-                if(edge) edge.style.display = 'none';
+                if(edge){
+					edge.style.display = 'none';
+					if(edge.style.display == "none"){
+						currentEdges--;
+						refreshGraphData();
+					}
+				}
             }
             else if(mode === "toDetailed"){
                 if(edge){

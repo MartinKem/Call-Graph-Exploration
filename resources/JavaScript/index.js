@@ -23,13 +23,13 @@ let f = d3.layout.force;
 
 			if (i===0){
 				d3.selectAll(".node_inhalt").classed("invis",true);
-				rootNodes.forEach(allToAbstract);
+				rootNodes.forEach(function(rootNode){ rootNode.allToAbstract(); });
 				document.getElementById("btn").innerText = "Show details";
 				i++;
 			}else {
 
 				d3.selectAll(".node_inhalt").classed("invis",false);
-				rootNodes.forEach(allToDetailed);
+				rootNodes.forEach(function(rootNode){ rootNode.allToDetailed(); });
 				document.getElementById("btn").innerText = "Hide details";
 				i=0;
 			}
