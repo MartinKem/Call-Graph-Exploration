@@ -8,7 +8,6 @@ document.getElementById("totalNodes").innerHTML = "Total Nodes: " + String(creat
 document.getElementById("totalEdges").innerHTML = "Total Edges: " + "undefined";
 }
 
+var createdEdges = 0;
 var currentNodes = 0;
 var currentEdges = 0;
-
-refreshGraphData();
