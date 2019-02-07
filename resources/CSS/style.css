@@ -56,7 +56,7 @@ svg{
 	outline: none;
 }
 
-/*Style for rightclickmenu*/
+/*Style for contextclickmenu*/
 
 #contextmenuNode, #contextmenuEdge{
     z-index: 1000;
@@ -201,6 +201,15 @@ input[type=text] {
   /*when navigating through the items using the arrow keys:*/
   background-color: DodgerBlue !important; 
   color: #ffffff; 
+}
+
+.edge{
+    stroke: black;
+    stroke-width: 3px;
+}
+
+.edge:hover{
+    stroke-width: 15px;
 }
 
 circle {

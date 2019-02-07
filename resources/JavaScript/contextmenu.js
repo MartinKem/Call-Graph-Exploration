@@ -17,7 +17,6 @@ $("html:not(.div_node)").on("contextmenu",function(e){
     closeEdgeContextmenu();
 });
 //on rightclick in .div_node calls nodeContextmenu and deactivates normal contextmenu
-//not used anymore
 // $(".div_node").contextmenu(function(e) {
 $("body").on("contextmenu",".div_node",function (e) {
     closeAllContextmenus();
@@ -115,12 +114,12 @@ function createEdgeContextmenu(e) {
 
 
     $("body").append("<div id='contextmenuEdge'>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Red<div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Green<div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Blue<div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Yellow<div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Normal<div class=\"color\" style=\"background-color: #000000\"></div></div>" +
-    "</div>")
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Red<div class=\"color\" style=\"background-color: #c24e4c \"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Green<div class=\"color\" style=\"background-color: #429c44\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Blue<div class=\"color\" style=\"background-color: #3076b4\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Yellow<div class=\"color\" style=\"background-color: #c4c931\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Default<div class=\"color\" style=\"background-color: #000000\"></div></div>" +
+    "</div>");
 
     $("#contextmenuEdge").css({
         "position":"absolute",
@@ -166,10 +165,9 @@ function markLastClickedNode() {
     lastMarkedNode = markedNode;
 }
 function markLastClickedEdge() {
-    console.log("1",markedEdge)
-    if(lastMarkedEdge !== null){
+    $(markedEdge).addClass("lastClickedEdge");
+    if(lastMarkedEdge !== null || lastMarkedEdge === markedEdge){
         $(lastMarkedEdge).removeClass("lastClickedEdge");
     }
-    $(markedEdge).addClass("lastClickedEdge");
     lastMarkedEdge = markedEdge;
 }
