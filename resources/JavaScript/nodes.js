@@ -4,7 +4,7 @@
 * *******
 */
 if (typeof module !== 'undefined') {
-    const index = require("./index");
+    var index = require("./index");
     var f = index.f;
 	var createdNodes = index.createdNodes;
 	var svgCont = index.svgCont;
@@ -16,6 +16,13 @@ if (typeof module !== 'undefined') {
 	var open_close = index.open_close;
     var i = index.i;
     var d3 = index.d3;
+
+    var refresh = require("./refresh");
+    var createdEdges = refresh.createdEdges;
+    var currentNodes = refresh.currentNodes;
+    var currentEdges = refresh.currentEdges;
+    var refreshGraphData = refresh.refreshGraphData;
+    var estGraphData = refresh.estGraphData;
 }
 
 

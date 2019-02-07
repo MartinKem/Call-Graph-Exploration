@@ -14,7 +14,7 @@
     "build:prod": "webpack resources/JavaScript/jsonPars.js bundle.js -p"
   },
   "dependencies": {
-    "d3": "^5.8.2",
+    "d3": "^3.5.17",
     "jquery": "^3.3.1"
   }
 }
