@@ -135,7 +135,6 @@ class node{
         child.setRootNode(this.rootNode);
         child.setGeneration(this.generation + 1);
         this.children.push({node: child, index: index});
-        createdEdges += this.callSiteStats[index].numberOfTargets++;
 		estGraphData();
         this.reloadContent();
         return this.children[this.children.length-1].node;

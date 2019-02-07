@@ -24,8 +24,7 @@ function createEdge(svg, xStart, yStart, xDest, yDest, edgeID, label, curved){
 			 .attr("refY", "4") 
 			 .attr("orient", "auto") 
 			 .append("svg:path") 
-				 .attr("d", "M5,4 L3,1 L10,4 L3,7 L5,4")
-				 .style("fill", "black");
+				 .attr("d", "M5,4 L3,1 L10,4 L3,7 L5,4");
 	 }
 	 
 	 if(label != null){
@@ -65,9 +64,7 @@ function createEdge(svg, xStart, yStart, xDest, yDest, edgeID, label, curved){
 		 .attr("d", path)
 		 .attr("id", edgeID)
 		 .attr("class", "edge")
-		 .style("stroke", "black") 
-		 .style("stroke-width", "3px") 
-		 .style("fill", "none") 
+		 // .style("fill", "none")
 		 .style("marker-end", "url(#markerArrow)")
 		 .style("marker-mid", "url(#" + label + ")")
 		 .style("opacity", "0.5")
