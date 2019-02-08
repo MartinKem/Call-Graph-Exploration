@@ -77,7 +77,7 @@ function createEdge(svg, xStart, yStart, xDest, yDest, edgeID, label, curved){
 		 .attr("d", path)
 		 .attr("id", edgeID)
 		 .attr("class", "edge")
-		 // .style("fill", "none")
+		 .style("fill", "none")	// necessary for recursive arrows
 		 .style("marker-end", "url(#markerArrow)")
 		 .style("marker-mid", "url(#" + label + ")")
 		 .style("opacity", "0.5")

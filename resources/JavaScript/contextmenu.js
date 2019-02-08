@@ -119,6 +119,7 @@ function createEdgeContextmenu(e) {
         " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Blue<div class=\"color\" style=\"background-color: #3076b4\"></div></div>" +
         " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Yellow<div class=\"color\" style=\"background-color: #c4c931\"></div></div>" +
         " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Default<div class=\"color\" style=\"background-color: #000000\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[1]).focus()\" style=\"white-space: nowrap\">focus Target</div>" +
     "</div>");
 
     $("#contextmenuEdge").css({
@@ -126,8 +127,8 @@ function createEdgeContextmenu(e) {
         "top":y,
         "left":x,});
 
-
     edgeMenuIsOpen = true;
+
 }
 
 function changeColorEdge(elem) {
@@ -157,7 +158,6 @@ function closeEdgeContextmenu() {
     }
 }
 function markLastClickedNode() {
-    console.log("0")
     if(lastMarkedNode !== null){
         $(lastMarkedNode).removeClass("lastClickedNode");
     }
