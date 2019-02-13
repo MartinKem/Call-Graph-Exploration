@@ -605,11 +605,11 @@ function createSingleNode(x, y, name, content, callSiteStats){
     node.append("xhtml:h3")
         .text(packageStr)
         .style("text-align", "center")
-        .style("overflow", "hidden");
+        .style("word-wrap", "break-word");
     node.append("xhtml:h3")
         .text(classStr + "." + methodStr)
         .style("text-align", "center")
-        .style("overflow", "hidden");
+        .style("word-wrap", "break-word");
 
     node = node.append("xhtml:div")
         .attr("class","node_inhalt");
