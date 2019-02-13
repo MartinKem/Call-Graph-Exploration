@@ -262,27 +262,34 @@ function autocomplete(inp, arr) {
 		//Füge das DIV Element dem Container als Kindelement hinzu
 		inputElem.parentNode.appendChild(div);
 
+		Loop1:
 		for (var i = 0; i < reducedArray.length; i++) {
-			//Prüfe, ob die eingegebenen Zeichen mit dem Anfang des Vorschlags übereinstimmen
-			if (reducedArray[i].substr(0, value.length).toUpperCase() == value.toUpperCase()) {
-				reducedArray[i] = reducedArray[i].replace(/</g, "&lt;").replace(/>/g, "&gt;")
-				//Erstelle DIV Element für jeden übereinstimmenden Vorschlag
-				items = document.createElement("DIV");
-				//Hebe übereinstimmende Zeichen als fettgedruckt hervor
-				items.innerHTML = "<strong>" + reducedArray[i].substr(0, value.length) + "</strong>";
-				items.innerHTML += reducedArray[i].substr(value.length);
-				//Erstelle INPUT Feld, das den aktuellen Wert der Vorschlags enthält
-				items.innerHTML += "<input type='hidden' value='" + reducedArray[i] + "'>";
-				//Führe die übergebene Funktion bei Knopfdruck des Elements aus
-				items.addEventListener("click", function (e) {
-					//Füge den Vervollständigungsvorschlag in das Textfeld ein
-					inp.value = this.getElementsByTagName("input")[0].value;
-					//Alle offenen Listen schließen
-					closeAllLists();
-				});
-				div.appendChild(items);
-				//Schleife unterbrechen wenn 10 Elemente gefunden wurden
-				if (div.childElementCount >= 10) { break; }
+			//Prüfe, ob die eingegebenen Zeichen mit beliebigem Teilstring des Vorschlags übereinstimmen
+			Loop2:
+			for (var j = 0; j < reducedArray[i].length - value.length + 1; j++){
+				if (reducedArray[i].substr(j, value.length).toUpperCase() == value.toUpperCase()) {
+					reducedArray[i] = reducedArray[i].replace(/</g, "&lt;").replace(/>/g, "&gt;")
+					//Erstelle DIV Element für jeden übereinstimmenden Vorschlag
+					items = document.createElement("DIV");
+					//Hebe übereinstimmende Zeichen als fettgedruckt hervor
+					items.innerHTML = reducedArray[i].substr(0, j);
+					items.innerHTML += "<strong>" + reducedArray[i].substr(j, value.length) + "</strong>";
+					items.innerHTML += reducedArray[i].substr(value.length + j);
+					//Erstelle INPUT Feld, das den aktuellen Wert der Vorschlags enthält
+					items.innerHTML += "<input type='hidden' value='" + reducedArray[i] + "'>";
+					//Führe die übergebene Funktion bei Knopfdruck des Elements aus
+					items.addEventListener("click", function (e) {
+						//Füge den Vervollständigungsvorschlag in das Textfeld ein
+						inp.value = this.getElementsByTagName("input")[0].value;
+						//Alle offenen Listen schließen
+						closeAllLists();
+					});
+					div.appendChild(items);
+					
+					//Schleife unterbrechen wenn 10 Elemente gefunden wurden
+					if (div.childElementCount >= 10) { break Loop1; }
+					break Loop2;
+				}
 			}
 		}
 	}
