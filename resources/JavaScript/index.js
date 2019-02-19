@@ -21,14 +21,27 @@ let f = d3.layout.force;
 		var rootNodeString;
 		var rootNode;	// initialized in jsonPars.js and referenced in node.js
 		var rootNodes = [];
-		
+
+		/*
+		maps from following string:	TODO: für alle Zugriffe auf nodeMap ändern, außerdem für jene auf parsedJsonMap
+		declaringClass.name(parameterTypes[0],...,parameterTypes[n]):returnType
+		to:
+		node object
+		 */
         var nodeMap = new Map();
-        
-
-
-
 
         var i = 0;
+
+        function idString(nodeData){
+        	let result = nodeData.declaringClass + '.' + nodeData.name + '(';
+        	for(let i = 0; i < nodeData.parameterTypes.length; i++){
+        		result += nodeData.parameterTypes[i];
+        		if(i < nodeData.parameterTypes.length-1) result += ',';
+			}
+        	result += '):' + nodeData.returnType;
+        	return result;
+		}
+
 		function open_close() {
 
 			if (i===0){

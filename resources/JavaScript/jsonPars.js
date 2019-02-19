@@ -156,7 +156,7 @@ function parseFile(file, callback) {
 			//map rechableMethods to HashMap
 			parsedJsonMap = new Map();
 			parsedJson.reachableMethods.forEach(function (element) {
-				parsedJsonMap.set(element.method.declaringClass + "." + element.method.name, element);
+				parsedJsonMap.set(idString(element.method), element);
 			});
 			console.log("Done map json");
 
@@ -173,10 +173,10 @@ function parseFile(file, callback) {
 
 			document.getElementById("search").removeAttribute("disabled");
 
-			var fullMethods = getStructuredMethodList();
+			// var fullMethods = getStructuredMethodList();
 
-			autocomplete(document.getElementById("classInput"), fullMethods);
-			autocomplete(document.getElementById("methodInput"), fullMethods);
+			// autocomplete(document.getElementById("classInput"), fullMethods);
+			// autocomplete(document.getElementById("methodInput"), fullMethods);
 			return;
 
 		}
@@ -208,15 +208,15 @@ function parseFile(file, callback) {
 	// now let's start the read with the first block
 	chunkReaderBlock(offset, chunkSize, file);
 
-	function getStructuredMethodList() {
-		var methodList = Array.from(parsedJsonMap.keys());
-		var result = [[], []];
-		for (var i = 0; i < methodList.length; i++) {
-			result[0].push(methodList[i].split('.')[0]);
-			result[1].push(methodList[i].split('.')[1]);
-		}
-		return result;
-	}
+	// function getStructuredMethodList() {
+	// 	var methodList = Array.from(parsedJsonMap.keys());
+	// 	var result = [[], []];
+	// 	for (var i = 0; i < methodList.length; i++) {
+	// 		result[0].push(methodList[i].split('.')[0]);
+	// 		result[1].push(methodList[i].split('.')[1]);
+	// 	}
+	// 	return result;
+	// }
 }
 function changeDiv() {
 	$("#load_page").addClass("invis");
@@ -352,25 +352,25 @@ function autocomplete(inp, arr) {
  * @param {number} index - call-site-index of the child
  * @returns {node | null} - returns null, if node already existed, returns the new node otherwise
  */
-function createNodeInstance(declaringClass, name, parentNode, index) {
-	var existingNode = nodeMap.get(declaringClass + '.' + name);
+function createNodeInstance(nodeData, parentNode, index) {
+	var existingNode = nodeMap.get(idString(nodeData));
 	var newNode;
 
 	if (existingNode) {
 		/* The node has already been created before, so it is just added as child to the parent node.
          */
-		newNode = parentNode.addChild(index, declaringClass + '.' + name, null);
+		newNode = parentNode.addChild(index, nodeData, null);
 		return undefined;
 	}
-	var jsonData = parsedJsonMap.get(declaringClass + "." + name);
+	var jsonData = parsedJsonMap.get(idString(nodeData));
 	if (!jsonData) {
 		// If there doesn't exist an entry in the json-map, the function just creates an empty node without call-sites.
 		if (!parentNode) {
 			// In case that parentNode doesn't exist too, the user tries to find a not existing node through the search field.
-			alert("\"" + declaringClass + '.' + name + "\" does not exist in the JSON-file!");
+			alert("\"" + nodeData.declaringClass + '.' + nodeData.name + "\" does not exist in the JSON-file!");
 			return;
 		}
-		newNode = parentNode.addChild(index, declaringClass + '.' + name, []);
+		newNode = parentNode.addChild(index, nodeData, []);
 	}
 	else {
 		// In else case, the jsonData exists and the function always creates a new node. Now the call-site-information is copied for the new node.
@@ -382,13 +382,13 @@ function createNodeInstance(declaringClass, name, parentNode, index) {
 		}
 		if (!parentNode) {
 			// If parentNode doesn't exist, the user generates a new node through the search field.
-			newNode = new node(null, declaringClass + '.' + name, callSites, callSiteStats);
+			newNode = new node(null, nodeData, callSites, callSiteStats);
 		}
 		else {
-			newNode = parentNode.addChild(index, declaringClass + '.' + name, callSites, callSiteStats);
+			newNode = parentNode.addChild(index, nodeData, callSites, callSiteStats);
 		}
 	}
-	if (newNode) nodeMap.set(declaringClass + '.' + name, newNode); // now the node object is added to the nodeMap
+	if (newNode) nodeMap.set(idString(nodeData), newNode); // now the node object is added to the nodeMap
 	return newNode;
 }
 
@@ -398,17 +398,16 @@ function createNodeInstance(declaringClass, name, parentNode, index) {
  * @param {node} node - node object, where the creating build starts
  */
 function createChildNodes(node) {
-	var declaringClass = node.getName().split(".")[0];
-	var name = node.getName().split(".")[1];
-	var jsonData = parsedJsonMap.get(declaringClass + "." + name);
-	var callSites = [];
+	let nodeData = node.getData();
+	let jsonData = parsedJsonMap.get(idString(nodeData));
+	let callSites = [];
 	if (jsonData) callSites = jsonData.callSites;
 
 	// for all targets of all call sites this function is called recursively, to create the nodes of the lower children generations too
 	for (var i = 0; i < callSites.length; i++) {
 		for (var j = 0; j < callSites[i].targets.length; j++) {
 			var target = callSites[i].targets[j];
-			var childNode = createNodeInstance(target.declaringClass, target.name, node, i);
+			var childNode = createNodeInstance(target, node, i);
 			if (childNode) createChildNodes(childNode);
 		}
 	}
@@ -418,9 +417,9 @@ function createChildNodes(node) {
  * initiates the generation of the graph through parsing the input of the search field and starting the node creation
  */
 function createGraph() {
-	rootNode = nodeMap.get(rootNodeString[0] + '.' + rootNodeString[1]);
-	if (!rootNode) rootNode = createNodeInstance(rootNodeString[0], rootNodeString[1]);
-	// rootNode = createNodeInstance("tmr/Demo", "main");
+	// let rootNode = nodeMap.get(rootNodeString[0] + '.' + rootNodeString[1]); // TODO
+	// if (!rootNode) rootNode = createNodeInstance(rootNodeString[0], rootNodeString[1]);
+	rootNode = createNodeInstance({declaringClass: "tmr/Demo", name: "main", parameterTypes: ["java/lang/String"], returnType: "V"});
 	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
 	if (rootNode) {

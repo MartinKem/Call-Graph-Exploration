@@ -9,7 +9,6 @@ if (typeof module !== 'undefined') {
 	var svgCont = index.svgCont;
 	var defsCont = index.defsCont;
 	var rootNodeString = index.rootNodeString;
-	var rootNode = index.rootNode;
 	var rootNodes = index.rootNodes;
 	var nodeMap = index.nodeMap;
 	var open_close = index.open_close;
@@ -54,36 +53,13 @@ class node{
      * @param {string[]} parameterTypes - string array with the types of the parameters
      * @param {string} returnType - name of the returnType
      */
-    constructor(parent, nameVal, contentVal, callSiteStats, parameterTypes, returnType){
+    constructor(parent, data, callSites, callSiteStats){
         this.parents = [];
-
-        // Only if this is the root node, this node is placed right now. Otherwise it is placed by setPosition(x, y).
-        // Also generation is set to 0
-        this.container = container;
-        this.name = nameVal;
-        this.content = contentVal;
-        if(parent == null){
-            // var width = nodeWidth;
-            // var height = Math.min(500, 108 + 27 * contentVal.length);	// node-width, node-hight, and content-height are still hard coded
-            // let height = nodeHeightEmpty + callSiteHeight*contentVal.length;
-
-            // this.x = container.attr("width")/2 - width/2;
-            // this.y = container.attr("height")/2 - height/2;
-            // this.placeCentrally();
-
-            this.generation = 0;
-            this.rootNode = this;
-        }
-        else{
-            this.parents.push(parent);
-        }
-        this.declaringClass = name.split('.')[0];
-        this.parameterTypes = parameterTypes;
-        this.returnType = returnType;
+        this.nodeData = data;
+        this.callSites = callSites;
+        if(parent) this.parents.push(parent);
         this.children = [];		// target nodes
         this.callSiteStats = callSiteStats;
-        // let length = contentVal.length;
-        // while(length-- > 0) this.callSiteStats.push({numberOfTargets: 0, line: lines[contentVal.length-length]});	// callSiteStats holds the number of child nodes to a given content element
         this.detailed = true;
         this.visible = null;	// this.visible == null: node has never been placed or displayed;
                                 // this.visible == false: this node has valid x- and y-values, but is currently invisible
@@ -112,9 +88,8 @@ class node{
 
     /**
      * adds a child node to the current node where parent and container are given by this node
-     * this node also sets the child's rootNode, it's generation and updates his own children and callSiteStats
+     * this node also updates its own children and callSiteStats
      *
-
      * @param {number} index - call-site-index-index of parent-node
      * @param {string} nameVal - child's title
      * @param {string[]} contentVal - string array with the name of the targets
@@ -124,21 +99,18 @@ class node{
      *
      * @returns {node} - child node instance
      */
-    addChild(index, nameVal, contentVal, callSiteStats, parameterTypes, returnType){
+    addChild(index, nodeData, callSites, callSiteStats){
         for(var i = 0; i < this.children.length; i++){	// child-node may only be created, if there doesn't exist a child with the given name yet
             if(this.children[i].node.getName() == nameVal) return;
         }
         if(index == null) console.log("null:", nameVal);
 
-        let child = nodeMap.get(nameVal);
+        let child = nodeMap.get(idString(nodeData));
 
         if(!child){		// new node-instance is only created, if it didn't exist yet
-            child = new node({node: this, index: index}, nameVal, contentVal, callSiteStats, parameterTypes, returnType);
+            child = new node({node: this, index: index}, data, callSites, callSiteStats);
         }
         else child.addParent(this, index);		// if the child-node already existed, it just adds this as new parent
-
-        child.setRootNode(this.rootNode);
-        child.setGeneration(this.generation + 1);
         this.children.push({node: child, index: index});
 		estGraphData();
         this.reloadContent();
@@ -249,9 +221,6 @@ class node{
 						//updates number of current shown nodes
 					}
             }
-			if(!this.rootNode.visible){
-				this.rootNode.showNode();	// the root-node shall always be visible
-			}
         }
         this.reloadEdges("hideNode", null);
 		//updates the graph data with new number of shown nodes
@@ -402,29 +371,6 @@ class node{
     }
 
     /**
-     * updates generation if new generation is smaller then current one
-     *
-     * @param {number} newGen - new possible generation value
-     */
-    setGeneration(newGen){
-        if(this.generation == undefined || this.generation > newGen) this.generation = newGen;
-    }
-
-    /**
-     * sets this root node
-     *
-     * @param {node} rootNode - new root node
-     */
-    setRootNode(rootNode){
-        this.rootNode = rootNode;
-    }
-
-    /**
-     * @returns {number} - generation = shortest path to root node
-     */
-    getGeneration(){ return this.generation; }
-
-    /**
      * @returns {number} - this nodes's x position
      */
     getX(){ return this.x; }
@@ -448,11 +394,6 @@ class node{
      * @returns {[node, number][]} - array of [parent, call-site-index]
      */
     getParents(){ return this.parents; }
-
-    /**
-     * @returns {number} - generation = shortest path to root node
-     */
-    getName(){ return this.name; }
 
     /**
      * @returns {string[]} - call sites
@@ -540,7 +481,7 @@ class node{
  * @param {string[]} content - array of call sites
  * @param {{numberOfTargets: number, line: number}} callSiteStats - some information about each call-site
  */
-function createSingleNode(x, y, name, content, callSiteStats){
+function createSingleNode(x, y, nodeData, content, callSiteStats){
 
     let lock = false;
 
@@ -620,7 +561,7 @@ function createSingleNode(x, y, name, content, callSiteStats){
             .attr("class", "methodButton")
             .on("click", function(){
                 let index = this.getAttribute("id").split('#')[1];
-                var node = nodeMap.get(name);
+                var node = nodeMap.get(idString(nodeData));
                 node.showChildNodes(index); })
             .style("border-width", "2px")
             .style("border-top-width", (i === 0 ? "2px" : "0px"))
