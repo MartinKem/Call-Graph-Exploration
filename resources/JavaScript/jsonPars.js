@@ -353,7 +353,7 @@ function autocomplete(inp, arr) {
  * @returns {node | null} - returns null, if node already existed, returns the new node otherwise
  */
 function createNodeInstance(nodeData, parentNode, index) {
-	var existingNode = nodeMap.get(idString(nodeData));
+    var existingNode = nodeMap.get(idString(nodeData));
 	var newNode;
 
 	if (existingNode) {
@@ -385,7 +385,7 @@ function createNodeInstance(nodeData, parentNode, index) {
 			newNode = new node(null, nodeData, callSites, callSiteStats);
 		}
 		else {
-			newNode = parentNode.addChild(index, nodeData, callSites, callSiteStats);
+            newNode = parentNode.addChild(index, nodeData, callSites, callSiteStats);
 		}
 	}
 	if (newNode) nodeMap.set(idString(nodeData), newNode); // now the node object is added to the nodeMap
@@ -398,7 +398,7 @@ function createNodeInstance(nodeData, parentNode, index) {
  * @param {node} node - node object, where the creating build starts
  */
 function createChildNodes(node) {
-	let nodeData = node.getData();
+	let nodeData = node.getNodeData();
 	let jsonData = parsedJsonMap.get(idString(nodeData));
 	let callSites = [];
 	if (jsonData) callSites = jsonData.callSites;
@@ -426,7 +426,6 @@ function createGraph() {
 		if (!rootNode.getX()) rootNode.placeCentrally();
 		rootNode.showNode();
 		rootNode.focus();
-		document.getElementById(rootNode.getName()).focus();
 		createChildNodes(rootNode, 0);
 		console.log(createdNodes + " additional nodes created");
 		//update createdNodes in Graph Data

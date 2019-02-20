@@ -117,7 +117,7 @@ svg{
     background-color: #f0f0f0;
 }
 
-.contentElem{
+.callSite{
 	max-width: 300px;
 	overflow: hidden;
 	white-space: nowrap;

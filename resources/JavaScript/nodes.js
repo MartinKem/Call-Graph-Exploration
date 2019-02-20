@@ -78,7 +78,7 @@ class node{
      */
     setPosition(x, y){
         // var width = 300;
-        // var height = 108 + 27 * this.content.length;
+        // var height = 108 + 27 * this.callSites.length;
         //
         // this.x = x - width/2;
         // this.y = y - height/2;
@@ -101,26 +101,26 @@ class node{
      */
     addChild(index, nodeData, callSites, callSiteStats){
         for(var i = 0; i < this.children.length; i++){	// child-node may only be created, if there doesn't exist a child with the given name yet
-            if(this.children[i].node.getName() == nameVal) return;
+            if(this.children[i].node.getNodeData() == nodeData) return;
         }
         if(index == null) console.log("null:", nameVal);
 
         let child = nodeMap.get(idString(nodeData));
 
         if(!child){		// new node-instance is only created, if it didn't exist yet
-            child = new node({node: this, index: index}, data, callSites, callSiteStats);
+            child = new node({node: this, index: index}, nodeData, callSites, callSiteStats);
         }
         else child.addParent(this, index);		// if the child-node already existed, it just adds this as new parent
         this.children.push({node: child, index: index});
 		estGraphData();
-        this.reloadContent();
+        // this.reloadCallSites();
         return this.children[this.children.length-1].node;
     }
 
     /**
      * shows all child nodes of a single call site and displays an edge to them
      *
-     * @param {number} index - index of the content array
+     * @param {number} index - index of the call-site-array
      */
     showChildNodes(index){
         // if there exists a child-node with the given source index, the has never been placed, it must be placed with respect on the existing force tree
@@ -148,7 +148,7 @@ class node{
     /**
      * sets x and y values of all child nodes to a given call site index, but doesn't show these nodes yet
      *
-     * @param {number} index - index of the content array
+     * @param {number} index - index of the call-site-array
      */
     placeChildNodes(index){
         var childArray = [];
@@ -157,7 +157,7 @@ class node{
             var childIndex = this.children[i].index;
             if(childIndex == index && !this.children[i].node.getVisibility()){
                 childArray.push(this.children[i]);
-                idArray.push(this.children[i].node.getName());
+                idArray.push(idString(this.children[i].node.getNodeData()));
             }
         }
         var positions = addNodeToForceTree(this.name, idArray);	// this function from the ForceTree.js file axtends for each node in
@@ -165,7 +165,7 @@ class node{
 
         for(var i = 0; i < childArray.length; i++){		// in the end the affected child-nodes are placed at the calculated positions
             let centerX = positions[i].x - nodeWidth/2;
-            let centerY = positions[i].y - (nodeHeightEmpty + callSiteHeight*childArray[i].node.getContent().length)/2;
+            let centerY = positions[i].y - (nodeHeightEmpty + callSiteHeight*childArray[i].node.getCallSites().length)/2;
             childArray[i].node.setPosition(centerX, centerY);
             childArray[i].node.setForceNodeIndex(positions[i].index);
         }
@@ -177,7 +177,7 @@ class node{
     placeCentrally(){
         let position = addNodeToForceTree(this.name);
         this.x = position.x - nodeWidth/2;
-        this.y = position.y - (nodeHeightEmpty + callSiteHeight*this.content.length)/2;
+        this.y = position.y - (nodeHeightEmpty + callSiteHeight*this.callSites.length)/2;
         this.forceNodeIndex = position.index;
     }
 
@@ -188,7 +188,7 @@ class node{
         if(this.visible != null){	// just changes the css-display property if the node was already placed before
             document.getElementById(this.name).style.display = "block";
         }
-        else createSingleNode(this.x, this.y, this.name, this.content, this.callSiteStats);	// creates a new node otherwise
+        else createSingleNode(this.x, this.y, this.nodeData, this.callSites, this.callSiteStats);	// creates a new node otherwise
         this.visible = true;
 		// updates the graph data with new number of shown nodes
 		currentNodes++;
@@ -212,11 +212,11 @@ class node{
 			refreshGraphData();
             // this.visibleParentNodes = 0;	// visibleParentNodes is set to 0 because there is no node anymore with an edge to this node
             for(var i = 0; i < this.children.length; i++){
-                let edgeID = this.name + '#' + this.children[i].index + '->' + this.children[i].node.getName();
+                let edgeID = idString(this.nodeData) + '#' + this.children[i].index + '->' + idString(this.children[i].node.getNodeData());
                 let edge = document.getElementById(edgeID);
                 if(edge != undefined
                     && edge.style.display == 'block'
-                    && this.children[i].node.getName() !== this.name){
+                    && idString(this.children[i].node.getNodeData()) !== idString(this.nodeData)){
 						this.children[i].node.hideNode();
 						//updates number of current shown nodes
 					}
@@ -236,7 +236,7 @@ class node{
     reloadEdges(mode, callSiteIndex){
         let thisNode = this;
         this.children.forEach(function(child){
-            let edgeID = thisNode.name + '#' + child.index + '->' + child.node.getName();
+            let edgeID = idString(thisNode.nodeData) + '#' + child.index + '->' + idString(child.node.getNodeData());
             if(mode !== "showChildNodes" || callSiteIndex == child.index){  // if mode is "showChildNodes", the child must have the correct call-site-index
                 handleSingleEdge(edgeID, thisNode, child.node, child.index, mode);
 				
@@ -247,7 +247,7 @@ class node{
             this.parents.forEach(function(parent){
                 // if edges shall just change their positions, it is necessary to adapt the mode to the parent's current detailed value
                 if(mode === "toDetailed" || mode === "toAbstract"){ mode = parent.node.getDetailed() ? "toDetailed" : "toAbstract"}
-                let edgeID = parent.node.getName() + '#' + parent.index + '->' + thisNode.name;
+                let edgeID = idString(parent.node.getNodeData()) + '#' + parent.index + '->' + idString(thisNode.nodeData);
                 handleSingleEdge(edgeID, parent.node, thisNode, parent.index, mode);
             });
         }
@@ -312,7 +312,7 @@ class node{
             if(index === undefined){    // if undefined the sizes of the whole node shall be returned
                 let height = nodeHeightEmpty;
                 // height variates, if node is currently in detailed mode or not
-                if(node.getDetailed()) height += callSiteHeight*node.getContent().length;
+                if(node.getDetailed()) height += callSiteHeight*node.getCallSites().length;
                 return {x: node.x, y: node.y, width: nodeWidth, height: height};
             }
             else{   // in else block, the size of a single call site shall be returned
@@ -371,6 +371,11 @@ class node{
     }
 
     /**
+     * @returns {node data} - ...
+     */
+    getNodeData(){ return this.nodeData; }
+
+    /**
      * @returns {number} - this nodes's x position
      */
     getX(){ return this.x; }
@@ -398,7 +403,7 @@ class node{
     /**
      * @returns {string[]} - call sites
      */
-    getContent(){ return this.content; }
+    getCallSites(){ return this.callSites; }
 
     /**
      * @returns {node[]} - array of node-instances of the child-nodes
@@ -418,37 +423,11 @@ class node{
     getDetailed(){ return this.detailed; }
 
     /**
-     * @returns {string} - declaring class of the method
-     */
-    getDeclaringClass(){ return this.declaringClass; }
-
-    /**
-     * @returns {string[]} - string array with the types of the parameters
-     */
-    getParameterTypes(){ return this.parameterTypes; }
-
-    /**
-     * @returns {string} - name of the returnType
-     */
-    getReturnType(){ return this.returnType; }
-
-    /**
-     * @returns {number} - number of visible parent nodes
-     */
-    // getVisibleParentNodes(){ return this.visibleParentNodes; }
-
-    /**
-     * sets visibleParentNodes of this node
-     *
-     * @param {number} - new number of visible parent nodes
-     */
-    // setVisibleParentNodes(number){ this.visibleParentNodes = number; }
-
-    /**
      * reloads all call site numbers of this node
      */
-    reloadContent(){
+    reloadCallSites(){
         if(this.visible){
+            console.log(idString(this.nodeData));
             var methodDivs = document.getElementById(this.name).childNodes[2].childNodes;
             for(var i = 0; i < methodDivs.length; i++){
                 methodDivs[i].childNodes[1].textContent = "(" + this.callSiteStats[i].numberOfTargets + ")";
@@ -461,7 +440,7 @@ class node{
      */
     focus(){
         let xCenter = this.x + nodeWidth/2;
-        let yCenter = this.y + (nodeHeightEmpty + callSiteHeight*this.content.length)/2;
+        let yCenter = this.y + (nodeHeightEmpty + callSiteHeight*this.callSites.length)/2;
         document.getElementsByTagName('html')[0].scrollLeft = parseInt(xCenter - window.innerWidth/2);
         document.getElementsByTagName('html')[0].scrollTop = parseInt(yCenter - window.innerHeight/2);
     }
@@ -481,8 +460,7 @@ class node{
  * @param {string[]} content - array of call sites
  * @param {{numberOfTargets: number, line: number}} callSiteStats - some information about each call-site
  */
-function createSingleNode(x, y, nodeData, content, callSiteStats){
-
+function createSingleNode(x, y, nodeData, callSites, callSiteStats){
     let lock = false;
 
     var drag = d3.behavior.drag()
@@ -497,7 +475,7 @@ function createSingleNode(x, y, nodeData, content, callSiteStats){
             if (!lock){
                 let node = nodeMap.get(this.childNodes[0].id);
                 let xCenter = parseInt(node.getX()) + nodeWidth / 2;
-                let yCenter = parseInt(node.getY()) + (nodeHeightEmpty + callSiteHeight * node.getContent().length) / 2;
+                let yCenter = parseInt(node.getY()) + (nodeHeightEmpty + callSiteHeight * node.getCallSites().length) / 2;
 
                 nodes[node.getForceNodeIndex()].x = xCenter;
                 nodes[node.getForceNodeIndex()].y = yCenter;
@@ -539,6 +517,8 @@ function createSingleNode(x, y, nodeData, content, callSiteStats){
         .style("padding", "20px")
         .style("border-width", "5px");	// sizes must stay in js-file for later calculations;
 
+    console.log(node);
+
     var packageStr = name.substring(0, name.lastIndexOf('/'));
     var classStr = name.substring(name.lastIndexOf('/')+1, name.indexOf('.'));
     var methodStr = name.substring(name.indexOf('.')+1, name.length);
@@ -555,7 +535,7 @@ function createSingleNode(x, y, nodeData, content, callSiteStats){
     node = node.append("xhtml:div")
         .attr("class","node_inhalt");
 
-    for(var i=0; i < content.length; i++){
+    for(var i=0; i < callSites.length; i++){
         var entry = node.append("xhtml:button")
             .attr("id", name + "#" + i)
             .attr("class", "methodButton")
@@ -568,8 +548,8 @@ function createSingleNode(x, y, nodeData, content, callSiteStats){
             .style("border-radius", "5px")
             .style("padding", "5px");
         entry.append("xhtml:div")
-            .attr("class", "contentElem")
-            .text(callSiteStats[i].line + ": " + content[i])
+            .attr("class", "callSite")
+            .text(callSiteStats[i].line + ": " + callSites[i])
             .style("float", "left");
         entry.append("xhtaml:div")
             .text("(" + callSiteStats[i].numberOfTargets + ")")
