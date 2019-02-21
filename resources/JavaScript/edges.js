@@ -1,3 +1,16 @@
+/**
+* (only for testing)
+* IMPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+    var index = require("./index");
+	var svgCont = index.svgCont;
+	var d3 = index.d3;
+}
+
+
+
 /*
 insertes an arrow from (xStart, yStart) to (xDest, yDest) into an svg-container
 
@@ -24,8 +37,7 @@ function createEdge(svg, xStart, yStart, xDest, yDest, edgeID, label, curved){
 			 .attr("refY", "4") 
 			 .attr("orient", "auto") 
 			 .append("svg:path") 
-				 .attr("d", "M5,4 L3,1 L10,4 L3,7 L5,4")
-				 .style("fill", "black");
+				 .attr("d", "M5,4 L3,1 L10,4 L3,7 L5,4");
 	 }
 	 
 	 if(label != null){
@@ -65,9 +77,7 @@ function createEdge(svg, xStart, yStart, xDest, yDest, edgeID, label, curved){
 		 .attr("d", path)
 		 .attr("id", edgeID)
 		 .attr("class", "edge")
-		 .style("stroke", "black") 
-		 .style("stroke-width", "3px") 
-		 .style("fill", "none") 
+		 .style("fill", "none")	// necessary for recursive arrows
 		 .style("marker-end", "url(#markerArrow)")
 		 .style("marker-mid", "url(#" + label + ")")
 		 .style("opacity", "0.5")
@@ -296,3 +306,11 @@ function toggleToDetailed(id, link){
 }
 
 
+/**
+* (only for testing)
+* EXPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+	module.exports.method2nodeEdge = method2nodeEdge;
+}
