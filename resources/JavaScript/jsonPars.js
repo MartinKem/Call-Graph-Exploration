@@ -173,10 +173,9 @@ function parseFile(file, callback) {
 
 			document.getElementById("search").removeAttribute("disabled");
 
-			// var fullMethods = getStructuredMethodList();
+			var fullMethods = getStructuredMethodList();
 
-			// autocomplete(document.getElementById("classInput"), fullMethods);
-			// autocomplete(document.getElementById("methodInput"), fullMethods);
+			autocomplete(document.getElementById("classInput"), fullMethods);
 			return;
 
 		}
@@ -208,15 +207,28 @@ function parseFile(file, callback) {
 	// now let's start the read with the first block
 	chunkReaderBlock(offset, chunkSize, file);
 
-	// function getStructuredMethodList() {
-	// 	var methodList = Array.from(parsedJsonMap.keys());
-	// 	var result = [[], []];
-	// 	for (var i = 0; i < methodList.length; i++) {
-	// 		result[0].push(methodList[i].split('.')[0]);
-	// 		result[1].push(methodList[i].split('.')[1]);
-	// 	}
-	// 	return result;
-	// }
+	function getStructuredMethodList() {
+		return Array.from(parsedJsonMap.keys());
+
+		// this is used to reduce the size of the shown strings, but brings difficulties with identification later
+		// -- do not remove --
+
+		// let methodList = Array.from(parsedJsonMap.values());
+        // let result = [];
+		// for (var i = 0; i < methodList.length; i++) {
+		// 	let method = methodList[i].method;
+		// 	// if(method.declaringClass.includes('(')) console.log(method);
+		// 	let resultingString = method.declaringClass + '.' + method.name + '(';
+		// 	for(let j = 0; j < method.parameterTypes.length; j++){
+		// 		if(j > 0) resultingString += ', ';
+		// 		resultingString += method.parameterTypes[j].substring(method.parameterTypes[j].lastIndexOf('/')+1, method.parameterTypes[j].length);
+		// 	}
+		// 	resultingString += '): ' + method.returnType.substring(method.returnType.lastIndexOf('/')+1, method.returnType.length);
+		//
+		// 	result.push(resultingString);
+		// }
+        // return result;
+	}
 }
 function changeDiv() {
 	$("#load_page").addClass("invis");
@@ -226,8 +238,8 @@ function changeDiv() {
 
 //Eingabe bei gegebenem Texteingabefeld mit gegebenem Stringarray autovervollständigen 
 function autocomplete(inp, arr) {
-	var searchField = (inp.getAttribute('id') == 'classInput' ? 0 : 1);
-	//2 Parameter, Textfeld und Array mit Vervollständigungsdaten
+    //2 Parameter, Textfeld und Array mit Vervollständigungsdaten
+
 	var currentFocus = 0;
 
 	//Texteingabe erkennen
@@ -240,17 +252,9 @@ function autocomplete(inp, arr) {
 
 	function autocompleteEvent(e, inputElem) {
 		var div, items, otherValue, thisArray, reducedArray = [], value = inputElem.value;
-		thisArray = arr[searchField];
-		otherValue = (searchField == 0 ? document.getElementById("methodInput").value : document.getElementById("classInput").value);
+		// reducedArray = arr; //arr[searchField];
 
-		if (otherValue != "") {
-			for (var i = 0; i < thisArray.length; i++) {
-				if (arr[1 - searchField][i] === otherValue) reducedArray.push(thisArray[i]);
-			}
-		}
-		else reducedArray = arr[searchField];
-
-		reducedArray = Array.from(new Set(reducedArray));
+        // arr = Array.from(new Set(arr));
 		//Alle offenen Listen schließen
 		closeAllLists();
 		//Unterbrechen, wenn das Textfeld leer ist
@@ -262,21 +266,21 @@ function autocomplete(inp, arr) {
 		//Füge das DIV Element dem Container als Kindelement hinzu
 		inputElem.parentNode.appendChild(div);
 
-		Loop1:
-		for (var i = 0; i < reducedArray.length; i++) {
+        Loop1:
+		for (var i = 0; i < arr.length; i++) {
 			//Prüfe, ob die eingegebenen Zeichen mit beliebigem Teilstring des Vorschlags übereinstimmen
 			Loop2:
-			for (var j = 0; j < reducedArray[i].length - value.length + 1; j++){
-				if (reducedArray[i].substr(j, value.length).toUpperCase() == value.toUpperCase()) {
-					reducedArray[i] = reducedArray[i].replace(/</g, "&lt;").replace(/>/g, "&gt;")
+			for (var j = 0; j < arr[i].length - value.length + 1; j++){
+				if (arr[i].substr(j, value.length).toUpperCase() == value.toUpperCase()) {
+                    arr[i] = arr[i].replace(/</g, "&lt;").replace(/>/g, "&gt;")
 					//Erstelle DIV Element für jeden übereinstimmenden Vorschlag
 					items = document.createElement("DIV");
 					//Hebe übereinstimmende Zeichen als fettgedruckt hervor
-					items.innerHTML = reducedArray[i].substr(0, j);
-					items.innerHTML += "<strong>" + reducedArray[i].substr(j, value.length) + "</strong>";
-					items.innerHTML += reducedArray[i].substr(value.length + j);
+					items.innerHTML = arr[i].substr(0, j);
+					items.innerHTML += "<strong>" + arr[i].substr(j, value.length) + "</strong>";
+					items.innerHTML += arr[i].substr(value.length + j);
 					//Erstelle INPUT Feld, das den aktuellen Wert der Vorschlags enthält
-					items.innerHTML += "<input type='hidden' value='" + reducedArray[i] + "'>";
+					items.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
 					//Führe die übergebene Funktion bei Knopfdruck des Elements aus
 					items.addEventListener("click", function (e) {
 						//Füge den Vervollständigungsvorschlag in das Textfeld ein
@@ -364,10 +368,10 @@ function createNodeInstance(nodeData, parentNode, index) {
 	}
 	var jsonData = parsedJsonMap.get(idString(nodeData));
 	if (!jsonData) {
-		// If there doesn't exist an entry in the json-map, the function just creates an empty node without call-sites.
+        // If there doesn't exist an entry in the json-map, the function just creates an empty node without call-sites.
 		if (!parentNode) {
 			// In case that parentNode doesn't exist too, the user tries to find a not existing node through the search field.
-			alert("\"" + nodeData.declaringClass + '.' + nodeData.name + "\" does not exist in the JSON-file!");
+			alert("\"" + rootNodeString + "\" does not exist in the JSON-file!");
 			return;
 		}
 		newNode = parentNode.addChild(index, nodeData, []);
@@ -417,9 +421,9 @@ function createChildNodes(node) {
  * initiates the generation of the graph through parsing the input of the search field and starting the node creation
  */
 function createGraph() {
-	// let rootNode = nodeMap.get(rootNodeString[0] + '.' + rootNodeString[1]); // TODO
-	// if (!rootNode) rootNode = createNodeInstance(rootNodeString[0], rootNodeString[1]);
-	rootNode = createNodeInstance({declaringClass: "tmr/Demo", name: "main", parameterTypes: ["java/lang/String"], returnType: "V"});
+	let rootNode = nodeMap.get(rootNodeString);
+    if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
+	// rootNode = createNodeInstance({declaringClass: "tmr/Demo", name: "main", parameterTypes: ["java/lang/String"], returnType: "V"});
 	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
 	if (rootNode) {

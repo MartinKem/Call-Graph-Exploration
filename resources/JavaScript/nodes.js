@@ -462,6 +462,7 @@ class node{
  */
 function createSingleNode(x, y, nodeData, callSites, callSiteStats){
     let lock = false;
+    let nodeHeight = nodeHeightEmpty + callSiteHeight * callSites.length;
 
     var drag = d3.behavior.drag()
         .on("dragstart", function(){
@@ -475,7 +476,7 @@ function createSingleNode(x, y, nodeData, callSites, callSiteStats){
             if (!lock){
                 let node = nodeMap.get(this.childNodes[0].id);
                 let xCenter = parseInt(node.getX()) + nodeWidth / 2;
-                let yCenter = parseInt(node.getY()) + (nodeHeightEmpty + callSiteHeight * node.getCallSites().length) / 2;
+                let yCenter = parseInt(node.getY()) + nodeHeight / 2;
 
                 nodes[node.getForceNodeIndex()].x = xCenter;
                 nodes[node.getForceNodeIndex()].y = yCenter;
@@ -505,23 +506,21 @@ function createSingleNode(x, y, nodeData, callSites, callSiteStats){
             }
         });
 
-    var node = svgCont.append("foreignObject")
+    let foreignObjectCont = svgCont.append("foreignObject")
         .attr("x", x)
         .attr("y", y)
-        .attr("width", nodeWidth)
-        .call(drag)
-        .append("xhtml:div")
-        .attr("id", name)
+        .call(drag);
+
+    let node = foreignObjectCont.append("xhtml:div")
+        .attr("id", idString(nodeData))
         .attr("class","div_node")
         .style("width", nodeWidth + "px")
         .style("padding", "20px")
         .style("border-width", "5px");	// sizes must stay in js-file for later calculations;
 
-    console.log(node);
-
-    var packageStr = name.substring(0, name.lastIndexOf('/'));
-    var classStr = name.substring(name.lastIndexOf('/')+1, name.indexOf('.'));
-    var methodStr = name.substring(name.indexOf('.')+1, name.length);
+    var packageStr = nodeData.declaringClass.substring(0, nodeData.declaringClass.lastIndexOf('/'));
+    var classStr = nodeData.declaringClass.substring(nodeData.declaringClass.lastIndexOf('/')+1, nodeData.declaringClass.length);
+    var methodStr = nodeData.name;
 
     node.append("xhtml:h3")
         .text(packageStr)
@@ -537,7 +536,7 @@ function createSingleNode(x, y, nodeData, callSites, callSiteStats){
 
     for(var i=0; i < callSites.length; i++){
         var entry = node.append("xhtml:button")
-            .attr("id", name + "#" + i)
+            .attr("id", idString(nodeData) + "#" + i)
             .attr("class", "methodButton")
             .on("click", function(){
                 let index = this.getAttribute("id").split('#')[1];
@@ -556,6 +555,10 @@ function createSingleNode(x, y, nodeData, callSites, callSiteStats){
             .style("float", "right")
             .style("color", "#b0b0b0");
     }
+
+    foreignObjectCont
+        .attr("width", foreignObjectCont[0][0].childNodes[0].offsetWidth)
+        .attr("height", foreignObjectCont[0][0].childNodes[0].offsetHeight);
 
     //on rightclick in this node calls rightclickmenu and deactivates normal contextmenu
 /*    $("[id='" + name + "']").contextmenu(function(e) {
