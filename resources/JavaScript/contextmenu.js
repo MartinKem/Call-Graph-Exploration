@@ -95,8 +95,8 @@ function deleteNodes() {
 	nodeInstance.hideNode();
 }
 function switchContent() {
-    let nodeName= $(clickedNode).attr('id');
-    let node = nodeMap.get(nodeName);
+    let nodeId= $(clickedNode).attr('id');
+    let node = nodeMap.get(nodeId);
     $(clickedNode).children(".node_inhalt").toggleClass("invis");
     if($(clickedNode).children(".node_inhalt").hasClass("invis")){ node.toggleToAbstract(); }
     else{ node.toggleToDetailed(); }

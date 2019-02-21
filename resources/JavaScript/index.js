@@ -15,20 +15,47 @@ let f = d3.layout.force;
 			.append("svg")
 			.attr("width", 40000)
 			.attr("height", 40000);
-			
+
 		var defsCont = svgCont.append("defs").attr("id", "definitions");
 		
 		var rootNodeString;
 		var rootNode;	// initialized in jsonPars.js and referenced in node.js
 		var rootNodes = [];
-		
+
+		/*
+		maps from following string:	TODO: für alle Zugriffe auf nodeMap ändern, außerdem für jene auf parsedJsonMap
+		declaringClass.name(parameterTypes[0],...,parameterTypes[n]):returnType
+		to:
+		node object
+		 */
         var nodeMap = new Map();
-        
-
-
-
 
         var i = 0;
+
+        function idString(nodeData){
+            if(!nodeData) return;
+            let result = nodeData.declaringClass + '.' + nodeData.name + '(';
+        	for(let i = 0; i < nodeData.parameterTypes.length; i++){
+        		result += nodeData.parameterTypes[i];
+        		if(i < nodeData.parameterTypes.length-1) result += ',';
+			}
+        	result += '):' + nodeData.returnType;
+        	return result;
+		}
+
+		function getNodeDataFromString(idString){
+        	if(idString.split('(').length > 2) console.log("Identification error, multiple '(' in idString");
+            [declaringClass, rest] = idString.split('.');
+            if(!rest) return;
+            [name, rest] = rest.split('(');
+            if(!rest) return;
+            [parameterString, returnType] = rest.split('):');
+            if(!returnType) return;
+            let parameterTypes = parameterString.split(',');
+
+            return {declaringClass: declaringClass, name: name, parameterTypes: parameterTypes, returnType: returnType};
+        }
+
 		function open_close() {
 
 			if (i===0){

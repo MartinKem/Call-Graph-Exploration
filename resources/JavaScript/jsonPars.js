@@ -156,7 +156,7 @@ function parseFile(file, callback) {
 			//map rechableMethods to HashMap
 			parsedJsonMap = new Map();
 			parsedJson.reachableMethods.forEach(function (element) {
-				parsedJsonMap.set(element.method.declaringClass + "." + element.method.name, element);
+				parsedJsonMap.set(idString(element.method), element);
 			});
 			console.log("Done map json");
 
@@ -176,7 +176,6 @@ function parseFile(file, callback) {
 			var fullMethods = getStructuredMethodList();
 
 			autocomplete(document.getElementById("classInput"), fullMethods);
-			autocomplete(document.getElementById("methodInput"), fullMethods);
 			return;
 
 		}
@@ -209,13 +208,26 @@ function parseFile(file, callback) {
 	chunkReaderBlock(offset, chunkSize, file);
 
 	function getStructuredMethodList() {
-		var methodList = Array.from(parsedJsonMap.keys());
-		var result = [[], []];
-		for (var i = 0; i < methodList.length; i++) {
-			result[0].push(methodList[i].split('.')[0]);
-			result[1].push(methodList[i].split('.')[1]);
-		}
-		return result;
+		return Array.from(parsedJsonMap.keys());
+
+		// this is used to reduce the size of the shown strings, but brings difficulties with identification later
+		// -- do not remove --
+
+		// let methodList = Array.from(parsedJsonMap.values());
+        // let result = [];
+		// for (var i = 0; i < methodList.length; i++) {
+		// 	let method = methodList[i].method;
+		// 	// if(method.declaringClass.includes('(')) console.log(method);
+		// 	let resultingString = method.declaringClass + '.' + method.name + '(';
+		// 	for(let j = 0; j < method.parameterTypes.length; j++){
+		// 		if(j > 0) resultingString += ', ';
+		// 		resultingString += method.parameterTypes[j].substring(method.parameterTypes[j].lastIndexOf('/')+1, method.parameterTypes[j].length);
+		// 	}
+		// 	resultingString += '): ' + method.returnType.substring(method.returnType.lastIndexOf('/')+1, method.returnType.length);
+		//
+		// 	result.push(resultingString);
+		// }
+        // return result;
 	}
 }
 function changeDiv() {
@@ -226,8 +238,8 @@ function changeDiv() {
 
 //Eingabe bei gegebenem Texteingabefeld mit gegebenem Stringarray autovervollständigen 
 function autocomplete(inp, arr) {
-	var searchField = (inp.getAttribute('id') == 'classInput' ? 0 : 1);
-	//2 Parameter, Textfeld und Array mit Vervollständigungsdaten
+    //2 Parameter, Textfeld und Array mit Vervollständigungsdaten
+
 	var currentFocus = 0;
 
 	//Texteingabe erkennen
@@ -240,17 +252,9 @@ function autocomplete(inp, arr) {
 
 	function autocompleteEvent(e, inputElem) {
 		var div, items, otherValue, thisArray, reducedArray = [], value = inputElem.value;
-		thisArray = arr[searchField];
-		otherValue = (searchField == 0 ? document.getElementById("methodInput").value : document.getElementById("classInput").value);
+		// reducedArray = arr; //arr[searchField];
 
-		if (otherValue != "") {
-			for (var i = 0; i < thisArray.length; i++) {
-				if (arr[1 - searchField][i] === otherValue) reducedArray.push(thisArray[i]);
-			}
-		}
-		else reducedArray = arr[searchField];
-
-		reducedArray = Array.from(new Set(reducedArray));
+        // arr = Array.from(new Set(arr));
 		//Alle offenen Listen schließen
 		closeAllLists();
 		//Unterbrechen, wenn das Textfeld leer ist
@@ -262,27 +266,34 @@ function autocomplete(inp, arr) {
 		//Füge das DIV Element dem Container als Kindelement hinzu
 		inputElem.parentNode.appendChild(div);
 
-		for (var i = 0; i < reducedArray.length; i++) {
-			//Prüfe, ob die eingegebenen Zeichen mit dem Anfang des Vorschlags übereinstimmen
-			if (reducedArray[i].substr(0, value.length).toUpperCase() == value.toUpperCase()) {
-				reducedArray[i] = reducedArray[i].replace(/</g, "&lt;").replace(/>/g, "&gt;")
-				//Erstelle DIV Element für jeden übereinstimmenden Vorschlag
-				items = document.createElement("DIV");
-				//Hebe übereinstimmende Zeichen als fettgedruckt hervor
-				items.innerHTML = "<strong>" + reducedArray[i].substr(0, value.length) + "</strong>";
-				items.innerHTML += reducedArray[i].substr(value.length);
-				//Erstelle INPUT Feld, das den aktuellen Wert der Vorschlags enthält
-				items.innerHTML += "<input type='hidden' value='" + reducedArray[i] + "'>";
-				//Führe die übergebene Funktion bei Knopfdruck des Elements aus
-				items.addEventListener("click", function (e) {
-					//Füge den Vervollständigungsvorschlag in das Textfeld ein
-					inp.value = this.getElementsByTagName("input")[0].value;
-					//Alle offenen Listen schließen
-					closeAllLists();
-				});
-				div.appendChild(items);
-				//Schleife unterbrechen wenn 10 Elemente gefunden wurden
-				if (div.childElementCount >= 10) { break; }
+        Loop1:
+		for (var i = 0; i < arr.length; i++) {
+			//Prüfe, ob die eingegebenen Zeichen mit beliebigem Teilstring des Vorschlags übereinstimmen
+			Loop2:
+			for (var j = 0; j < arr[i].length - value.length + 1; j++){
+				if (arr[i].substr(j, value.length).toUpperCase() == value.toUpperCase()) {
+                    arr[i] = arr[i].replace(/</g, "&lt;").replace(/>/g, "&gt;")
+					//Erstelle DIV Element für jeden übereinstimmenden Vorschlag
+					items = document.createElement("DIV");
+					//Hebe übereinstimmende Zeichen als fettgedruckt hervor
+					items.innerHTML = arr[i].substr(0, j);
+					items.innerHTML += "<strong>" + arr[i].substr(j, value.length) + "</strong>";
+					items.innerHTML += arr[i].substr(value.length + j);
+					//Erstelle INPUT Feld, das den aktuellen Wert der Vorschlags enthält
+					items.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+					//Führe die übergebene Funktion bei Knopfdruck des Elements aus
+					items.addEventListener("click", function (e) {
+						//Füge den Vervollständigungsvorschlag in das Textfeld ein
+						inp.value = this.getElementsByTagName("input")[0].value;
+						//Alle offenen Listen schließen
+						closeAllLists();
+					});
+					div.appendChild(items);
+					
+					//Schleife unterbrechen wenn 10 Elemente gefunden wurden
+					if (div.childElementCount >= 10) { break Loop1; }
+					break Loop2;
+				}
 			}
 		}
 	}
@@ -345,25 +356,25 @@ function autocomplete(inp, arr) {
  * @param {number} index - call-site-index of the child
  * @returns {node | null} - returns null, if node already existed, returns the new node otherwise
  */
-function createNodeInstance(declaringClass, name, parentNode, index) {
-	var existingNode = nodeMap.get(declaringClass + '.' + name);
+function createNodeInstance(nodeData, parentNode, index) {
+    var existingNode = nodeMap.get(idString(nodeData));
 	var newNode;
 
 	if (existingNode) {
 		/* The node has already been created before, so it is just added as child to the parent node.
          */
-		newNode = parentNode.addChild(index, declaringClass + '.' + name, null);
+		newNode = parentNode.addChild(index, nodeData, null);
 		return undefined;
 	}
-	var jsonData = parsedJsonMap.get(declaringClass + "." + name);
+	var jsonData = parsedJsonMap.get(idString(nodeData));
 	if (!jsonData) {
-		// If there doesn't exist an entry in the json-map, the function just creates an empty node without call-sites.
+        // If there doesn't exist an entry in the json-map, the function just creates an empty node without call-sites.
 		if (!parentNode) {
 			// In case that parentNode doesn't exist too, the user tries to find a not existing node through the search field.
-			alert("\"" + declaringClass + '.' + name + "\" does not exist in the JSON-file!");
+			alert("\"" + rootNodeString + "\" does not exist in the JSON-file!");
 			return;
 		}
-		newNode = parentNode.addChild(index, declaringClass + '.' + name, []);
+		newNode = parentNode.addChild(index, nodeData, []);
 	}
 	else {
 		// In else case, the jsonData exists and the function always creates a new node. Now the call-site-information is copied for the new node.
@@ -375,13 +386,13 @@ function createNodeInstance(declaringClass, name, parentNode, index) {
 		}
 		if (!parentNode) {
 			// If parentNode doesn't exist, the user generates a new node through the search field.
-			newNode = new node(null, declaringClass + '.' + name, callSites, callSiteStats);
+			newNode = new node(null, nodeData, callSites, callSiteStats);
 		}
 		else {
-			newNode = parentNode.addChild(index, declaringClass + '.' + name, callSites, callSiteStats);
+            newNode = parentNode.addChild(index, nodeData, callSites, callSiteStats);
 		}
 	}
-	if (newNode) nodeMap.set(declaringClass + '.' + name, newNode); // now the node object is added to the nodeMap
+	if (newNode) nodeMap.set(idString(nodeData), newNode); // now the node object is added to the nodeMap
 	return newNode;
 }
 
@@ -391,17 +402,16 @@ function createNodeInstance(declaringClass, name, parentNode, index) {
  * @param {node} node - node object, where the creating build starts
  */
 function createChildNodes(node) {
-	var declaringClass = node.getName().split(".")[0];
-	var name = node.getName().split(".")[1];
-	var jsonData = parsedJsonMap.get(declaringClass + "." + name);
-	var callSites = [];
+	let nodeData = node.getNodeData();
+	let jsonData = parsedJsonMap.get(idString(nodeData));
+	let callSites = [];
 	if (jsonData) callSites = jsonData.callSites;
 
 	// for all targets of all call sites this function is called recursively, to create the nodes of the lower children generations too
 	for (var i = 0; i < callSites.length; i++) {
 		for (var j = 0; j < callSites[i].targets.length; j++) {
 			var target = callSites[i].targets[j];
-			var childNode = createNodeInstance(target.declaringClass, target.name, node, i);
+			var childNode = createNodeInstance(target, node, i);
 			if (childNode) createChildNodes(childNode);
 		}
 	}
@@ -411,16 +421,15 @@ function createChildNodes(node) {
  * initiates the generation of the graph through parsing the input of the search field and starting the node creation
  */
 function createGraph() {
-	rootNode = nodeMap.get(rootNodeString[0] + '.' + rootNodeString[1]);
-	if (!rootNode) rootNode = createNodeInstance(rootNodeString[0], rootNodeString[1]);
-	// rootNode = createNodeInstance("tmr/Demo", "main");
+	let rootNode = nodeMap.get(rootNodeString);
+    if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
+	// rootNode = createNodeInstance({declaringClass: "tmr/Demo", name: "main", parameterTypes: ["java/lang/String"], returnType: "V"});
 	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
 	if (rootNode) {
 		if (!rootNode.getX()) rootNode.placeCentrally();
 		rootNode.showNode();
 		rootNode.focus();
-		document.getElementById(rootNode.getName()).focus();
 		createChildNodes(rootNode, 0);
 		console.log(createdNodes + " additional nodes created");
 		//update createdNodes in Graph Data
