@@ -121,26 +121,44 @@ class node{
      * shows all child nodes of a single call site and displays an edge to them
      *
      * @param {number} index - index of the call-site-array
+     * @param {string[] | undefined} names - only these targets shall be shown, shows all children if undefined
      */
-    showChildNodes(index){
-        // if there exists a child-node with the given source index, the has never been placed, it must be placed with respect on the existing force tree
-        for(var i = 0; i < this.children.length; i++){
-            if(this.children[i].index == index){
-                if(this.children[i].node.getVisibility() == null){ // if null, child-node has never been placed
-                    this.placeChildNodes(index);
-                    break;  // we break here, because the place-function places all child-nodes for the given index
+    showChildNodes(index, names){
+        let childArrayIndices = [];
+        if(!names){
+            for(let i = 0; i < this.children.length; i++) childArrayIndices.push(i);
+        }
+        else{
+            for(let i = 0; i < this.children.length; i++){
+                if(names.includes(idString(this.children[i].node.getNodeData()))) childArrayIndices.push(i);
+            }
+        }
+
+        // if there exists a child-node with the given source index, that has never been placed, it must be placed with respect on the existing force tree
+        // for(var i = 0; i < this.children.length; i++){
+        let lock = false;
+        let thisNode = this;
+        childArrayIndices.forEach(function(i){
+            if(thisNode.children[i].index == index && !lock){
+                // console.log(i, thisNode.children[i].node.getVisibility());
+                if(thisNode.children[i].node.getVisibility() == null){ // if null, child-node has never been placed
+                    thisNode.placeChildNodes(index, childArrayIndices);
+                    lock = true;  // we break here, because the place-function places all child-nodes for the given index
                 }
             }
-        }
+        });
+        // }
         // all child-nodes must be displayed right now
-        for(var i = 0; i < this.children.length; i++){
-            if(this.children[i].index == index){
-				//only call showNode if node is not already visible
-				if(!this.children[i].node.visible){
-					this.children[i].node.showNode();
-				}
+        // for(var i = 0; i < this.children.length; i++){
+        childArrayIndices.forEach(function(i){
+            if(thisNode.children[i].index == index){
+                //only call showNode if node is not already visible
+                if(!thisNode.children[i].node.visible){
+                    thisNode.children[i].node.showNode();
+                }
             }
-        }
+        });
+        // }
         this.reloadEdges("showChildNodes", index);
 		
     }
@@ -150,20 +168,23 @@ class node{
      *
      * @param {number} index - index of the call-site-array
      */
-    placeChildNodes(index){
-        var childArray = [];
-        var idArray = [];	// first an array with all the child-ids is created
-        for(var i = 0; i < this.children.length; i++){
-            var childIndex = this.children[i].index;
-            if(childIndex == index && !this.children[i].node.getVisibility()){
-                childArray.push(this.children[i]);
-                idArray.push(idString(this.children[i].node.getNodeData()));
+    placeChildNodes(index, childArrayIndices){
+        let childArray = [];
+        let idArray = [];	// first an array with all the child-ids is created
+        let thisNode = this;
+        // for(let i = 0; i < this.children.length; i++){
+        childArrayIndices.forEach(function(i){
+            let childIndex = thisNode.children[i].index;
+            if(childIndex == index && thisNode.children[i].node.getVisibility() == null){
+                childArray.push(thisNode.children[i]);
+                idArray.push(idString(thisNode.children[i].node.getNodeData()));
             }
-        }
-        var positions = addNodeToForceTree(this.name, idArray);	// this function from the ForceTree.js file axtends for each node in
+        });
+        // }
+        let positions = addNodeToForceTree(this.name, idArray);	// this function from the ForceTree.js file extends for each node in
         // the idArray the invisible force graph and returns their positions
 
-        for(var i = 0; i < childArray.length; i++){		// in the end the affected child-nodes are placed at the calculated positions
+        for(let i = 0; i < childArray.length; i++){		// in the end the affected child-nodes are placed at the calculated positions
             let centerX = positions[i].x - nodeWidth/2;
             let centerY = positions[i].y - (nodeHeightEmpty + callSiteHeight*childArray[i].node.getCallSites().length)/2;
             childArray[i].node.setPosition(centerX, centerY);
@@ -237,7 +258,7 @@ class node{
         let thisNode = this;
         this.children.forEach(function(child){
             let edgeID = idString(thisNode.nodeData) + '#' + child.index + '->' + idString(child.node.getNodeData());
-            if(mode !== "showChildNodes" || callSiteIndex == child.index){  // if mode is "showChildNodes", the child must have the correct call-site-index
+            if((mode !== "showChildNodes" || callSiteIndex == child.index) && child.node.getVisibility() != null){  // if mode is "showChildNodes", the child must have the correct call-site-index
                 handleSingleEdge(edgeID, thisNode, child.node, child.index, mode);
 				
             }
@@ -406,6 +427,11 @@ class node{
     getCallSites(){ return this.callSites; }
 
     /**
+     * @returns {string[]} - call sites stats
+     */
+    getCallSiteStats(){ return this.callSiteStats; }
+
+    /**
      * @returns {node[]} - array of node-instances of the child-nodes
      */
     getChildNodes(){ return this.children; }
@@ -466,9 +492,9 @@ function createSingleNode(x, y, nodeData, callSites, callSiteStats){
 
     var drag = d3.behavior.drag()
         .on("dragstart", function(){
-            // closeAllContextmenus();
             if(d3.event.sourceEvent.path[0].nodeName === "BUTTON"
-                || d3.event.sourceEvent.path[1].nodeName === "BUTTON") {
+                || d3.event.sourceEvent.path[1].nodeName === "BUTTON"
+                || d3.event.sourceEvent.which != 1) {
                 lock = true;
             }
         })
@@ -541,7 +567,7 @@ function createSingleNode(x, y, nodeData, callSites, callSiteStats){
             .on("click", function(){
                 let index = this.getAttribute("id").split('#')[1];
                 var node = nodeMap.get(idString(nodeData));
-                node.showChildNodes(index); })
+                if(node.getCallSiteStats()[index].numberOfTargets < callSiteThreshold) node.showChildNodes(index); })
             .style("border-width", "2px")
             .style("border-top-width", (i === 0 ? "2px" : "0px"))
             .style("border-radius", "5px")

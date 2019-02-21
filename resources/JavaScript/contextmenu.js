@@ -3,10 +3,19 @@ var clickedNode;
 var nodeMenuIsOpen = false;
 var clickedEdge;
 var edgeMenuIsOpen = false;
-var markedNode
-var markedEdge
+var callSiteMenuIsOpen = false;
+var markedNode;
+var markedEdge;
 var lastMarkedNode;
 var lastMarkedEdge;
+
+// -- these are used for the call site contextmenu --
+var availableTargets;
+var selectedTargets;
+var selectedNode;
+var callSiteIndex;
+var callSiteThreshold = 5;
+// --------------------------------------------------
 
 //eventhandler for normal leftclick, deaktivates the contextmenu for nodes
 $("html").on("click", function(e){
@@ -48,14 +57,20 @@ $("body").on("click","svg path",function () {
         markLastClickedEdge();
     }
 });
-
-
-
+$("body").on("click",".node_inhalt button",function (e) {
+    let node = nodeMap.get(this.parentNode.parentNode.getAttribute("id"));
+    let index = this.getAttribute("id").split("#");
+    index = parseInt(index[index.length - 1]);
+    if (node.getCallSiteStats()[index].numberOfTargets >= callSiteThreshold){
+        closeAllContextmenus();
+        closeCallSiteContextmenu();
+        createCallSiteContextmenu(e, node, index);
+    }
+    return false;
+});
 
 //loads rightclickmenu.html on current mouse position
 function createNodeContextmenu(e) {
-
-
     let x = e.pageX + "px";     // Get the horizontal coordinate
     let y = e.pageY + "px";     // Get the vertical coordinate
     //let link = "https://raw.githubusercontent.com/MartinKem/Call-Graph-Exploration/developer's/eingelesener%20Graph/rightclickmenu.html?token=gAYfhzzRW1xhwgU-GLzFnB5r3gtbBHuFpks5cRbzjwA%3D%3D";
@@ -111,8 +126,6 @@ function createEdgeContextmenu(e) {
     let x = e.pageX + "px";     // Get the horizontal coordinate
     let y = e.pageY + "px";     // Get the vertical coordinate
 
-
-
     $("body").append("<div id='contextmenuEdge'>" +
         " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Red<div class=\"color\" style=\"background-color: #c24e4c \"></div></div>" +
         " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Green<div class=\"color\" style=\"background-color: #429c44\"></div></div>" +
@@ -128,7 +141,6 @@ function createEdgeContextmenu(e) {
         "left":x,});
 
     edgeMenuIsOpen = true;
-
 }
 
 function changeColorEdge(elem) {
@@ -157,6 +169,12 @@ function closeEdgeContextmenu() {
         edgeMenuIsOpen = false;
     }
 }
+function closeCallSiteContextmenu(){
+    if(callSiteMenuIsOpen){
+        $("#contextmenuCallSite").remove();
+        callSiteMenuIsOpen = false;
+    }
+}
 function markLastClickedNode() {
     if(lastMarkedNode !== null){
         $(lastMarkedNode).removeClass("lastClickedNode");
@@ -170,4 +188,61 @@ function markLastClickedEdge() {
         $(lastMarkedEdge).removeClass("lastClickedEdge");
     }
     lastMarkedEdge = markedEdge;
+}
+
+function createCallSiteContextmenu(e, node, index){
+    // node = e.target.parentNode.parentNode;
+
+    selectedNode = node;
+    callSiteIndex = index;
+    selectedTargets = [];
+    availableTargets = [];
+    node.children.forEach(function(child){
+        if(child.index === index) availableTargets.push(idString(child.node.getNodeData()));
+    });
+
+    $("body").append(
+        "<div id='contextmenuCallSite'>" +
+            "<h3 style='margin: 0px'>Choose targets for the call site <span style='color: blue'; word-break: break-word;>" + escapeSG(node.getCallSites()[index]) + "</span> to be shown:</h3>" +
+            "<form autocomplete='off' onsubmit='return false' style='margin-top: 15px; overflow: auto; clear: both'>" +
+                "<input type='text' name='targetSearch' id='targetSearch' placeholder='add targets' spellcheck='false' style='width: 80%; height: 30px; padding: 5px; float: left'>" +
+                "<input type='submit' id='AddTarget' value='Add' onclick='addTargetToSelected()' style='float: left; margin-left: 5%; height: 30px; width: 15%'>" +
+            "</form>" +
+            "<div style='margin-top: 15px; height: 930px'>" +
+                // "<div id='availableTargets' style='border: solid; min-height: 80px; max-height: 650px'>" +
+                // "</div>" +
+                "<div id='selectedTargets' style='border: solid 1px; min-height: 80px; max-height: 250px; /*overflow: auto;*/ padding-right: 5px'>" +
+                    "<h5 style='text-align: center; margin: 10px'>Selected Targets</h5>" +
+                    "<ul id='selectedTargetsList'></ul>" +
+                "</div>" +
+            "</div>" +
+            "<div style='position: absolute; bottom: 0; right: 0; width: 100%; overflow: auto; padding: 15px'>" +
+                "<button id='btn' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex)' style='position: relative; font-size: 15px;'>Show all possible Targets</button>" +
+                "<button id='btn' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex, selectedTargets)' style='position: relative; margin-left: 15px; font-size: 15px'>Show Selected Targets</button>" +
+                "<button id='btn' onclick='closeCallSiteContextmenu()' style='position: relative; margin-left: 15px; font-size: 15px'>Close</button>" +
+            "</div>"+
+        "</div>");
+
+    autocomplete(document.getElementById("targetSearch"), availableTargets);
+    callSiteMenuIsOpen = true;
+
+    $("#contextmenuCallSite").css({
+        "position":"fixed",
+        "top":0,
+        "right": 0,
+        "height":"100%",
+        "width":"30%",
+        "background-color": "white",
+        "border": "solid",
+        "border-width": 1,
+        "padding": 15
+    });
+}
+
+function addTargetToSelected(){
+    let targetSearch = document.getElementById("targetSearch");
+    let targetList = document.getElementById("selectedTargetsList");
+    targetList.innerHTML += "<li style='word-break: break-word'>" + targetSearch.value + "</li>";
+    availableTargets.splice( availableTargets.indexOf(targetSearch.value), 1);
+    selectedTargets.push(targetSearch.value);
 }

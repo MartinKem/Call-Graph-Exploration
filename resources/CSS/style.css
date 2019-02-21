@@ -160,7 +160,7 @@ svg{
   display: inline-block;
 }
 
-input[type=text] {
+#searchInput {
   border-width: 3px;
   border-style: ridge;
   border-color: #f1c5ab;
@@ -169,13 +169,15 @@ input[type=text] {
   background-color: #fffefc;
   padding: 10px;
   font-size: 16px;
-  width: 600px;
+  width: 800px;
   transition: 0.5s;
 }
 
 .autocomplete-items {
   position: relative;
   border: 1px solid #d4d4d4;
+  font-size: 13px;
+  clear: both;
   /* border-bottom: none; */
   /* border-top: none; */
   z-index: 99;

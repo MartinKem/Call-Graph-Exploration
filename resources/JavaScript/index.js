@@ -56,6 +56,10 @@ let f = d3.layout.force;
             return {declaringClass: declaringClass, name: name, parameterTypes: parameterTypes, returnType: returnType};
         }
 
+        function escapeSG(string){
+        	return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+		}
+
 		function open_close() {
 
 			if (i===0){
