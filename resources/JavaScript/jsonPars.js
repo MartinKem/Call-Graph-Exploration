@@ -22,6 +22,7 @@ var strJson = "";
 var arr = [];
 var parsedJsonMap;
 var isLoading = false;
+var autocompleteMode;
 
 //Add the events for the drop zone
 var dropZone = document.getElementById('dropZone');
@@ -238,7 +239,8 @@ function changeDiv() {
 
 //Eingabe bei gegebenem Texteingabefeld mit gegebenem Stringarray autovervollständigen 
 function autocomplete(inp, arr) {
-    //2 Parameter, Textfeld und Array mit Vervollständigungsdaten
+	//2 Parameter, Textfeld und Array mit Vervollständigungsdaten
+	//wenn mode auf "callSite" gesetzt, werden Suchergebnisse nicht in inp geschrieben, sondern es wird addTargetToSelected() aufgerufen
 
 	var currentFocus = 0;
 
@@ -247,14 +249,17 @@ function autocomplete(inp, arr) {
 	inp.addEventListener("focus", function (e) { autocompleteEvent(e, this); });
 
 	document.addEventListener("click", function (e) {
-		if (e.srcElement.id != "searchInput" && e.srcElement.id != "targetSearch"){
+		if (e.srcElement.id !== "searchInput" && e.srcElement.id !== "targetSearch"){
+			// console.log(mode);
 			closeAllLists(e.target);
+			if(e.srcElement.parentNode && e.srcElement.parentNode.id === "targetSearchautocomplete-list"){
+				inp.focus();
+			}
 		}
 	});
 
 	function autocompleteEvent(e, inputElem) {
 		var div, items, otherValue, thisArray, reducedArray = [], value = inputElem.value;
-		// reducedArray = arr; //arr[searchField];
 
 		//Alle offenen Listen schließen
 		closeAllLists();
@@ -284,10 +289,18 @@ function autocomplete(inp, arr) {
 					items.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
 					//Führe die übergebene Funktion bei Knopfdruck des Elements aus
 					items.addEventListener("click", function (e) {
-						//Füge den Vervollständigungsvorschlag in das Textfeld ein
-						inp.value = this.getElementsByTagName("input")[0].value;
-						//Alle offenen Listen schließen
-						closeAllLists();
+						if(autocompleteMode === "callSite"){
+							//Füge den Vervollständigungsvorschlag in das Textfeld ein
+							inp.value = this.getElementsByTagName("input")[0].value;
+							addTargetToSelected();
+							inp.value = "";
+						} else {
+							//Füge den Vervollständigungsvorschlag in das Textfeld ein
+							inp.value = this.getElementsByTagName("input")[0].value;
+							//Alle offenen Listen schließen
+							closeAllLists();
+						}
+
 					});
 					div.appendChild(items);
 					
@@ -318,6 +331,9 @@ function autocomplete(inp, arr) {
 				//Simuliere Klick auf Listenelement
 				e.preventDefault();
 				if (x) x[currentFocus].click();
+				currentFocus = -1;
+			} else if(this.value){
+				document.getElementById("search").click();
 			}
 		}
 	});

@@ -172,6 +172,7 @@ function closeEdgeContextmenu() {
 function closeCallSiteContextmenu(){
     if(callSiteMenuIsOpen){
         $("#contextmenuCallSite").remove();
+        autocompleteMode = undefined;
         callSiteMenuIsOpen = false;
     }
 }
@@ -198,20 +199,23 @@ function createCallSiteContextmenu(e, node, index){
     selectedTargets = [];
     availableTargets = [];
     node.children.forEach(function(child){
-        if(child.index === index) availableTargets.push(idString(child.node.getNodeData()));
+        if(child.index === index){
+            // console.log(child.node.getNodeData().declaringClass);
+            availableTargets.push(idString(child.node.getNodeData()));
+        }
     });
 
     $("body").append(
         "<div id='contextmenuCallSite'>" +
             "<h3 style='margin: 0px'>Choose targets for the call site <span style='color: blue'; word-break: break-word;>" + escapeSG(node.getCallSites()[index]) + "</span> to be shown:</h3>" +
             "<form autocomplete='off' onsubmit='return false' style='margin-top: 15px; overflow: auto; clear: both'>" +
-                "<input type='text' name='targetSearch' id='targetSearch' placeholder='add targets' spellcheck='false' style='width: 80%; height: 30px; padding: 5px; float: left'>" +
-                "<input type='submit' id='AddTarget' value='Add' onclick='addTargetToSelected()' style='float: left; margin-left: 5%; height: 30px; width: 15%'>" +
+                "<input type='text' name='targetSearch' id='targetSearch' placeholder='add targets' spellcheck='false' style='width: 100%; height: 30px; padding: 5px; float: left'>" +
+                // "<input type='submit' id='AddTarget' value='Add' onclick='addTargetToSelected()' style='float: left; margin-left: 5%; height: 30px; width: 15%'>" +
             "</form>" +
             "<div style='margin-top: 15px; height: 930px'>" +
                 // "<div id='availableTargets' style='border: solid; min-height: 80px; max-height: 650px'>" +
                 // "</div>" +
-                "<div id='selectedTargets' style='border: solid 1px; min-height: 80px; max-height: 250px; /*overflow: auto;*/ padding-right: 5px'>" +
+                "<div id='selectedTargets' style='border: solid 1px; min-height: 80px; max-height: 800px; /*overflow: auto;*/ padding-right: 5px'>" +
                     "<h5 style='text-align: center; margin: 10px'>Selected Targets</h5>" +
                     "<ul id='selectedTargetsList'></ul>" +
                 "</div>" +
@@ -223,6 +227,7 @@ function createCallSiteContextmenu(e, node, index){
             "</div>"+
         "</div>");
 
+    autocompleteMode = "callSite";
     autocomplete(document.getElementById("targetSearch"), availableTargets);
     callSiteMenuIsOpen = true;
 
@@ -242,7 +247,12 @@ function createCallSiteContextmenu(e, node, index){
 function addTargetToSelected(){
     let targetSearch = document.getElementById("targetSearch");
     let targetList = document.getElementById("selectedTargetsList");
-    targetList.innerHTML += "<li style='word-break: break-word'>" + targetSearch.value + "</li>";
+    targetList.innerHTML += "<li style='word-break: break-word' onclick='removeTargetFromSelected(this.textContent); this.remove()'>" + targetSearch.value + "</li>";
     availableTargets.splice( availableTargets.indexOf(targetSearch.value), 1);
     selectedTargets.push(targetSearch.value);
+}
+
+function removeTargetFromSelected(target){
+    availableTargets.push(target);
+    selectedTargets.splice( selectedTargets.indexOf(target), 1);
 }
