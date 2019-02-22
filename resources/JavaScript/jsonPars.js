@@ -175,7 +175,7 @@ function parseFile(file, callback) {
 
 			var fullMethods = getStructuredMethodList();
 
-			autocomplete(document.getElementById("classInput"), fullMethods);
+			autocomplete(document.getElementById("searchInput"), fullMethods);
 			return;
 
 		}
@@ -247,14 +247,15 @@ function autocomplete(inp, arr) {
 	inp.addEventListener("focus", function (e) { autocompleteEvent(e, this); });
 
 	document.addEventListener("click", function (e) {
-		if (e.srcElement.id != "classInput" && e.srcElement.id != "methodInput") closeAllLists(e.target);
+		if (e.srcElement.id != "searchInput" && e.srcElement.id != "targetSearch"){
+			closeAllLists(e.target);
+		}
 	});
 
 	function autocompleteEvent(e, inputElem) {
 		var div, items, otherValue, thisArray, reducedArray = [], value = inputElem.value;
 		// reducedArray = arr; //arr[searchField];
 
-        // arr = Array.from(new Set(arr));
 		//Alle offenen Listen schließen
 		closeAllLists();
 		//Unterbrechen, wenn das Textfeld leer ist
@@ -272,7 +273,7 @@ function autocomplete(inp, arr) {
 			Loop2:
 			for (var j = 0; j < arr[i].length - value.length + 1; j++){
 				if (arr[i].substr(j, value.length).toUpperCase() == value.toUpperCase()) {
-                    arr[i] = arr[i].replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                    arr[i] = escapeSG(arr[i]);
 					//Erstelle DIV Element für jeden übereinstimmenden Vorschlag
 					items = document.createElement("DIV");
 					//Hebe übereinstimmende Zeichen als fettgedruckt hervor

@@ -1,6 +1,6 @@
 //Rufe Suchfunktion mit gegebenen Eingaben aus
 function callSearch(){
-	rootNodeString = document.getElementById("classInput").value;
+	rootNodeString = document.getElementById("searchInput").value;
     // rootNodeString = search(document.getElementById("methodInput").value, document.getElementById("classInput").value);
 	// console.log(rootNodeString);
 }
