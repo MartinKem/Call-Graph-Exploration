@@ -205,6 +205,8 @@ svg{
   color: #ffffff; 
 }
 
+ul li:hover {cursor: pointer;}
+
 .edge{
     stroke: black;
     stroke-width: 3px;

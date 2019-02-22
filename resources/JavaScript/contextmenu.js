@@ -172,7 +172,7 @@ function closeEdgeContextmenu() {
 function closeCallSiteContextmenu(){
     if(callSiteMenuIsOpen){
         $("#contextmenuCallSite").remove();
-        autocompleteMode = undefined;
+        autocompleteMode = undefined;   // autocomplete shall work as usual, when the call site contextmenu closes
         callSiteMenuIsOpen = false;
     }
 }
@@ -192,15 +192,14 @@ function markLastClickedEdge() {
 }
 
 function createCallSiteContextmenu(e, node, index){
-    // node = e.target.parentNode.parentNode;
 
-    selectedNode = node;
-    callSiteIndex = index;
-    selectedTargets = [];
-    availableTargets = [];
+    // these variables are global, because local variables cannot be used in the following html-section
+    selectedNode = node;    // the node, that holds the clicked call site
+    callSiteIndex = index;  // the call site index of the clicked call site
+    selectedTargets = [];   // array of node strings, that holds the childnodes, that shall be shown later
+    availableTargets = [];  // array of node strings, that holds all possible child nodes, that belong to the clicked call site, but are not selected yet
     node.children.forEach(function(child){
         if(child.index === index){
-            // console.log(child.node.getNodeData().declaringClass);
             availableTargets.push(idString(child.node.getNodeData()));
         }
     });
@@ -210,11 +209,8 @@ function createCallSiteContextmenu(e, node, index){
             "<h3 style='margin: 0px'>Choose targets for the call site <span style='color: blue'; word-break: break-word;>" + escapeSG(node.getCallSites()[index]) + "</span> to be shown:</h3>" +
             "<form autocomplete='off' onsubmit='return false' style='margin-top: 15px; overflow: auto; clear: both'>" +
                 "<input type='text' name='targetSearch' id='targetSearch' placeholder='add targets' spellcheck='false' style='width: 100%; height: 30px; padding: 5px; float: left'>" +
-                // "<input type='submit' id='AddTarget' value='Add' onclick='addTargetToSelected()' style='float: left; margin-left: 5%; height: 30px; width: 15%'>" +
             "</form>" +
             "<div style='margin-top: 15px; height: 930px'>" +
-                // "<div id='availableTargets' style='border: solid; min-height: 80px; max-height: 650px'>" +
-                // "</div>" +
                 "<div id='selectedTargets' style='border: solid 1px; min-height: 80px; max-height: 800px; /*overflow: auto;*/ padding-right: 5px'>" +
                     "<h5 style='text-align: center; margin: 10px'>Selected Targets</h5>" +
                     "<ul id='selectedTargetsList'></ul>" +
@@ -227,7 +223,7 @@ function createCallSiteContextmenu(e, node, index){
             "</div>"+
         "</div>");
 
-    autocompleteMode = "callSite";
+    autocompleteMode = "callSite";  // this global variable is used in the autocomplete function, that shall work a little bit different, when in call site mode
     autocomplete(document.getElementById("targetSearch"), availableTargets);
     callSiteMenuIsOpen = true;
 
@@ -247,12 +243,13 @@ function createCallSiteContextmenu(e, node, index){
 function addTargetToSelected(){
     let targetSearch = document.getElementById("targetSearch");
     let targetList = document.getElementById("selectedTargetsList");
+    // add the selected target as html list element
     targetList.innerHTML += "<li style='word-break: break-word' onclick='removeTargetFromSelected(this.textContent); this.remove()'>" + targetSearch.value + "</li>";
-    availableTargets.splice( availableTargets.indexOf(targetSearch.value), 1);
-    selectedTargets.push(targetSearch.value);
+    availableTargets.splice( availableTargets.indexOf(targetSearch.value), 1);  // remove selected target from available
+    selectedTargets.push(targetSearch.value);   // add selected target to selected
 }
 
 function removeTargetFromSelected(target){
-    availableTargets.push(target);
-    selectedTargets.splice( selectedTargets.indexOf(target), 1);
+    availableTargets.push(target);  // add selected target to available
+    selectedTargets.splice( selectedTargets.indexOf(target), 1);    // rmove selected target from selected
 }
