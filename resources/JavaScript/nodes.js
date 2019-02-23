@@ -369,6 +369,7 @@ class node{
      * uses toggleToAbstract() for this and all child nodes
      */
     allToAbstract(){
+        console.log("abstract");
         this.toggleToAbstract();
         this.children.forEach(function(child){
             if(!child.node.getDetailed()) child.node.allToAbstract();

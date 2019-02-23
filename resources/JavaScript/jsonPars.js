@@ -438,6 +438,7 @@ function createChildNodes(node) {
  * initiates the generation of the graph through parsing the input of the search field and starting the node creation
  */
 function createGraph() {
+	let rootNodeString = document.getElementById("searchInput").value;
 	let rootNode = nodeMap.get(rootNodeString);
     if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
 	// rootNode = createNodeInstance({declaringClass: "tmr/Demo", name: "main", parameterTypes: ["java/lang/String"], returnType: "V"});
@@ -447,7 +448,8 @@ function createGraph() {
 		if (!rootNode.getX()) rootNode.placeCentrally();
 		rootNode.showNode();
 		rootNode.focus();
-		createChildNodes(rootNode, 0);
+		rootNodes.push(rootNode);
+		createChildNodes(rootNode);
 		console.log(createdNodes + " additional nodes created");
 		//update createdNodes in Graph Data
 		estGraphData();

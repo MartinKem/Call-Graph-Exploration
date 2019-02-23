@@ -37,12 +37,12 @@
 				<!--<div class="autocomplete" style="float: left; margin-right: 10px">-->
 				<!--<input type="text" name="searchMethod" id="methodInput" placeholder="Method">-->
 				<!--</div>-->
-				<input type="submit" id="search" disabled value="Find" onclick="callSearch(); createGraph()" disabled>
+				<input type="submit" id="search" value="Find" onclick="createGraph()" disabled>
 			</form>
-			<button id="btn" onclick="open_close()" style="margin-top: 10px">Hide Details</button>
+			<button id="btn" onclick="open_close(this.innerHTML)" style="margin-top: 10px">Hide Details</button>
 		</div>
-		<div id="bottom_fixed" style="position: fixed; bottom: 10px; left 10px; margin-left: 5px">
-			<div id="totalNodes";>Total Nodes:
+		<div id="bottom_fixed" style="position: fixed; bottom: 10px; left: 10px; margin-left: 5px">
+			<div id="totalNodes">Total Nodes:
 			</div>
 			<div id="totalEdges">Total Edges:
 			</div>

@@ -18,19 +18,17 @@ let f = d3.layout.force;
 
 		var defsCont = svgCont.append("defs").attr("id", "definitions");
 		
-		var rootNodeString;
-		var rootNode;	// initialized in jsonPars.js and referenced in node.js
+		// var rootNodeString; // global rootNodeString not used anymore
+		// var rootNode;	// global rootNode not used anymore
 		var rootNodes = [];
 
 		/*
-		maps from following string:	TODO: für alle Zugriffe auf nodeMap ändern, außerdem für jene auf parsedJsonMap
+		maps from following string:
 		declaringClass.name(parameterTypes[0],...,parameterTypes[n]):returnType
 		to:
 		node object
 		 */
         var nodeMap = new Map();
-
-        var i = 0;
 
         function idString(nodeData){
             if(!nodeData) return;
@@ -60,21 +58,18 @@ let f = d3.layout.force;
         	return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 		}
 
-		function open_close() {
+		function open_close(currentValue) {
 
-			if (i===0){
+			if (currentValue === "Hide details"){
 				d3.selectAll(".node_inhalt").classed("invis",true);
 				rootNodes.forEach(function(rootNode){ rootNode.allToAbstract(); });
 				document.getElementById("btn").innerText = "Show details";
-				i++;
 			}else {
 
 				d3.selectAll(".node_inhalt").classed("invis",false);
 				rootNodes.forEach(function(rootNode){ rootNode.allToDetailed(); });
 				document.getElementById("btn").innerText = "Hide details";
-				i=0;
 			}
-			return;
 		}
 
 
@@ -88,8 +83,8 @@ if(typeof module !== 'undefined'){
 	module.exports.createdNodes = createdNodes;
 	module.exports.svgCont = svgCont;
 	module.exports.defsCont = defsCont;
-	module.exports.rootNodeString = rootNodeString;
-	module.exports.rootNode = rootNode;
+	// module.exports.rootNodeString = rootNodeString;
+	// module.exports.rootNode = rootNode;
 	module.exports.rootNodes = rootNodes;
 	module.exports.nodeMap = nodeMap;
 	module.exports.open_close = open_close;
