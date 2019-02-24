@@ -127,12 +127,13 @@ function createEdgeContextmenu(e) {
     let y = e.pageY + "px";     // Get the vertical coordinate
 
     $("body").append("<div id='contextmenuEdge'>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Red<div class=\"color\" style=\"background-color: #c24e4c \"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Green<div class=\"color\" style=\"background-color: #429c44\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Blue<div class=\"color\" style=\"background-color: #3076b4\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Yellow<div class=\"color\" style=\"background-color: #c4c931\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Default<div class=\"color\" style=\"background-color: #000000\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[1]).focus()\" style=\"white-space: nowrap\">focus Target</div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Red <span class='hotKeySpan'>[1+MouseLeft]</span><div class=\"color\" style=\"background-color: #c24e4c \"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Green <span class='hotKeySpan'>[2+MouseLeft]</span><div class=\"color\" style=\"background-color: #429c44\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Blue <span class='hotKeySpan'>[3+MouseLeft]</span><div class=\"color\" style=\"background-color: #3076b4\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Yellow <span class='hotKeySpan'>[4+MouseLeft]</span><div class=\"color\" style=\"background-color: #c4c931\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Default <span class='hotKeySpan'>[5+MouseLeft]</span><div class=\"color\" style=\"background-color: #000000\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[0].split('#')[0]).focus()\" style=\"white-space: nowrap\">focus Source <span class='hotKeySpan'>[Ctrl+MouseLeft]</span></div>" +
+        " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[1]).focus()\" style=\"white-space: nowrap\">focus Target <span class='hotKeySpan'>[Double Click]</span></div>" +
     "</div>");
 
     $("#contextmenuEdge").css({
@@ -217,9 +218,9 @@ function createCallSiteContextmenu(e, node, index){
                 "</div>" +
             "</div>" +
             "<div style='position: absolute; bottom: 0; right: 0; width: 100%; overflow: auto; padding: 15px'>" +
-                "<button id='btn' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex)' style='position: relative; font-size: 15px;'>Show all possible Targets</button>" +
-                "<button id='btn' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex, selectedTargets)' style='position: relative; margin-left: 15px; font-size: 15px'>Show Selected Targets</button>" +
-                "<button id='btn' onclick='closeCallSiteContextmenu()' style='position: relative; margin-left: 15px; font-size: 15px'>Close</button>" +
+                "<button onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex)' style='position: relative; font-size: 15px;'>Show all possible Targets</button>" +
+                "<button onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex, selectedTargets)' style='position: relative; margin-left: 15px; font-size: 15px'>Show Selected Targets</button>" +
+                "<button onclick='closeCallSiteContextmenu()' style='position: relative; margin-left: 15px; font-size: 15px'>Close</button>" +
             "</div>"+
         "</div>");
 

@@ -64,7 +64,8 @@ let f = d3.layout.force;
 				.replace(/>/g, "&gt;");
 		}
 
-		function resizeSVGCont(node, mode){
+		// if a node is placed outside the current svg container, the container grows in that direction
+		function resizeSVGCont(node){
         	let svgWidth = parseInt(svgCont.attr("width"));
         	let svgHeight = parseInt(svgCont.attr("height"));
         	let sizes = node.getSizes();
@@ -87,12 +88,15 @@ let f = d3.layout.force;
 				svgCont.attr("height", svgHeight + 1000);
 			}
 
+        	// this function is executed until the placed node is inside the svg container
         	if(resized){
 				// force.size([svgCont.attr("width"), svgCont.attr("height")]);
-        		resizeSVGCont(node, mode);
+        		resizeSVGCont(node);
         		node.focus();
 			}
 
+        	// In case that the node was placed behind the left or the top border, in addition to increasing the container sizes
+			// the whole graph and the force graph must be replaced.
         	function replaceAllHorizontally(){
         		Array.from(placedNodesMap.values()).forEach(function(node){
         			node.setPosition(node.getSizes().x + 1000, node.getSizes().y);
@@ -121,15 +125,17 @@ let f = d3.layout.force;
 
 		function open_close(currentValue) {
 
-			if (currentValue === "Hide details"){
+			if (currentValue === "Hide Details"){
 				d3.selectAll(".node_inhalt").classed("invis",true);
-				rootNodes.forEach(function(rootNode){ rootNode.allToAbstract(); });
-				document.getElementById("btn").innerText = "Show details";
+				Array.from(placedNodesMap.values()).forEach(function(node){ node.toggleToAbstract(); });
+				// rootNodes.forEach(function(rootNode){ rootNode.allToAbstract(); });
+				document.getElementById("btn").innerText = "Show Details";
 			}else {
 
 				d3.selectAll(".node_inhalt").classed("invis",false);
-				rootNodes.forEach(function(rootNode){ rootNode.allToDetailed(); });
-				document.getElementById("btn").innerText = "Hide details";
+				Array.from(placedNodesMap.values()).forEach(function(node){ node.toggleToDetailed(); });
+				// rootNodes.forEach(function(rootNode){ rootNode.allToDetailed(); });
+				document.getElementById("btn").innerText = "Hide Details";
 			}
 		}
 

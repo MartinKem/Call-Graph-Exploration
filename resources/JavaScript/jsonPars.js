@@ -210,25 +210,6 @@ function parseFile(file, callback) {
 
 	function getStructuredMethodList() {
 		return Array.from(parsedJsonMap.keys());
-
-		// this is used to reduce the size of the shown strings, but brings difficulties with identification later
-		// -- do not remove --
-
-		// let methodList = Array.from(parsedJsonMap.values());
-        // let result = [];
-		// for (var i = 0; i < methodList.length; i++) {
-		// 	let method = methodList[i].method;
-		// 	// if(method.declaringClass.includes('(')) console.log(method);
-		// 	let resultingString = method.declaringClass + '.' + method.name + '(';
-		// 	for(let j = 0; j < method.parameterTypes.length; j++){
-		// 		if(j > 0) resultingString += ', ';
-		// 		resultingString += method.parameterTypes[j].substring(method.parameterTypes[j].lastIndexOf('/')+1, method.parameterTypes[j].length);
-		// 	}
-		// 	resultingString += '): ' + method.returnType.substring(method.returnType.lastIndexOf('/')+1, method.returnType.length);
-		//
-		// 	result.push(resultingString);
-		// }
-        // return result;
 	}
 }
 function changeDiv() {
@@ -240,7 +221,6 @@ function changeDiv() {
 //Eingabe bei gegebenem Texteingabefeld mit gegebenem Stringarray autovervollständigen 
 function autocomplete(inp, arr) {
 	//2 Parameter, Textfeld und Array mit Vervollständigungsdaten
-	//wenn mode auf "callSite" gesetzt, werden Suchergebnisse nicht in inp geschrieben, sondern es wird addTargetToSelected() aufgerufen
 
 	var currentFocus = 0;
 
@@ -290,6 +270,7 @@ function autocomplete(inp, arr) {
 					//Führe die übergebene Funktion bei Knopfdruck des Elements aus
 					items.addEventListener("click", function (e) {
 						if(autocompleteMode === "callSite"){
+							// Das Call-Site-Menü soll nur durch die eigenen Buttons und andere Call-Site-Menüs schließbar sein
 							//Füge den Vervollständigungsvorschlag in das Textfeld ein
 							inp.value = this.getElementsByTagName("input")[0].value;
 							addTargetToSelected();
