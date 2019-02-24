@@ -217,13 +217,13 @@ ul li:hover {cursor: pointer;}
 }
 
 circle {
-	visibility: hidden; /* visible or hidden */
+	visibility: visible; /* visible or hidden */
 }
 
 line {
 	stroke: #d8a806;
 	stroke-width: 2px;
-	visibility: hidden; /* visible or hidden */
+	visibility: visible; /* visible or hidden */
 }
 
 #top_fixed {

@@ -57,6 +57,7 @@ class node{
         this.parents = [];
         this.nodeData = data;
         this.callSites = callSites;
+        this.sizes = {x: undefined, y: undefined, width: nodeWidth, height: nodeHeightEmpty + callSiteHeight*this.callSites.length};
         if(parent) this.parents.push(parent);
         this.children = [];		// target nodes
         this.callSiteStats = callSiteStats;
@@ -77,13 +78,8 @@ class node{
      * @param {number} y - new y-value
      */
     setPosition(x, y){
-        // var width = 300;
-        // var height = 108 + 27 * this.callSites.length;
-        //
-        // this.x = x - width/2;
-        // this.y = y - height/2;
-        this.x = x;
-        this.y = y;
+        this.sizes.x = x;
+        this.sizes.y = y;
     }
 
     /**
@@ -191,8 +187,8 @@ class node{
      */
     placeCentrally(){
         let position = addNodeToForceTree(idString(this.nodeData));
-        this.x = position.x - nodeWidth/2;
-        this.y = position.y - (nodeHeightEmpty + callSiteHeight*this.callSites.length)/2;
+        this.sizes.x = position.x - this.sizes.width/2;
+        this.sizes.y = position.y - this.sizes.height/2;
         this.forceNodeIndex = position.index;
     }
 
@@ -200,14 +196,16 @@ class node{
      * displays this node
      */
     showNode(){
+        placedNodesMap.set(idString(this.nodeData), this);
         if(this.visible != null){	// just changes the css-display property if the node was already placed before
             document.getElementById(idString(this.nodeData)).style.display = "block";
         }
-        else createSingleNode(this.x, this.y, this.nodeData, this.callSites, this.callSiteStats);	// creates a new node otherwise
+        else createSingleNode(this.sizes.x, this.sizes.y, this.nodeData, this.callSites, this.callSiteStats);	// creates a new node otherwise
         this.visible = true;
 		// updates the graph data with new number of shown nodes
 		currentNodes++;
 		refreshGraphData();
+        resizeSVGCont(this);
     }
 
 
@@ -328,11 +326,11 @@ class node{
                 let height = nodeHeightEmpty;
                 // height variates, if node is currently in detailed mode or not
                 if(node.getDetailed()) height += callSiteHeight*node.getCallSites().length;
-                return {x: node.x, y: node.y, width: nodeWidth, height: height};
+                return {x: node.getSizes().x, y: node.getSizes().y, width: nodeWidth, height: height};
             }
             else{   // in else block, the size of a single call site shall be returned
-                return {x: node.x + (nodeWidth-callSiteWidth)/2,
-                            y: node.y + callSiteTopOffset + callSiteHeight*index,
+                return {x: node.getSizes().x + (nodeWidth-callSiteWidth)/2,
+                            y: node.getSizes().y + callSiteTopOffset + callSiteHeight*index,
                             width: callSiteWidth,
                             height: callSiteHeight};
             }
@@ -369,7 +367,6 @@ class node{
      * uses toggleToAbstract() for this and all child nodes
      */
     allToAbstract(){
-        console.log("abstract");
         this.toggleToAbstract();
         this.children.forEach(function(child){
             if(!child.node.getDetailed()) child.node.allToAbstract();
@@ -387,19 +384,14 @@ class node{
     }
 
     /**
-     * @returns {node data} - ...
+     * @returns {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} - all the data that identifies this single node
      */
     getNodeData(){ return this.nodeData; }
 
     /**
-     * @returns {number} - this nodes's x position
+     * @returns {{x: number, y: number, width: number, height: number}} - sizes of this node
      */
-    getX(){ return this.x; }
-
-    /**
-     * @returns {number} - this nodes's y position
-     */
-    getY(){ return this.y; }
+    getSizes(){ return this.sizes; }
 
     /**
      * @param {number} index - array index of the corresponding node in the force-graph
@@ -459,8 +451,8 @@ class node{
      * sets scrollbar that this node is in the center of the display
      */
     focus(){
-        let xCenter = this.x + nodeWidth/2;
-        let yCenter = this.y + (nodeHeightEmpty + callSiteHeight*this.callSites.length)/2;
+        let xCenter = this.sizes.x + this.sizes.width/2;
+        let yCenter = this.sizes.y + this.sizes.height/2;
         document.getElementsByTagName('html')[0].scrollLeft = parseInt(xCenter - window.innerWidth/2);
         document.getElementsByTagName('html')[0].scrollTop = parseInt(yCenter - window.innerHeight/2);
     }
@@ -495,18 +487,15 @@ function createSingleNode(x, y, nodeData, callSites, callSiteStats){
         .on("dragend", function() {
             if (!lock){
                 let node = nodeMap.get(this.childNodes[0].id);
-                let xCenter = parseInt(node.getX()) + nodeWidth / 2;
-                let yCenter = parseInt(node.getY()) + nodeHeight / 2;
+                let xCenter = node.getSizes().x + node.getSizes().width / 2;
+                let yCenter = node.getSizes().y + node.getSizes().height / 2;
 
                 nodes[node.getForceNodeIndex()].x = xCenter;
                 nodes[node.getForceNodeIndex()].y = yCenter;
                 nodes[node.getForceNodeIndex()].px = xCenter;
                 nodes[node.getForceNodeIndex()].py = yCenter;
 
-                // nodeSelection.attr("cx", xCenter);
-                // nodeSelection.attr("cy", yCenter);
-
-                // restartForceLayouting(1);
+                resizeSVGCont(node);
             }
 
             lock = false;

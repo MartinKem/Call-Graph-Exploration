@@ -445,7 +445,7 @@ function createGraph() {
 	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
 	if (rootNode) {
-		if (!rootNode.getX()) rootNode.placeCentrally();
+		if (!rootNode.getSizes().x) rootNode.placeCentrally();
 		rootNode.showNode();
 		rootNode.focus();
 		rootNodes.push(rootNode);

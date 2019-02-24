@@ -13,8 +13,8 @@ let f = d3.layout.force;
 		var createdNodes = 0;
 		var svgCont = d3.select("#graph")
 			.append("svg")
-			.attr("width", 40000)
-			.attr("height", 40000);
+			.attr("width", 4000)
+			.attr("height", 4000);
 
 		var defsCont = svgCont.append("defs").attr("id", "definitions");
 		
@@ -29,7 +29,9 @@ let f = d3.layout.force;
 		node object
 		 */
         var nodeMap = new Map();
+        var placedNodesMap = new Map();
 
+        // returns the string, that identifies the node with the given data
         function idString(nodeData){
             if(!nodeData) return;
             let result = nodeData.declaringClass + '.' + nodeData.name + '(';
@@ -41,6 +43,8 @@ let f = d3.layout.force;
         	return result;
 		}
 
+		// extracts the node data out of an identification string
+		// requires, that declaringClass, name, parameterTypes and returnType do not contain any of the following symbols: "."   ","   "):"   "("
 		function getNodeDataFromString(idString){
         	if(idString.split('(').length > 2) console.log("Identification error, multiple '(' in idString");
             [declaringClass, rest] = idString.split('.');
@@ -54,8 +58,65 @@ let f = d3.layout.force;
             return {declaringClass: declaringClass, name: name, parameterTypes: parameterTypes, returnType: returnType};
         }
 
+        // returns a string with escaped ">" and "<"
         function escapeSG(string){
-        	return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        	return string.replace(/</g, "&lt;")
+				.replace(/>/g, "&gt;");
+		}
+
+		function resizeSVGCont(node, mode){
+        	let svgWidth = parseInt(svgCont.attr("width"));
+        	let svgHeight = parseInt(svgCont.attr("height"));
+        	let sizes = node.getSizes();
+			let resized = false;
+
+        	if(sizes.x < 0){
+        		resized = true;
+				svgCont.attr("width", svgWidth + 1000);
+				replaceAllHorizontally()
+			} else if(sizes.x + sizes.width > svgWidth){
+				resized = true;
+        		svgCont.attr("width", svgWidth + 1000);
+			}
+        	if(sizes.y < 0){
+				resized = true;
+				svgCont.attr("height", svgHeight + 1000);
+				replaceAllVertically()
+			} else if(sizes.y + sizes.height > svgHeight){
+				resized = true;
+				svgCont.attr("height", svgHeight + 1000);
+			}
+
+        	if(resized){
+				// force.size([svgCont.attr("width"), svgCont.attr("height")]);
+        		resizeSVGCont(node, mode);
+        		node.focus();
+			}
+
+        	function replaceAllHorizontally(){
+        		Array.from(placedNodesMap.values()).forEach(function(node){
+        			node.setPosition(node.getSizes().x + 1000, node.getSizes().y);
+					document.getElementById(idString(node.getNodeData())).parentNode.setAttribute("x", node.getSizes().x);
+					node.reloadEdges(node.getDetailed() ? "toDetailed" : "toAbstract");
+				});
+				for(let i = 0; i < nodes.length; i++){
+					nodes[i].px += 1000;
+					nodes[i].x += 1000;
+				}
+			}
+
+			function replaceAllVertically(){
+				Array.from(placedNodesMap.values()).forEach(function(node){
+					node.setPosition(node.getSizes().x, node.getSizes().y + 1000);
+					document.getElementById(idString(node.getNodeData())).parentNode.setAttribute("y", node.getSizes().y);
+					node.reloadEdges(node.getDetailed() ? "toDetailed" : "toAbstract");
+				});
+				for(let i = 0; i < nodes.length; i++){
+					nodes[i].py += 1000;
+					nodes[i].y += 1000;
+				}
+			}
+        	return resized;
 		}
 
 		function open_close(currentValue) {
