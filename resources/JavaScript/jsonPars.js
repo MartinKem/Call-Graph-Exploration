@@ -22,6 +22,7 @@ var strJson = "";
 var arr = [];
 var parsedJsonMap;
 var isLoading = false;
+var autocompleteMode;
 
 //Add the events for the drop zone
 var dropZone = document.getElementById('dropZone');
@@ -209,25 +210,6 @@ function parseFile(file, callback) {
 
 	function getStructuredMethodList() {
 		return Array.from(parsedJsonMap.keys());
-
-		// this is used to reduce the size of the shown strings, but brings difficulties with identification later
-		// -- do not remove --
-
-		// let methodList = Array.from(parsedJsonMap.values());
-        // let result = [];
-		// for (var i = 0; i < methodList.length; i++) {
-		// 	let method = methodList[i].method;
-		// 	// if(method.declaringClass.includes('(')) console.log(method);
-		// 	let resultingString = method.declaringClass + '.' + method.name + '(';
-		// 	for(let j = 0; j < method.parameterTypes.length; j++){
-		// 		if(j > 0) resultingString += ', ';
-		// 		resultingString += method.parameterTypes[j].substring(method.parameterTypes[j].lastIndexOf('/')+1, method.parameterTypes[j].length);
-		// 	}
-		// 	resultingString += '): ' + method.returnType.substring(method.returnType.lastIndexOf('/')+1, method.returnType.length);
-		//
-		// 	result.push(resultingString);
-		// }
-        // return result;
 	}
 }
 function changeDiv() {
@@ -238,7 +220,7 @@ function changeDiv() {
 
 //Eingabe bei gegebenem Texteingabefeld mit gegebenem Stringarray autovervollständigen 
 function autocomplete(inp, arr) {
-    //2 Parameter, Textfeld und Array mit Vervollständigungsdaten
+	//2 Parameter, Textfeld und Array mit Vervollständigungsdaten
 
 	var currentFocus = 0;
 
@@ -247,14 +229,17 @@ function autocomplete(inp, arr) {
 	inp.addEventListener("focus", function (e) { autocompleteEvent(e, this); });
 
 	document.addEventListener("click", function (e) {
-		if (e.srcElement.id != "searchInput" && e.srcElement.id != "targetSearch"){
+		if (e.srcElement.id !== "searchInput" && e.srcElement.id !== "targetSearch"){
+			// console.log(mode);
 			closeAllLists(e.target);
+			if(e.srcElement.parentNode && e.srcElement.parentNode.id === "targetSearchautocomplete-list"){
+				inp.focus();
+			}
 		}
 	});
 
 	function autocompleteEvent(e, inputElem) {
 		var div, items, otherValue, thisArray, reducedArray = [], value = inputElem.value;
-		// reducedArray = arr; //arr[searchField];
 
 		//Alle offenen Listen schließen
 		closeAllLists();
@@ -284,10 +269,19 @@ function autocomplete(inp, arr) {
 					items.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
 					//Führe die übergebene Funktion bei Knopfdruck des Elements aus
 					items.addEventListener("click", function (e) {
-						//Füge den Vervollständigungsvorschlag in das Textfeld ein
-						inp.value = this.getElementsByTagName("input")[0].value;
-						//Alle offenen Listen schließen
-						closeAllLists();
+						if(autocompleteMode === "callSite"){
+							// Das Call-Site-Menü soll nur durch die eigenen Buttons und andere Call-Site-Menüs schließbar sein
+							//Füge den Vervollständigungsvorschlag in das Textfeld ein
+							inp.value = this.getElementsByTagName("input")[0].value;
+							addTargetToSelected();
+							inp.value = "";
+						} else {
+							//Füge den Vervollständigungsvorschlag in das Textfeld ein
+							inp.value = this.getElementsByTagName("input")[0].value;
+							//Alle offenen Listen schließen
+							closeAllLists();
+						}
+
 					});
 					div.appendChild(items);
 					
@@ -318,6 +312,9 @@ function autocomplete(inp, arr) {
 				//Simuliere Klick auf Listenelement
 				e.preventDefault();
 				if (x) x[currentFocus].click();
+				currentFocus = -1;
+			} else if(this.value){
+				document.getElementById("search").click();
 			}
 		}
 	});
@@ -422,16 +419,18 @@ function createChildNodes(node) {
  * initiates the generation of the graph through parsing the input of the search field and starting the node creation
  */
 function createGraph() {
+	let rootNodeString = document.getElementById("searchInput").value;
 	let rootNode = nodeMap.get(rootNodeString);
     if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
 	// rootNode = createNodeInstance({declaringClass: "tmr/Demo", name: "main", parameterTypes: ["java/lang/String"], returnType: "V"});
 	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
 	if (rootNode) {
-		if (!rootNode.getX()) rootNode.placeCentrally();
+		if (!rootNode.getSizes().x) rootNode.placeCentrally();
 		rootNode.showNode();
 		rootNode.focus();
-		createChildNodes(rootNode, 0);
+		rootNodes.push(rootNode);
+		createChildNodes(rootNode);
 		console.log(createdNodes + " additional nodes created");
 		//update createdNodes in Graph Data
 		estGraphData();

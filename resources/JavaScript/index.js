@@ -13,25 +13,25 @@ let f = d3.layout.force;
 		var createdNodes = 0;
 		var svgCont = d3.select("#graph")
 			.append("svg")
-			.attr("width", 40000)
-			.attr("height", 40000);
+			.attr("width", 4000)
+			.attr("height", 4000);
 
 		var defsCont = svgCont.append("defs").attr("id", "definitions");
 		
-		var rootNodeString;
-		var rootNode;	// initialized in jsonPars.js and referenced in node.js
+		// var rootNodeString; // global rootNodeString not used anymore
+		// var rootNode;	// global rootNode not used anymore
 		var rootNodes = [];
 
 		/*
-		maps from following string:	TODO: für alle Zugriffe auf nodeMap ändern, außerdem für jene auf parsedJsonMap
+		maps from following string:
 		declaringClass.name(parameterTypes[0],...,parameterTypes[n]):returnType
 		to:
 		node object
 		 */
         var nodeMap = new Map();
+        var placedNodesMap = new Map();
 
-        var i = 0;
-
+        // returns the string, that identifies the node with the given data
         function idString(nodeData){
             if(!nodeData) return;
             let result = nodeData.declaringClass + '.' + nodeData.name + '(';
@@ -43,6 +43,8 @@ let f = d3.layout.force;
         	return result;
 		}
 
+		// extracts the node data out of an identification string
+		// requires, that declaringClass, name, parameterTypes and returnType do not contain any of the following symbols: "."   ","   "):"   "("
 		function getNodeDataFromString(idString){
         	if(idString.split('(').length > 2) console.log("Identification error, multiple '(' in idString");
             [declaringClass, rest] = idString.split('.');
@@ -56,25 +58,85 @@ let f = d3.layout.force;
             return {declaringClass: declaringClass, name: name, parameterTypes: parameterTypes, returnType: returnType};
         }
 
+        // returns a string with escaped ">" and "<"
         function escapeSG(string){
-        	return string.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        	return string.replace(/</g, "&lt;")
+				.replace(/>/g, "&gt;");
 		}
 
-		function open_close() {
+		// if a node is placed outside the current svg container, the container grows in that direction
+		function resizeSVGCont(node){
+        	let svgWidth = parseInt(svgCont.attr("width"));
+        	let svgHeight = parseInt(svgCont.attr("height"));
+        	let sizes = node.getSizes();
+			let resized = false;
 
-			if (i===0){
+        	if(sizes.x < 0){
+        		resized = true;
+				svgCont.attr("width", svgWidth + 1000);
+				replaceAllHorizontally()
+			} else if(sizes.x + sizes.width > svgWidth){
+				resized = true;
+        		svgCont.attr("width", svgWidth + 1000);
+			}
+        	if(sizes.y < 0){
+				resized = true;
+				svgCont.attr("height", svgHeight + 1000);
+				replaceAllVertically()
+			} else if(sizes.y + sizes.height > svgHeight){
+				resized = true;
+				svgCont.attr("height", svgHeight + 1000);
+			}
+
+        	// this function is executed until the placed node is inside the svg container
+        	if(resized){
+				// force.size([svgCont.attr("width"), svgCont.attr("height")]);
+        		resizeSVGCont(node);
+        		node.focus();
+			}
+
+        	// In case that the node was placed behind the left or the top border, in addition to increasing the container sizes
+			// the whole graph and the force graph must be replaced.
+        	function replaceAllHorizontally(){
+        		Array.from(placedNodesMap.values()).forEach(function(node){
+        			node.setPosition(node.getSizes().x + 1000, node.getSizes().y);
+					document.getElementById(idString(node.getNodeData())).parentNode.setAttribute("x", node.getSizes().x);
+					node.reloadEdges(node.getDetailed() ? "toDetailed" : "toAbstract");
+				});
+				for(let i = 0; i < nodes.length; i++){
+					nodes[i].px += 1000;
+					nodes[i].x += 1000;
+				}
+			}
+
+			function replaceAllVertically(){
+				Array.from(placedNodesMap.values()).forEach(function(node){
+					node.setPosition(node.getSizes().x, node.getSizes().y + 1000);
+					document.getElementById(idString(node.getNodeData())).parentNode.setAttribute("y", node.getSizes().y);
+					node.reloadEdges(node.getDetailed() ? "toDetailed" : "toAbstract");
+				});
+				for(let i = 0; i < nodes.length; i++){
+					nodes[i].py += 1000;
+					nodes[i].y += 1000;
+				}
+			}
+        	return resized;
+		}
+
+		function open_close(currentValue) {
+
+			if (currentValue === "Hide Details"){
 				d3.selectAll(".node_inhalt").classed("invis",true);
-				rootNodes.forEach(function(rootNode){ rootNode.allToAbstract(); });
-				document.getElementById("btn").innerText = "Show details";
-				i++;
+				Array.from(placedNodesMap.values()).forEach(function(node){ node.toggleToAbstract(); });
+				// rootNodes.forEach(function(rootNode){ rootNode.allToAbstract(); });
+				document.getElementById("btn").innerText = "Show Details";
 			}else {
 
 				d3.selectAll(".node_inhalt").classed("invis",false);
-				rootNodes.forEach(function(rootNode){ rootNode.allToDetailed(); });
-				document.getElementById("btn").innerText = "Hide details";
-				i=0;
+				Array.from(placedNodesMap.values()).forEach(function(node){ node.toggleToDetailed(); });
+				// rootNodes.forEach(function(rootNode){ rootNode.allToDetailed(); });
+				document.getElementById("btn").innerText = "Hide Details";
 			}
-			return;
 		}
 
 
@@ -88,8 +150,8 @@ if(typeof module !== 'undefined'){
 	module.exports.createdNodes = createdNodes;
 	module.exports.svgCont = svgCont;
 	module.exports.defsCont = defsCont;
-	module.exports.rootNodeString = rootNodeString;
-	module.exports.rootNode = rootNode;
+	// module.exports.rootNodeString = rootNodeString;
+	// module.exports.rootNode = rootNode;
 	module.exports.rootNodes = rootNodes;
 	module.exports.nodeMap = nodeMap;
 	module.exports.open_close = open_close;
