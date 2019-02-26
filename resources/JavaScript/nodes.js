@@ -47,11 +47,9 @@ class node{
     /**
      *
      * @param {{node: node, index: number}} parent - parent-node, callsite-index of parent-node
-     * @param {string} nameVal - name of the method name
-     * @param {string[]} contentVal - string array with the name of the targets
+     * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} data - signature of this node
+     * @param {string[]} callSites - string array with the name of the call sites
      * @param {{numberOfTargets: number, line: number}[]} callSiteStats - holds for each callsite to number of targets and the line, where the site is called
-     * @param {string[]} parameterTypes - string array with the types of the parameters
-     * @param {string} returnType - name of the returnType
      */
     constructor(parent, data, callSites, callSiteStats){
         this.parents = [];
@@ -68,7 +66,7 @@ class node{
 
         // this is only for logging
         createdNodes++;
-        if(createdNodes % 1000 == 0) console.log(createdNodes + " nodes created");
+        if(createdNodes % 1000 === 0) console.log(createdNodes + " nodes created");
     }
 
     /**
@@ -87,17 +85,15 @@ class node{
      * this node also updates its own children and callSiteStats
      *
      * @param {number} index - call-site-index-index of parent-node
-     * @param {string} nameVal - child's title
-     * @param {string[]} contentVal - string array with the name of the targets
-     * @param {{numberOfTargets: number, line: number}[]} callSiteStats - holds an array with the number of targets and the line number for each call site
-     * @param {string[]} parameterTypes - string array with the types of the parameters
-     * @param {string} returnType - name of the returnType
+     * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} nodeData - signature of this node
+     * @param {string[]} callSites - string array with the name of the call sites
+     * @param {{numberOfTargets: number, line: number}[]} callSiteStats - holds for each callsite to number of targets and the line, where the site is called
      *
      * @returns {node} - child node instance
      */
     addChild(index, nodeData, callSites, callSiteStats){
-        for(var i = 0; i < this.children.length; i++){	// child-node may only be created, if there doesn't exist a child with the given name yet
-            if(idString(this.children[i].node.getNodeData()) === idString(nodeData)) return;
+        for(let i = 0; i < this.children.length; i++){	// child-node may only be created, if there doesn't exist a child with the given name yet
+            if(idString(this.children[i].node.getNodeData()) === idString(nodeData)) return undefined;
         }
         let child = nodeMap.get(idString(nodeData));
 
@@ -424,7 +420,7 @@ class node{
     getChildNodes(){ return this.children; }
 
     /**
-     * @returns {boolean or null} - null: node has never been placed or displayed;
+     * @returns {boolean | null} - null: node has never been placed or displayed;
      * 								false: this node has valid x- and y-values, but is currently invisible;
      *								true: node has valid x- and y-values and is currently displayed
      */
@@ -465,11 +461,10 @@ class node{
 /**
  * plots a single node with some given attributes
  *
- * @param {SVG-foreignObject element} cont - foreignObject-container
  * @param {number} x - left distance
  * @param {number} y - top distance
- * @param {string} name - node title
- * @param {string[]} content - array of call sites
+ * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} nodeData - signature of this method
+ * @param {string[]} callSites - string array with the name of the call sites
  * @param {{numberOfTargets: number, line: number}} callSiteStats - some information about each call-site
  */
 function createSingleNode(x, y, nodeData, callSites, callSiteStats){
