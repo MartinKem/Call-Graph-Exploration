@@ -138,18 +138,20 @@ class node{
             }
         });
         // all child-nodes must be displayed right now
-        // for(var i = 0; i < this.children.length; i++){
         childArrayIndices.forEach(function(i){
             if(thisNode.children[i].index == index){
                 //only call showNode if node is not already visible
-                if(!thisNode.children[i].node.visible){
+                if(!thisNode.children[i].node.visible) {
                     thisNode.children[i].node.showNode();
-                    thisNode.children[i].edge.createEdge();
+                }
+                if(thisNode.children[i].edge.visible === null){
+                    thisNode.children[i].edge.create();
+                }
+                else if(thisNode.children[i].edge.visible === false){
+                    thisNode.children[i].edge.show();
                 }
             }
         });
-        // }
-        //this.reloadEdges("showChildNodes", index);
 		
     }
 

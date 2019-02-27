@@ -23,15 +23,15 @@ class Edge{
                 y: source.getSizes().y + (callSiteTopOffset + callSiteHeight * this.callsiteIndex),
                 width: callSiteWidth, height: callSiteHeight}
         }else{
-            node1 = {x: source.getSizes().x, y: source.getSizes().y, width: nodeWidth, height: nodeHeightEmpty}
+            node1 = {x: source.getSizes().x, y: source.getSizes().y, width: nodeWidth, height: nodeHeightEmpty};
 
         }
         if(target.detailed){
             node2 = target.getSizes();
         } else {
-            node2 = {x: target.getSizes().x, y: target.getSizes().y, width: nodeWidth, height: nodeHeightEmpty}
+            node2 = {x: target.getSizes().x, y: target.getSizes().y, width: nodeWidth, height: nodeHeightEmpty};
         }
-        return {n1: node1, n2: node2}
+        return {n1: node1, n2: node2};
     }
 
     getBorderPoints(){
@@ -39,11 +39,8 @@ class Edge{
         let node1 = nodeSizes.n1;
         let node2 = nodeSizes.n2;
 
-
         let center1 = {x: node1.x + node1.width/2, y: node1.y + node1.height/2};
         let center2 = {x: node2.x + node2.width/2, y: node2.y + node2.height/2};
-
-
 
         function f1(x){
             return (node1.height/node1.width) * (x - center1.x) + center1.y;
@@ -139,28 +136,13 @@ class Edge{
         edge.style.display = "block";
     }
 
-    getPathString(){
-        let positions;
-        if(this.source.detailed){
-            positions = this.sidePoint();
-        }else{
-            positions = this.getBorderPoints();
-        }
-        let path = "M" + positions.xSource + "," + positions.ySource + "L" + positions.xTarget + "," + positions.yTarget;
-
-        if(this.curved){
-           path = getCurvedPath();
-        }
-        return path
-    }
-
     /**
      * insertes an arrow from (xStart, yStart) to (xDest, yDest) into an svg-container
      */
-    createEdge(){
+    create(){
         if(this.visible !== null){
             this.reload();
-            return
+            return;
         }
         let positions;
         if(this.source.detailed){
@@ -202,22 +184,38 @@ class Edge{
             .style("visibility", "visible");
     }
 
-    getCurvedPath(){
-        let sourceSize = this.source.getSizes();
-        let xStart = sourceSize.x;
-        let yStart = sourceSize.y + 60;
-        let xDest = xStart;
-        let yDest = sourceSize.y + 30;
-        if(!this.source.detailed) {
-            let ns = this.getNodeSizes();
-            xStart = ns.n1.x;
-            yStart = ns.n1.y + callSiteHeight/2;
-            xDest = ns.n2.x;
-            yDest = ns.n1.y - 65;
+    getPathString(){
+        let positions;
+        if(this.source.detailed){
+            positions = this.sidePoint();
+        }else{
+            positions = this.getBorderPoints();
         }
-        return "M " + xStart + " " + (yStart+15).toString() +
-            " C " + (xStart-150).toString() + " " + (yStart+50).toString() +
-            ", " + (xDest-120).toString() + " " + (yDest-50).toString() +
-            ", " + (xDest).toString() + " " + (yDest).toString();
+        let path = "M" + positions.xSource + "," + positions.ySource + "L" + positions.xTarget + "," + positions.yTarget;
+
+        if(this.curved){
+            path = getCurvedPath();
+        }
+
+        function getCurvedPath(){
+            let sourceSize = this.source.getSizes();
+            let xStart = sourceSize.x;
+            let yStart = sourceSize.y + 60;
+            let xDest = xStart;
+            let yDest = sourceSize.y + 30;
+            if(this.source.detailed) {
+                let ns = this.getNodeSizes();
+                xStart = ns.n1.x;
+                yStart = ns.n1.y + callSiteHeight/2;
+                xDest = ns.n2.x;
+                yDest = ns.n1.y - 65;
+            }
+            return "M " + xStart + " " + (yStart).toString() +
+                " C " + (xStart-150).toString() + " " + (yStart+50).toString() +
+                ", " + (xDest-120).toString() + " " + (yDest-50).toString() +
+                ", " + (xDest).toString() + " " + (yDest).toString();
+        }
+
+        return path;
     }
 }
