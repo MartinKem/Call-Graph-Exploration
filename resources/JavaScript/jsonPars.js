@@ -130,7 +130,12 @@ function correctClassNames(methods) {
 	}
 }
 
-
+function resetFileRead(){
+	arr = [];
+	strJson = "";
+	isLoading = false;
+	setProgBar(0);
+}
 
 
 function parseFile(file, callback) {
@@ -149,7 +154,21 @@ function parseFile(file, callback) {
 		}
 		if (offset >= fileSize) {
 			console.log("Done reading file");
-			let parsedJson = parseString();
+			
+			let parsedJson;
+			try{
+				parsedJson = parseString();
+			} catch(e) {
+				if (e instanceof SyntaxError){
+					alert("File could not be read. \n-Is the Json-File saved as UNIX (LF)? \n-Is the Json-File properly formatted? \n" + e);
+					resetFileRead();
+					return;
+				} else {
+					resetFileRead();
+					return;
+				}
+			}
+			
 
 			correctClassNames(parsedJson); // remove 'L' and ';' out of the class names
 			console.log("Done parsing file");
