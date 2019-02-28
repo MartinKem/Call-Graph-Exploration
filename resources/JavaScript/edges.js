@@ -210,20 +210,22 @@ id: id of the element
 returns: {xPos, yPos, width, height}
 */
 function absPosition(id){
-	var element = document.getElementById(id);
-	var widthVal = element.offsetWidth;
-	var heightVal = element.offsetHeight;
-	var xVal = 0, yVal = 0;
-    do {
-		// if(id === "tmr/Demo.main#4") console.log(xVal, yVal);
-		var borderwidth = 0;
-		if(element != document.getElementById(id)) borderwidth = parseInt(element.style.borderWidth, 10) || 0;
-        yVal += element.offsetTop + borderwidth || 0;
-        xVal += element.offsetLeft + borderwidth || 0;
-        element = element.offsetParent;
-    } while(element);
-    // console.log("xy", id, xVal, yVal);
-	return {x: xVal, y: yVal, width: widthVal, height: heightVal}
+	[nodeString, index] = id.split('#');
+	let node = nodeMap.get(nodeString);
+	let offsetX = 0;
+	let offsetY = 0;
+	let width = node.getSizes().width;
+	let height = node.getSizes().height;
+	if(index){
+		index = parseInt(index);
+		offsetX = (node.getSizes().width - callSiteWidth)/2;
+		offsetY = callSiteTopOffset + index*callSiteHeight;
+		width = callSiteWidth;
+		height = callSiteHeight;
+	}
+	let x = node.getSizes().x + offsetX;
+	let y = node.getSizes().y + offsetY;
+	return {x: x, y: y, width: width, height: height};
 }
 
 /*
@@ -250,7 +252,7 @@ id2: id of the destination element
 returns: void
 */
 function method2nodeEdge(id1, id2){
-	var link = {source: absPosition(id1), dest: absPosition(id2)}
+	var link = {source: absPosition(id1), dest: absPosition(id2)};
 
 	if(id1.split("#")[0] == id2) createEdge(svgCont, link.source.x, link.source.y, -1, -1, id1 + "->" + id2, null, true);
 	else side2centerEdge(svgCont, link, id1 + "->" + id2);

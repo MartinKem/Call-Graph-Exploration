@@ -47,16 +47,15 @@ class node{
     /**
      *
      * @param {{node: node, index: number}} parent - parent-node, callsite-index of parent-node
-     * @param {string} nameVal - name of the method name
-     * @param {string[]} contentVal - string array with the name of the targets
+     * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} data - signature of this node
+     * @param {string[]} callSites - string array with the name of the call sites
      * @param {{numberOfTargets: number, line: number}[]} callSiteStats - holds for each callsite to number of targets and the line, where the site is called
-     * @param {string[]} parameterTypes - string array with the types of the parameters
-     * @param {string} returnType - name of the returnType
      */
     constructor(parent, data, callSites, callSiteStats){
         this.parents = [];
         this.nodeData = data;
         this.callSites = callSites;
+        this.sizes = {x: undefined, y: undefined, width: nodeWidth, height: nodeHeightEmpty + callSiteHeight*this.callSites.length};
         if(parent) this.parents.push(parent);
         this.children = [];		// target nodes
         this.callSiteStats = callSiteStats;
@@ -67,7 +66,7 @@ class node{
 
         // this is only for logging
         createdNodes++;
-        if(createdNodes % 1000 == 0) console.log(createdNodes + " nodes created");
+        if(createdNodes % 1000 === 0) console.log(createdNodes + " nodes created");
     }
 
     /**
@@ -77,13 +76,8 @@ class node{
      * @param {number} y - new y-value
      */
     setPosition(x, y){
-        // var width = 300;
-        // var height = 108 + 27 * this.callSites.length;
-        //
-        // this.x = x - width/2;
-        // this.y = y - height/2;
-        this.x = x;
-        this.y = y;
+        this.sizes.x = x;
+        this.sizes.y = y;
     }
 
     /**
@@ -91,20 +85,16 @@ class node{
      * this node also updates its own children and callSiteStats
      *
      * @param {number} index - call-site-index-index of parent-node
-     * @param {string} nameVal - child's title
-     * @param {string[]} contentVal - string array with the name of the targets
-     * @param {{numberOfTargets: number, line: number}[]} callSiteStats - holds an array with the number of targets and the line number for each call site
-     * @param {string[]} parameterTypes - string array with the types of the parameters
-     * @param {string} returnType - name of the returnType
+     * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} nodeData - signature of this node
+     * @param {string[]} callSites - string array with the name of the call sites
+     * @param {{numberOfTargets: number, line: number}[]} callSiteStats - holds for each callsite to number of targets and the line, where the site is called
      *
      * @returns {node} - child node instance
      */
     addChild(index, nodeData, callSites, callSiteStats){
-        for(var i = 0; i < this.children.length; i++){	// child-node may only be created, if there doesn't exist a child with the given name yet
-            if(this.children[i].node.getNodeData() == nodeData) return;
+        for(let i = 0; i < this.children.length; i++){	// child-node may only be created, if there doesn't exist a child with the given name yet
+            if(idString(this.children[i].node.getNodeData()) === idString(nodeData)) return undefined;
         }
-        if(index == null) console.log("null:", nameVal);
-
         let child = nodeMap.get(idString(nodeData));
 
         if(!child){		// new node-instance is only created, if it didn't exist yet
@@ -135,7 +125,6 @@ class node{
         }
 
         // if there exists a child-node with the given source index, that has never been placed, it must be placed with respect on the existing force tree
-        // for(var i = 0; i < this.children.length; i++){
         let lock = false;
         let thisNode = this;
         childArrayIndices.forEach(function(i){
@@ -147,7 +136,6 @@ class node{
                 }
             }
         });
-        // }
         // all child-nodes must be displayed right now
         // for(var i = 0; i < this.children.length; i++){
         childArrayIndices.forEach(function(i){
@@ -172,7 +160,6 @@ class node{
         let childArray = [];
         let idArray = [];	// first an array with all the child-ids is created
         let thisNode = this;
-        // for(let i = 0; i < this.children.length; i++){
         childArrayIndices.forEach(function(i){
             let childIndex = thisNode.children[i].index;
             if(childIndex == index && thisNode.children[i].node.getVisibility() == null){
@@ -180,8 +167,7 @@ class node{
                 idArray.push(idString(thisNode.children[i].node.getNodeData()));
             }
         });
-        // }
-        let positions = addNodeToForceTree(this.name, idArray);	// this function from the ForceTree.js file extends for each node in
+        let positions = addNodeToForceTree(idString(this.nodeData), idArray);	// this function from the ForceTree.js file extends for each node in
         // the idArray the invisible force graph and returns their positions
 
         for(let i = 0; i < childArray.length; i++){		// in the end the affected child-nodes are placed at the calculated positions
@@ -196,9 +182,9 @@ class node{
      * places this node in the center of the svg container, but takes care of existing nodes
      */
     placeCentrally(){
-        let position = addNodeToForceTree(this.name);
-        this.x = position.x - nodeWidth/2;
-        this.y = position.y - (nodeHeightEmpty + callSiteHeight*this.callSites.length)/2;
+        let position = addNodeToForceTree(idString(this.nodeData));
+        this.sizes.x = position.x - this.sizes.width/2;
+        this.sizes.y = position.y - this.sizes.height/2;
         this.forceNodeIndex = position.index;
     }
 
@@ -206,14 +192,16 @@ class node{
      * displays this node
      */
     showNode(){
+        placedNodesMap.set(idString(this.nodeData), this);
         if(this.visible != null){	// just changes the css-display property if the node was already placed before
-            document.getElementById(this.name).style.display = "block";
+            document.getElementById(idString(this.nodeData)).style.display = "block";
         }
-        else createSingleNode(this.x, this.y, this.nodeData, this.callSites, this.callSiteStats);	// creates a new node otherwise
+        else createSingleNode(this.sizes.x, this.sizes.y, this.nodeData, this.callSites, this.callSiteStats);	// creates a new node otherwise
         this.visible = true;
 		// updates the graph data with new number of shown nodes
 		currentNodes++;
 		refreshGraphData();
+        resizeSVGCont(this);
     }
 
 
@@ -225,7 +213,7 @@ class node{
     hideNode(){
         if(this.visible === true){
 
-            let node = document.getElementById(this.name);	// now this node itself becomes hidden
+            let node = document.getElementById(idString(this.nodeData));	// now this node itself becomes hidden
             node.style.display = "none";
             this.visible = false;
 			//updates number of current shown nodes and edges
@@ -334,11 +322,11 @@ class node{
                 let height = nodeHeightEmpty;
                 // height variates, if node is currently in detailed mode or not
                 if(node.getDetailed()) height += callSiteHeight*node.getCallSites().length;
-                return {x: node.x, y: node.y, width: nodeWidth, height: height};
+                return {x: node.getSizes().x, y: node.getSizes().y, width: nodeWidth, height: height};
             }
             else{   // in else block, the size of a single call site shall be returned
-                return {x: node.x + (nodeWidth-callSiteWidth)/2,
-                            y: node.y + callSiteTopOffset + callSiteHeight*index,
+                return {x: node.getSizes().x + (nodeWidth-callSiteWidth)/2,
+                            y: node.getSizes().y + callSiteTopOffset + callSiteHeight*index,
                             width: callSiteWidth,
                             height: callSiteHeight};
             }
@@ -392,19 +380,14 @@ class node{
     }
 
     /**
-     * @returns {node data} - ...
+     * @returns {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} - all the data that identifies this single node
      */
     getNodeData(){ return this.nodeData; }
 
     /**
-     * @returns {number} - this nodes's x position
+     * @returns {{x: number, y: number, width: number, height: number}} - sizes of this node
      */
-    getX(){ return this.x; }
-
-    /**
-     * @returns {number} - this nodes's y position
-     */
-    getY(){ return this.y; }
+    getSizes(){ return this.sizes; }
 
     /**
      * @param {number} index - array index of the corresponding node in the force-graph
@@ -437,7 +420,7 @@ class node{
     getChildNodes(){ return this.children; }
 
     /**
-     * @returns {boolean or null} - null: node has never been placed or displayed;
+     * @returns {boolean | null} - null: node has never been placed or displayed;
      * 								false: this node has valid x- and y-values, but is currently invisible;
      *								true: node has valid x- and y-values and is currently displayed
      */
@@ -453,8 +436,7 @@ class node{
      */
     reloadCallSites(){
         if(this.visible){
-            console.log(idString(this.nodeData));
-            var methodDivs = document.getElementById(this.name).childNodes[2].childNodes;
+            var methodDivs = document.getElementById(idString(this.nodeData)).childNodes[2].childNodes;
             for(var i = 0; i < methodDivs.length; i++){
                 methodDivs[i].childNodes[1].textContent = "(" + this.callSiteStats[i].numberOfTargets + ")";
             }
@@ -465,8 +447,8 @@ class node{
      * sets scrollbar that this node is in the center of the display
      */
     focus(){
-        let xCenter = this.x + nodeWidth/2;
-        let yCenter = this.y + (nodeHeightEmpty + callSiteHeight*this.callSites.length)/2;
+        let xCenter = this.sizes.x + this.sizes.width/2;
+        let yCenter = this.sizes.y + this.sizes.height/2;
         document.getElementsByTagName('html')[0].scrollLeft = parseInt(xCenter - window.innerWidth/2);
         document.getElementsByTagName('html')[0].scrollTop = parseInt(yCenter - window.innerHeight/2);
     }
@@ -479,11 +461,10 @@ class node{
 /**
  * plots a single node with some given attributes
  *
- * @param {SVG-foreignObject element} cont - foreignObject-container
  * @param {number} x - left distance
  * @param {number} y - top distance
- * @param {string} name - node title
- * @param {string[]} content - array of call sites
+ * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} nodeData - signature of this method
+ * @param {string[]} callSites - string array with the name of the call sites
  * @param {{numberOfTargets: number, line: number}} callSiteStats - some information about each call-site
  */
 function createSingleNode(x, y, nodeData, callSites, callSiteStats){
@@ -501,18 +482,15 @@ function createSingleNode(x, y, nodeData, callSites, callSiteStats){
         .on("dragend", function() {
             if (!lock){
                 let node = nodeMap.get(this.childNodes[0].id);
-                let xCenter = parseInt(node.getX()) + nodeWidth / 2;
-                let yCenter = parseInt(node.getY()) + nodeHeight / 2;
+                let xCenter = node.getSizes().x + node.getSizes().width / 2;
+                let yCenter = node.getSizes().y + node.getSizes().height / 2;
 
                 nodes[node.getForceNodeIndex()].x = xCenter;
                 nodes[node.getForceNodeIndex()].y = yCenter;
                 nodes[node.getForceNodeIndex()].px = xCenter;
                 nodes[node.getForceNodeIndex()].py = yCenter;
 
-                // nodeSelection.attr("cx", xCenter);
-                // nodeSelection.attr("cy", yCenter);
-
-                // restartForceLayouting(1);
+                resizeSVGCont(node);
             }
 
             lock = false;
@@ -583,19 +561,8 @@ function createSingleNode(x, y, nodeData, callSites, callSiteStats){
     }
 
     foreignObjectCont
-        .attr("width", foreignObjectCont[0][0].childNodes[0].offsetWidth)
+        .attr("width", foreignObjectCont[0][0].childNodes[0].offsetWidth+50)
         .attr("height", foreignObjectCont[0][0].childNodes[0].offsetHeight);
-
-    //on rightclick in this node calls rightclickmenu and deactivates normal contextmenu
-/*    $("[id='" + name + "']").contextmenu(function(e) {
-        if(nodeMenuIsOpen){
-            $("#contextmenuNode").remove();
-            nodeMenuIsOpen = false;
-        }
-        clickedNode = this;
-        createNodeContextmenu(e);
-        return false;
-    });*/
 }
 
 
