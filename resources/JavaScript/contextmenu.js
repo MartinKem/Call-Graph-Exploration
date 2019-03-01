@@ -14,7 +14,7 @@ var availableTargets;
 var selectedTargets;
 var selectedNode;
 var callSiteIndex;
-var callSiteThreshold = 5;
+const callSiteThreshold = 5;
 // --------------------------------------------------
 
 //eventhandler for normal leftclick, deaktivates the contextmenu for nodes

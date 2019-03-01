@@ -95,10 +95,8 @@ class node{
         if(!child){		// new node-instance is only created, if it didn't exist yet
             child = new node(nodeData, callSites, callSiteStats);
         }
-        let edge = new Edge(this, child, callsiteIndex);
-        child.addParent(this, callsiteIndex, edge);
 
-        this.children.push({node: child, index: callsiteIndex, edge: edge});
+        this.children.push({node: child, index: callsiteIndex, edge: undefined});
 		estGraphData();
         // this.reloadCallSites();
         return this.children[this.children.length-1].node;
@@ -140,8 +138,11 @@ class node{
                 if(!thisNode.children[i].node.visible) {
                     thisNode.children[i].node.showNode();
                 }
-                if(thisNode.children[i].edge.visible === null){
-                    thisNode.children[i].edge.create();
+                if(thisNode.children[i].edge === undefined){
+                    let edge = new Edge(thisNode, thisNode.children[i].node, thisNode.children[i].index);
+                    edge.create();
+                    thisNode.children[i].edge = edge;
+                    thisNode.children[i].node.addParent(this, thisNode.children[i].index, edge);
                 }
                 else if(thisNode.children[i].edge.visible === false){
                     thisNode.children[i].edge.reload();
@@ -229,11 +230,13 @@ class node{
      */
     reloadEdges(){
         this.children
+            .filter(child => child.edge !== undefined)
             .filter(child => child.edge.visible !== null)
             .forEach(function(child){
             child.edge.reload();
         });
         this.parents
+            .filter(parent => parent.edge !== undefined)
             .filter(parent => parent.edge.visible !== null)
             .forEach(function(parent){
             parent.edge.reload();
@@ -245,9 +248,12 @@ class node{
      */
     toggleToDetailed(){
         this.detailed = true;
-        this.children.forEach(function (c) {
-            c.edge.reload();
-        })
+        this.reloadEdges();
+        // this.children
+        //     .filter(child => child.edge !== undefined)
+        //     .forEach(function (child) {
+        //         child.edge.reload();
+        // })
     }
 
     /**
@@ -255,9 +261,12 @@ class node{
      */
     toggleToAbstract(){
         this.detailed = false;
-        this.children.forEach(function (c) {
-            c.edge.reload();
-        })
+        this.reloadEdges();
+        // this.children
+        //     .filter(child => child.edge !== undefined)
+        //     .forEach(function (child) {
+        //         child.edge.reload();
+        // })
     }
 
     /**
