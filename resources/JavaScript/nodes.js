@@ -211,7 +211,7 @@ class node{
      * hides this node, if it was already displayed before
      * also hides all child-nodes of this node, if they don't have another visible parent
      */
-    hideNode(){
+/*    hideNode2(){
         if(this.visible === true){
 
             let node = document.getElementById(idString(this.nodeData));	// now this node itself becomes hidden
@@ -223,6 +223,80 @@ class node{
         }
         this.reloadEdges();
 		//updates the graph data with new number of shown nodes
+    }*/
+    hideNode(){
+        if(this.visible === true){
+            this.marked = true;
+            this.visible = false;
+            console.log(this);
+            var markedArr = [];
+            markChilds(this);
+            function markChilds(n){
+
+                if(n.children.length > 0) {
+                    n.children.forEach(function (c) {
+                        if(c.node.visible && !c.node.marked) {
+                            c.node.marked = true;
+                            //document.getElementById(idString(c.node.nodeData)).style.backgroundColor = "green"
+                            markedArr.push(c.node);
+                            markChilds(c.node);
+                        }
+                    })
+                }
+            }
+            markedArr.forEach(function(n){
+                unmark(n);
+            });
+            function unmark(n) {
+                if(n.parents.length){
+                    for(let i = 0; i<n.parents.length; i++){
+                        let p = n.parents[i];
+                        //console.log("pev: ",p.edge, p.edge.visible)
+                        //console.log(p.node,(p.node.visible && !p.node.marked && p.edge.visible))
+                        if(p.node.visible && !p.node.marked && p.edge.visible){
+                            n.marked = false;
+                            markedArr.splice(markedArr.indexOf(n), 1);
+                            if (n.children) {
+                                n.children.forEach(function (c) {
+                                    if (c.node.marked === true && c.node.visible) {
+                                        unmark(c.node);
+                                    }
+                                })
+                            }
+                            break;
+                        }
+                    }
+                }
+
+            }
+
+            markedArr.push(this);
+            markedArr.forEach(function (n) {
+                deleteEdges(n);
+
+            });
+            console.log(markedArr);
+            markedArr.forEach(function (n) {
+                document.getElementById(idString(n.nodeData)).style.display = "none";
+                //document.getElementById(idString(n.nodeData)).style.backgroundColor = "red"
+                n.visible = false;
+                n.marked = false;
+            });
+        }
+        function deleteEdges(node) {
+            for (let i = 0; i < node.parents.length; i++) {		// all edges to this node become hidden
+                node.children.forEach(function (c) {
+                    c.edge.hide();
+                });
+                if(node.parents[i].node.visible && node.parents[i].edge.visible) {
+                    try {
+                        node.parents[i].edge.hide();
+                    }catch (e) {
+
+                    }
+                }
+            }
+        }
     }
 
     /**
