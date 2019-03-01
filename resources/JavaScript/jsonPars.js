@@ -416,9 +416,6 @@ function createGraph() {
 	let rootNodeString = document.getElementById("searchInput").value;
 	let rootNode = nodeMap.get(rootNodeString);
     if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
-	// rootNode = createNodeInstance({declaringClass: "tmr/Demo", name: "main", parameterTypes: ["java/lang/String"], returnType: "V"});
-	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
-	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
 	if (rootNode) {
 		if (!rootNode.getSizes().x) rootNode.placeCentrally();
 		rootNode.showNode();
