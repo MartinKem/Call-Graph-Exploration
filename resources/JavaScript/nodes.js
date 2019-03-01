@@ -146,7 +146,7 @@ class node{
                     thisNode.children[i].edge.create();
                 }
                 else if(thisNode.children[i].edge.visible === false){
-                    thisNode.children[i].edge.show();
+                    thisNode.children[i].edge.reload();
                 }
             }
         });
@@ -221,17 +221,6 @@ class node{
 			//updates number of current shown nodes and edges
 			currentNodes--;
 			refreshGraphData();
-            // this.visibleParentNodes = 0;	// visibleParentNodes is set to 0 because there is no node anymore with an edge to this node
-            // for(var i = 0; i < this.children.length; i++){
-            //     let edgeID = idString(this.nodeData) + '#' + this.children[i].index + '->' + idString(this.children[i].node.getNodeData());
-            //     let edge = document.getElementById(edgeID);
-            //     if(edge != undefined
-            //         && edge.style.display === 'block'
-            //         && idString(this.children[i].node.getNodeData()) !== idString(this.nodeData)){
-			// 			this.children[i].node.hideNode();
-			// 			//updates number of current shown nodes
-			// 		}
-            // }
         }
         this.reloadEdges();
 		//updates the graph data with new number of shown nodes
