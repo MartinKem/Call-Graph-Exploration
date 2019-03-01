@@ -369,18 +369,19 @@ function createNodeInstance(nodeData, parentNode, index) {
 	}
 	else {
 		// In else case, the jsonData exists and the function always creates a new node. Now the call-site-information is copied for the new node.
-		let callSites = [];
-		let callSiteStats = [];
-		for (let i = 0; i < jsonData.callSites.length; i++) {
-			callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
-			callSiteStats.push({ numberOfTargets: jsonData.callSites[i].targets.length, line: jsonData.callSites[i].line });
-		}
+		// let callSites = [];
+		// let callSiteStats = [];
+		// for (let i = 0; i < jsonData.callSites.length; i++) {
+		// 	// callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
+		// 	callSites.push(jsonData.callSites[i].declaredTarget);
+		// 	callSiteStats.push({ numberOfTargets: jsonData.callSites[i].targets.length, line: jsonData.callSites[i].line });
+		// }
 		if (!parentNode) {
 			// If parentNode doesn't exist, the user generates a new node through the search field.
-			newNode = new node(nodeData, callSites, callSiteStats);
+			newNode = new node(nodeData, jsonData.callSites);
 		}
 		else {
-			newNode = parentNode.addChild(index, nodeData, callSites, callSiteStats);
+			newNode = parentNode.addChild(index, nodeData, jsonData.callSites);
 		}
 	}
 	if (newNode) nodeMap.set(idString(nodeData), newNode); // now the node object is added to the nodeMap

@@ -61,7 +61,7 @@ $("body").on("click",".node_inhalt button",function (e) {
     let node = nodeMap.get(this.parentNode.parentNode.getAttribute("id"));
     let index = this.getAttribute("id").split("#");
     index = parseInt(index[index.length - 1]);
-    if (node.getCallSiteStats()[index].numberOfTargets >= callSiteThreshold){
+    if(node.callSites[index].targets.length >= callSiteThreshold){
         closeAllContextmenus();
         closeCallSiteContextmenu();
         createCallSiteContextmenu(e, node, index);

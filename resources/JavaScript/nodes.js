@@ -39,13 +39,12 @@ class node{
      * @param {string[]} callSites - string array with the name of the call sites
      * @param {{numberOfTargets: number, line: number}[]} callSiteStats - holds for each callsite to number of targets and the line, where the site is called
      */
-    constructor(data, callSites, callSiteStats){
+    constructor(data, callSites){
         this.parents = [];
         this.nodeData = data;
         this.callSites = callSites;
         this.sizes = {x: undefined, y: undefined, width: nodeWidth, height: nodeHeightEmpty + callSiteHeight*this.callSites.length};
         this.children = [];		// target nodes
-        this.callSiteStats = callSiteStats;
         this.detailed = true;
         this.visible = null;	// this.visible == null: node has never been placed or displayed;
                                 // this.visible == false: this node has valid x- and y-values, but is currently invisible
@@ -188,7 +187,7 @@ class node{
         if(this.visible != null){	// just changes the css-display property if the node was already placed before
             document.getElementById(idString(this.nodeData)).style.display = "block";
         }
-        else createSingleNode(this.sizes.x, this.sizes.y, this.nodeData, this.callSites, this.callSiteStats);	// creates a new node otherwise
+        else createSingleNode(this.sizes.x, this.sizes.y, this.nodeData, this.callSites);	// creates a new node otherwise
         this.visible = true;
 		// updates the graph data with new number of shown nodes
 		currentNodes++;
@@ -221,73 +220,58 @@ class node{
             this.visible = false;
             var markedArr = [];
             markChildren(this);
-            function markChildren(n){
-
-                if(n.children.length > 0) {
-                    n.children.forEach(function (c) {
-                        if(c.node.visible && !c.node.marked) {
-                            c.node.marked = true;
-                            //document.getElementById(idString(c.node.nodeData)).style.backgroundColor = "green"
-                            markedArr.push(c.node);
-                            markChildren(c.node);
-                        }
-                    })
-                }
-            }
             markedArr.forEach(function(n){
                 unmark(n);
             });
-            function unmark(n) {
-                if(n.parents.length){
-                    for(let i = 0; i<n.parents.length; i++){
-                        let p = n.parents[i];
-                        //console.log("pev: ",p.edge, p.edge.visible)
-                        //console.log(p.node,(p.node.visible && !p.node.marked && p.edge.visible))
-                        if(p.node.visible && !p.node.marked && p.edge !== undefined && p.edge.visible !== false){
-                            n.marked = false;
-                            markedArr.splice(markedArr.indexOf(n), 1);
-                            if (n.children) {
-                                n.children.forEach(function (c) {
-                                    if (c.node.marked === true && c.node.visible) {
-                                        unmark(c.node);
-                                    }
-                                })
-                            }
-                            break;
-                        }
-                    }
-                }
-
-            }
 
             markedArr.push(this);
-            markedArr.forEach(function (n) {
-                deleteEdges(n);
-
-            });
+            // markedArr.forEach(function (n) {
+            //     n.reloadEdges();
+            // });
             markedArr.forEach(function (n) {
                 document.getElementById(idString(n.nodeData)).style.display = "none";
                 //document.getElementById(idString(n.nodeData)).style.backgroundColor = "red"
                 n.visible = false;
+                n.reloadEdges();
                 n.marked = false;
             });
         }
-        function deleteEdges(node) {
-            node.reloadEdges();
-            // for (let i = 0; i < node.parents.length; i++) {		// all edges to this node become hidden
-            //     node.children
-            //         .filter(child => child.edge !== undefined)
-            //         .forEach(function (c) {
-            //         c.edge.hide();
-            //     });
-            //     if(node.parents[i].node.visible && node.parents[i].edge !== undefined && node.parents[i].edge.visible) {
-            //         try {
-            //             node.parents[i].edge.hide();
-            //         }catch (e) {
-            //
-            //         }
-            //     }
-            // }
+
+        function markChildren(n){
+
+            if(n.children.length > 0) {
+                n.children
+                    .filter(child => child.node.visible && !child.node.marked)
+                    .forEach(function (c) {
+                        c.node.marked = true;
+                        //document.getElementById(idString(c.node.nodeData)).style.backgroundColor = "green"
+                        markedArr.push(c.node);
+                        markChildren(c.node);
+                });
+            }
+        }
+
+        function unmark(n) {
+            if(n.parents.length){
+                for(let i = 0; i < n.parents.length; i++){
+                    let p = n.parents[i];
+                    //console.log("pev: ",p.edge, p.edge.visible)
+                    //console.log(p.node,(p.node.visible && !p.node.marked && p.edge.visible))
+                    if(p.node.visible && !p.node.marked && p.edge !== undefined && p.edge.visible !== false){
+                        n.marked = false;
+                        markedArr.splice(markedArr.indexOf(n), 1);
+                        if (n.children) {
+                            n.children.forEach(function (c) {
+                                if (c.node.marked === true && c.node.visible) {
+                                    unmark(c.node);
+                                }
+                            })
+                        }
+                        break;
+                    }
+                }
+            }
+
         }
     }
 
@@ -367,11 +351,6 @@ class node{
     getCallSites(){ return this.callSites; }
 
     /**
-     * @returns {string[]} - call sites stats
-     */
-    getCallSiteStats(){ return this.callSiteStats; }
-
-    /**
      * @returns {node[]} - array of node-instances of the child-nodes
      */
     getChildNodes(){ return this.children; }
@@ -395,7 +374,7 @@ class node{
         if(this.visible){
             var methodDivs = document.getElementById(idString(this.nodeData)).childNodes[2].childNodes;
             for(var i = 0; i < methodDivs.length; i++){
-                methodDivs[i].childNodes[1].textContent = "(" + this.callSiteStats[i].numberOfTargets + ")";
+                methodDivs[i].childNodes[1].textContent = "(" + this.callSites[i].targets.length + ")";
             }
         }
     }
@@ -495,30 +474,30 @@ function createSingleNode(x, y, nodeData, callSites, callSiteStats){
     node = node.append("xhtml:div")
         .attr("class","node_inhalt");
 
-    for(var i=0; i < callSites.length; i++){
+    for(let i=0; i < callSites.length; i++){
         var entry = node.append("xhtml:button")
             .attr("id", idString(nodeData) + "#" + i)
             .attr("class", "methodButton")
             .on("click", function(){
                 let index = this.getAttribute("id").split('#')[1];
                 var node = nodeMap.get(idString(nodeData));
-                if(node.getCallSiteStats()[index].numberOfTargets < callSiteThreshold) node.showChildNodes(index); })
+                if(node.callSites[i].targets.length < callSiteThreshold) node.showChildNodes(index); })
             .style("border-width", "2px")
             .style("border-top-width", (i === 0 ? "2px" : "0px"))
             .style("border-radius", "5px")
             .style("padding", "5px");
         entry.append("xhtml:div")
             .attr("class", "callSite")
-            .text(callSiteStats[i].line + ": " + callSites[i])
+            .text(callSites[i].line + ": " + idString(callSites[i].declaredTarget))
             .style("float", "left");
         entry.append("xhtaml:div")
-            .text("(" + callSiteStats[i].numberOfTargets + ")")
+            .text("(" + callSites[i].targets.length + ")")
             .style("float", "right")
             .style("color", "#b0b0b0");
     }
 
     foreignObjectCont
-        .attr("width", foreignObjectCont[0][0].childNodes[0].offsetWidth+50)
+        .attr("width", foreignObjectCont[0][0].childNodes[0].offsetWidth+1000)
         .attr("height", foreignObjectCont[0][0].childNodes[0].offsetHeight);
 }
 
