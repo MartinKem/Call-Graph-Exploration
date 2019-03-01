@@ -230,8 +230,8 @@ class node{
             this.visible = false;
             console.log(this);
             var markedArr = [];
-            markChilds(this);
-            function markChilds(n){
+            markChildren(this);
+            function markChildren(n){
 
                 if(n.children.length > 0) {
                     n.children.forEach(function (c) {
@@ -239,7 +239,7 @@ class node{
                             c.node.marked = true;
                             //document.getElementById(idString(c.node.nodeData)).style.backgroundColor = "green"
                             markedArr.push(c.node);
-                            markChilds(c.node);
+                            markChildren(c.node);
                         }
                     })
                 }
@@ -253,7 +253,7 @@ class node{
                         let p = n.parents[i];
                         //console.log("pev: ",p.edge, p.edge.visible)
                         //console.log(p.node,(p.node.visible && !p.node.marked && p.edge.visible))
-                        if(p.node.visible && !p.node.marked && p.edge.visible){
+                        if(p.node.visible && !p.node.marked && p.edge.visible !== false){
                             n.marked = false;
                             markedArr.splice(markedArr.indexOf(n), 1);
                             if (n.children) {
