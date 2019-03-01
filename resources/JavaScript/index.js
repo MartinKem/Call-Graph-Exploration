@@ -92,7 +92,6 @@ function resizeSVGCont(node) {
 	if (resized) {
 		// force.size([svgCont.attr("width"), svgCont.attr("height")]);
 		resizeSVGCont(node);
-		node.focus();
 	}
 
 	// In case that the node was placed behind the left or the top border, in addition to increasing the container sizes
@@ -107,6 +106,7 @@ function resizeSVGCont(node) {
 			nodes[i].px += 1000;
 			nodes[i].x += 1000;
 		}
+		document.getElementsByTagName('html')[0].scrollLeft += 1000;
 	}
 
 	function replaceAllVertically() {
@@ -119,6 +119,7 @@ function resizeSVGCont(node) {
 			nodes[i].py += 1000;
 			nodes[i].y += 1000;
 		}
+		document.getElementsByTagName('html')[0].scrollTop += 1000;
 	}
 	return resized;
 }
