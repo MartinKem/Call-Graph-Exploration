@@ -228,7 +228,6 @@ class node{
         if(this.visible === true){
             this.marked = true;
             this.visible = false;
-            console.log(this);
             var markedArr = [];
             markChildren(this);
             function markChildren(n){
@@ -253,7 +252,8 @@ class node{
                         let p = n.parents[i];
                         //console.log("pev: ",p.edge, p.edge.visible)
                         //console.log(p.node,(p.node.visible && !p.node.marked && p.edge.visible))
-                        if(p.node.visible && !p.node.marked && p.edge && p.edge.visible !== false){
+                        console.log(p);
+                        if(p.node.visible && !p.node.marked && p.edge !== undefined && p.edge.visible !== false){
                             n.marked = false;
                             markedArr.splice(markedArr.indexOf(n), 1);
                             if (n.children) {
@@ -284,18 +284,22 @@ class node{
             });
         }
         function deleteEdges(node) {
-            for (let i = 0; i < node.parents.length; i++) {		// all edges to this node become hidden
-                node.children.forEach(function (c) {
-                    c.edge.hide();
-                });
-                if(node.parents[i].node.visible && node.parents[i].edge.visible) {
-                    try {
-                        node.parents[i].edge.hide();
-                    }catch (e) {
-
-                    }
-                }
-            }
+            console.log(node);
+            node.reloadEdges();
+            // for (let i = 0; i < node.parents.length; i++) {		// all edges to this node become hidden
+            //     node.children
+            //         .filter(child => child.edge !== undefined)
+            //         .forEach(function (c) {
+            //         c.edge.hide();
+            //     });
+            //     if(node.parents[i].node.visible && node.parents[i].edge !== undefined && node.parents[i].edge.visible) {
+            //         try {
+            //             node.parents[i].edge.hide();
+            //         }catch (e) {
+            //
+            //         }
+            //     }
+            // }
         }
     }
 
