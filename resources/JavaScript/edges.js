@@ -126,6 +126,16 @@ class Edge{
             edge.setAttribute("d", path);
         }
     }
+    hide(){
+        this.visible = false;
+        let edge = document.getElementById(this.id);
+        edge.style.display = "none";
+    }
+    show(){
+        this.visible = true;
+        let edge = document.getElementById(this.id);
+        edge.style.display = "block";
+    }
 
     /**
      * insertes an arrow from (xStart, yStart) to (xDest, yDest) into an svg-container
