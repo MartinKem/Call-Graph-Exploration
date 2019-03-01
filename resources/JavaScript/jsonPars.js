@@ -5,15 +5,7 @@
 */
 if (typeof module !== 'undefined') {
 	const index = require("./index");
-	var createdNodes = index.createdNodes;
-	var svgCont = index.svgCont;
-	var defsCont = index.defsCont;
-	var rootNodeString = index.rootNodeString;
-	var rootNode = index.rootNode;
-	var rootNodes = index.rootNodes;
-	var nodeMap = index.nodeMap;
 	var open_close = index.open_close;
-	var i = index.i;
 }
 
 
@@ -24,10 +16,7 @@ var parsedJsonMap;
 var isLoading = false;
 var autocompleteMode;
 
-//Add the events for the drop zone
-var dropZone = document.getElementById('dropZone');
-dropZone.addEventListener('dragover', handleDragOver, false);
-dropZone.addEventListener('drop', handleFileSelect, false);
+
 
 /**
  * 
@@ -40,20 +29,6 @@ function setProgBar(percent) {
 	progress.textContent = percent + '%';
 }
 
-function handleDragOver(evt) {
-	evt.stopPropagation();
-	evt.preventDefault();
-	evt.dataTransfer.dropEffect = 'copy'; //shows it is a copy
-}
-
-function handleFileSelect(evt) {
-	evt.stopPropagation();
-	evt.preventDefault();
-
-	var files = evt.dataTransfer.files; // FileList object.
-
-	document.getElementById('fileinput').files = files; // set new file
-}
 
 var setString = function (str) {
 	strJson += str;
