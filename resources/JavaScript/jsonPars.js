@@ -57,14 +57,14 @@ function loadFile() {
 }
 
 function parseString() {
-	var rest = "";
-	var finalarray;
+	let rest = "";
+	let finalarray;
 
 	arr.push(strJson);
 	arr.forEach(function (a) {
 		a = rest + a;
-		var first = a.indexOf("\n    \"method\" : {") - 1;
-		var last = a.lastIndexOf("\n    \"method\" : {") - 3;
+		let first = a.indexOf("\n    \"method\" : {") - 1;
+		let last = a.lastIndexOf("\n    \"method\" : {") - 3;
 
 		if (finalarray == null) { finalarray = JSON.parse("{\n  \"reachableMethods\" : [ " + a.slice(first, last) + " ]\n}").reachableMethods; }
 		else { Array.prototype.push.apply(finalarray, JSON.parse("{\n  \"reachableMethods\" : [ " + a.slice(first, last) + " ]\n}").reachableMethods) }
@@ -84,7 +84,7 @@ function parseString() {
 }
 
 function correctClassNames(methods) {
-	for (var i = 0; i < methods.reachableMethods.length; i++) {
+	for (let i = 0; i < methods.reachableMethods.length; i++) {
 		correctSingleMethod(methods.reachableMethods[i].method);
 		methods.reachableMethods[i].callSites.forEach(function (site) {
 			correctSingleMethod(site.declaredTarget);
@@ -178,7 +178,7 @@ function parseFile(file, callback) {
 		// of to the next chunk
 
 		chunkReaderBlock(offset, chunkSize, file);
-	}
+	};
 
 	chunkReaderBlock = function (_offset, length, _file) {
 		var r = new FileReader();
@@ -195,7 +195,7 @@ function parseFile(file, callback) {
 			}
 		};
 		r.readAsText(blob);
-	}
+	};
 
 
 
@@ -247,11 +247,11 @@ function autocomplete(inp, arr) {
 		inputElem.parentNode.appendChild(div);
 
         Loop1:
-		for (var i = 0; i < arr.length; i++) {
+		for (let i = 0; i < arr.length; i++) {
 			//Prüfe, ob die eingegebenen Zeichen mit beliebigem Teilstring des Vorschlags übereinstimmen
 			Loop2:
-			for (var j = 0; j < arr[i].length - value.length + 1; j++){
-				if (arr[i].substr(j, value.length).toUpperCase() == value.toUpperCase()) {
+			for (let j = 0; j < arr[i].length - value.length + 1; j++){
+				if (arr[i].substr(j, value.length).toUpperCase() === value.toUpperCase()) {
                     arr[i] = escapeSG(arr[i]);
 					//Erstelle DIV Element für jeden übereinstimmenden Vorschlag
 					items = document.createElement("DIV");
@@ -288,19 +288,19 @@ function autocomplete(inp, arr) {
 	}
 	//Führe eine Funktion aus, wenn die Tastatur betätigt wird
 	inp.addEventListener("keydown", function (e) {
-		var x = document.getElementById(this.id + "autocomplete-list");
+		let x = document.getElementById(this.id + "autocomplete-list");
 		if (x) x = x.getElementsByTagName("div");
-		if (e.keyCode == 40) {
+		if (e.keyCode === 40) {
 			//Erhöhe aktuellen Fokus bei Pfeiltaste UNTEN
 			currentFocus++;
 			//Hebe aktuelles Listenelement hervor
 			addActive(x);
-		} else if (e.keyCode == 38) {
+		} else if (e.keyCode === 38) {
 			//Verringere aktuellen Fokus bei Pfeiltaste HOCH
 			currentFocus--;
 			//Hebe aktuelles Listenelement hervor
 			addActive(x);
-		} else if (e.keyCode == 13) {
+		} else if (e.keyCode === 13) {
 			//Verhindere, dass ein Formular gesendet wird, wenn ENTER gedrückt wird
 			if (currentFocus > -1) {
 				//Simuliere Klick auf Listenelement
@@ -324,14 +324,14 @@ function autocomplete(inp, arr) {
 	}
 	function removeActive(x) {
 		//Entferne die "aktiv" Klasse von allen Listenelementen
-		for (var i = 0; i < x.length; i++) {
+		for (let i = 0; i < x.length; i++) {
 			x[i].classList.remove("autocomplete-active");
 		}
 	}
 	function closeAllLists(elmnt) {
 		//Schließe alle offenen Autovervollständigungslisten mit Ausnahme der übergebenen
-		var x = document.getElementsByClassName("autocomplete-items");
-		for (var i = 0; i < x.length; i++) {
+		let x = document.getElementsByClassName("autocomplete-items");
+		for (let i = 0; i < x.length; i++) {
 			if (elmnt != x[i] && elmnt != inp) {
 				x[i].parentNode.removeChild(x[i]);
 			}
@@ -372,7 +372,7 @@ function createNodeInstance(nodeData, parentNode, index) {
 		// In else case, the jsonData exists and the function always creates a new node. Now the call-site-information is copied for the new node.
 		let callSites = [];
 		let callSiteStats = [];
-		for (var i = 0; i < jsonData.callSites.length; i++) {
+		for (let i = 0; i < jsonData.callSites.length; i++) {
 			callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
 			callSiteStats.push({ numberOfTargets: jsonData.callSites[i].targets.length, line: jsonData.callSites[i].line });
 		}
@@ -400,10 +400,10 @@ function createChildNodes(node) {
 	if (jsonData) callSites = jsonData.callSites;
 
 	// for all targets of all call sites this function is called recursively, to create the nodes of the lower children generations too
-	for (var i = 0; i < callSites.length; i++) {
-		for (var j = 0; j < callSites[i].targets.length; j++) {
-			var target = callSites[i].targets[j];
-			var childNode = createNodeInstance(target, node, i);
+	for (let i = 0; i < callSites.length; i++) {
+		for (let j = 0; j < callSites[i].targets.length; j++) {
+			let target = callSites[i].targets[j];
+			let childNode = createNodeInstance(target, node, i);
 			if (childNode) createChildNodes(childNode);
 		}
 	}
