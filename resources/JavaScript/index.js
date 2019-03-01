@@ -147,4 +147,5 @@ function open_close(currentValue) {
 */
 if (typeof module !== 'undefined') {
 	module.exports.open_close = open_close;
+	module.exports.idString = idString;
 }

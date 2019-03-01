@@ -4,8 +4,7 @@
 * *******
 */
 if (typeof module !== 'undefined') {
-	const index = require("./index");
-	var open_close = index.open_close;
+
 }
 
 
@@ -105,7 +104,7 @@ function correctClassNames(methods) {
 	}
 }
 
-function resetFileRead(){
+function resetFileRead() {
 	arr = [];
 	strJson = "";
 	isLoading = false;
@@ -129,12 +128,12 @@ function parseFile(file, callback) {
 		}
 		if (offset >= fileSize) {
 			console.log("Done reading file");
-			
+
 			let parsedJson;
-			try{
+			try {
 				parsedJson = parseString();
-			} catch(e) {
-				if (e instanceof SyntaxError){
+			} catch (e) {
+				if (e instanceof SyntaxError) {
 					alert("File could not be read. \n-Is the Json-File saved as UNIX (LF)? \n-Is the Json-File properly formatted? \n" + e);
 					resetFileRead();
 					return;
@@ -143,7 +142,7 @@ function parseFile(file, callback) {
 					return;
 				}
 			}
-			
+
 
 			correctClassNames(parsedJson); // remove 'L' and ';' out of the class names
 			console.log("Done parsing file");
@@ -223,10 +222,10 @@ function autocomplete(inp, arr) {
 	inp.addEventListener("focus", function (e) { autocompleteEvent(e, this); });
 
 	document.addEventListener("click", function (e) {
-		if (e.srcElement.id !== "searchInput" && e.srcElement.id !== "targetSearch"){
+		if (e.srcElement.id !== "searchInput" && e.srcElement.id !== "targetSearch") {
 			// console.log(mode);
 			closeAllLists(e.target);
-			if(e.srcElement.parentNode && e.srcElement.parentNode.id === "targetSearchautocomplete-list"){
+			if (e.srcElement.parentNode && e.srcElement.parentNode.id === "targetSearchautocomplete-list") {
 				inp.focus();
 			}
 		}
@@ -246,13 +245,13 @@ function autocomplete(inp, arr) {
 		//Füge das DIV Element dem Container als Kindelement hinzu
 		inputElem.parentNode.appendChild(div);
 
-        Loop1:
+		Loop1:
 		for (let i = 0; i < arr.length; i++) {
 			//Prüfe, ob die eingegebenen Zeichen mit beliebigem Teilstring des Vorschlags übereinstimmen
 			Loop2:
-			for (let j = 0; j < arr[i].length - value.length + 1; j++){
+			for (let j = 0; j < arr[i].length - value.length + 1; j++) {
 				if (arr[i].substr(j, value.length).toUpperCase() === value.toUpperCase()) {
-                    arr[i] = escapeSG(arr[i]);
+					arr[i] = escapeSG(arr[i]);
 					//Erstelle DIV Element für jeden übereinstimmenden Vorschlag
 					items = document.createElement("DIV");
 					//Hebe übereinstimmende Zeichen als fettgedruckt hervor
@@ -263,7 +262,7 @@ function autocomplete(inp, arr) {
 					items.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
 					//Führe die übergebene Funktion bei Knopfdruck des Elements aus
 					items.addEventListener("click", function (e) {
-						if(autocompleteMode === "callSite"){
+						if (autocompleteMode === "callSite") {
 							// Das Call-Site-Menü soll nur durch die eigenen Buttons und andere Call-Site-Menüs schließbar sein
 							//Füge den Vervollständigungsvorschlag in das Textfeld ein
 							inp.value = this.getElementsByTagName("input")[0].value;
@@ -278,7 +277,7 @@ function autocomplete(inp, arr) {
 
 					});
 					div.appendChild(items);
-					
+
 					//Schleife unterbrechen wenn 10 Elemente gefunden wurden
 					if (div.childElementCount >= 10) { break Loop1; }
 					break Loop2;
@@ -307,7 +306,7 @@ function autocomplete(inp, arr) {
 				e.preventDefault();
 				if (x) x[currentFocus].click();
 				currentFocus = -1;
-			} else if(this.value){
+			} else if (this.value) {
 				document.getElementById("search").click();
 			}
 		}
@@ -349,7 +348,7 @@ function autocomplete(inp, arr) {
  * @returns {node | null} - returns null, if node already existed, returns the new node otherwise
  */
 function createNodeInstance(nodeData, parentNode, index) {
-    var existingNode = nodeMap.get(idString(nodeData));
+	var existingNode = nodeMap.get(idString(nodeData));
 	var newNode;
 
 	if (existingNode) {
@@ -360,7 +359,7 @@ function createNodeInstance(nodeData, parentNode, index) {
 	}
 	var jsonData = parsedJsonMap.get(idString(nodeData));
 	if (!jsonData) {
-        // If there doesn't exist an entry in the json-map, the function just creates an empty node without call-sites.
+		// If there doesn't exist an entry in the json-map, the function just creates an empty node without call-sites.
 		if (!parentNode) {
 			// In case that parentNode doesn't exist too, the user tries to find a not existing node through the search field.
 			alert("\"" + rootNodeString + "\" does not exist in the JSON-file!");
@@ -381,7 +380,7 @@ function createNodeInstance(nodeData, parentNode, index) {
 			newNode = new node(nodeData, callSites, callSiteStats);
 		}
 		else {
-            newNode = parentNode.addChild(index, nodeData, callSites, callSiteStats);
+			newNode = parentNode.addChild(index, nodeData, callSites, callSiteStats);
 		}
 	}
 	if (newNode) nodeMap.set(idString(nodeData), newNode); // now the node object is added to the nodeMap
@@ -415,7 +414,7 @@ function createChildNodes(node) {
 function createGraph() {
 	let rootNodeString = document.getElementById("searchInput").value;
 	let rootNode = nodeMap.get(rootNodeString);
-    if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
+	if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
 	// rootNode = createNodeInstance({declaringClass: "tmr/Demo", name: "main", parameterTypes: ["java/lang/String"], returnType: "V"});
 	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
 	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");

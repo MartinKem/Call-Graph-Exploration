@@ -4,21 +4,12 @@
 * *******
 */
 if (typeof module !== 'undefined') {
-    var index = require("./index");
-	var createdNodes = index.createdNodes;
-	var svgCont = index.svgCont;
-	var defsCont = index.defsCont;
-	var rootNodeString = index.rootNodeString;
-	var rootNodes = index.rootNodes;
-	var nodeMap = index.nodeMap;
-	var open_close = index.open_close;
-    var i = index.i;
-    var d3 = index.d3;
+    //var global = require('./global');
+
+    var index = require('./index');
+    var idString = index.idString;
 
     var refresh = require("./refresh");
-    var createdEdges = refresh.createdEdges;
-    var currentNodes = refresh.currentNodes;
-    var currentEdges = refresh.currentEdges;
     var refreshGraphData = refresh.refreshGraphData;
     var estGraphData = refresh.estGraphData;
 

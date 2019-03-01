@@ -18,16 +18,16 @@ test('Test hide of nodes 1', () => {
 
     // create graphs
     let SubRootNode = new nodes.node(null,"Main.main",["Sub2.sub1","Sub2.sub2"],[{numberOfTargets: 1, line: 4},{numberOfTargets: 1, line: 5}],["int"],"int");
-    index.nodeMap.set("Main.main", SubRootNode);
+    nodeMap.set("Main.main", SubRootNode);
     SubRootNode.placeCentrally();
     let sub2Sub1 = SubRootNode.addChild(0,"Sub2.sub1",["Sub3.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
-    index.nodeMap.set("Sub2.sub1", sub2Sub1);
+    nodeMap.set("Sub2.sub1", sub2Sub1);
     let sub2Sub2 = SubRootNode.addChild(1,"Sub2.sub2",["Subn.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
-    index.nodeMap.set("Sub2.sub2", sub2Sub2);
+    nodeMap.set("Sub2.sub2", sub2Sub2);
     let sub3Sub1 = sub2Sub1.addChild(0,"Sub3.sub1",["Subn.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
-    index.nodeMap.set("Sub3.sub1", sub3Sub1);
+    nodeMap.set("Sub3.sub1", sub3Sub1);
     let subnSub1 = sub3Sub1.addChild(0,"Subn.sub1",["Sub2.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
-    index.nodeMap.set("Subn.sub1", subnSub1);
+    nodeMap.set("Subn.sub1", subnSub1);
 
     //show the Nodes
     SubRootNode.showNode();
@@ -101,16 +101,16 @@ test('Test hide of nodes 2', () => {
 
     // create graphs
     let SubRootNode = new nodes.node(null,"Main.main",["Sub2.sub1","Sub2.sub2"],[{numberOfTargets: 1, line: 4},{numberOfTargets: 1, line: 5}],["int"],"int");
-    index.nodeMap.set("Main.main", SubRootNode);
+    nodeMap.set("Main.main", SubRootNode);
     SubRootNode.placeCentrally();
     let sub2Sub1 = SubRootNode.addChild(0,"Sub2.sub1",["Sub3.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
-    index.nodeMap.set("Sub2.sub1", sub2Sub1);
+    nodeMap.set("Sub2.sub1", sub2Sub1);
     let sub2Sub2 = SubRootNode.addChild(1,"Sub2.sub2",["Subn.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
-    index.nodeMap.set("Sub2.sub2", sub2Sub2);
+    nodeMap.set("Sub2.sub2", sub2Sub2);
     let sub3Sub1 = sub2Sub1.addChild(0,"Sub3.sub1",["Subn.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
-    index.nodeMap.set("Sub3.sub1", sub3Sub1);
+    nodeMap.set("Sub3.sub1", sub3Sub1);
     let subnSub1 = sub3Sub1.addChild(0,"Subn.sub1",["Sub2.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
-    index.nodeMap.set("Subn.sub1", subnSub1);
+    nodeMap.set("Subn.sub1", subnSub1);
     sub2Sub2.addChild(0,"Subn.sub1",["Sub2.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
     subnSub1.addChild(0,"Sub2.sub1",["Sub3.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
 

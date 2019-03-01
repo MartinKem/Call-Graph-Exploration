@@ -5,9 +5,7 @@
 * *******
 */
 if (typeof module !== 'undefined') {
-    var index = require("./index");
-	var svgCont = index.svgCont;
-    var d3 = index.d3;
+    var d3 = require('d3');
 }
 
 var links = [];

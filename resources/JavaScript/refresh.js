@@ -1,13 +1,4 @@
-/**
-* (only for testing)
-* IMPORT:
-* *******
-*/
-if (typeof module !== 'undefined') {
-    var index = require("./index");
-	var createdNodes = index.createdNodes;
 
-}
 
 function refreshGraphData(){
 document.getElementById("currentVisibleNodes").innerHTML = "Current Nodes: " + String(currentNodes);
@@ -19,10 +10,6 @@ document.getElementById("totalNodes").innerHTML = "Total Nodes: " + String(creat
 document.getElementById("totalEdges").innerHTML = "Total Edges: " + "undefined";
 }
 
-var createdEdges = 0;
-var currentNodes = 0;
-var currentEdges = 0;
-
 
 /**
 * (only for testing)
@@ -32,7 +19,4 @@ var currentEdges = 0;
 if (typeof module !== 'undefined') {
     module.exports.refreshGraphData = refreshGraphData;
     module.exports.estGraphData = estGraphData;
-    module.exports.createdEdges = createdEdges;
-    module.exports.currentNodes = currentNodes;
-    module.exports.currentEdges = currentEdges;
 }

@@ -5,8 +5,8 @@
 * *******
 */
 if (typeof module !== 'undefined') {
-	var $ = require('jquery');
-	var d3 = require('d3');
+    var $ = require('jquery');
+    var d3 = require('d3');
 }
 
 let f = d3.layout.force;
@@ -33,6 +33,9 @@ var nodeMap = new Map();
 var placedNodesMap = new Map();
 
 
+var createdEdges = 0;
+var currentNodes = 0;
+var currentEdges = 0;
 
 /**
 * (only for testing)
@@ -41,15 +44,28 @@ var placedNodesMap = new Map();
 */
 if (typeof module !== 'undefined') {
 
-    module.exports = {
-        f,
-        createdNodes,
-        svgCont,
-        defsCont,
-        rootNodes,
-        nodeMap,
-        placedNodesMap
+    global.f = f;
+    global.createdNodes = createdNodes;
+    global.svgCont = svgCont;
+    global.defsCont = defsCont;
+    global.rootNodes = rootNodes;
+    global.nodeMap = nodeMap;
+    global.placedNodesMap = placedNodesMap;
+    global.createdEdges = createdEdges;
+    global.currentEdges = currentEdges;
+    global.currentNodes = currentNodes;
 
-    }
+    //module.exports = {
+    //    f,
+    //    createdNodes,
+    //    svgCont,
+    //    defsCont,
+    //    rootNodes,
+    //    nodeMap,
+    //    placedNodesMap,
+    //    createdEdges,
+    //    currentEdges,
+    //    currentNodes
+    //}
 }
 
