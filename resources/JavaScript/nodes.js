@@ -249,11 +249,6 @@ class node{
     toggleToDetailed(){
         this.detailed = true;
         this.reloadEdges();
-        // this.children
-        //     .filter(child => child.edge !== undefined)
-        //     .forEach(function (child) {
-        //         child.edge.reload();
-        // })
     }
 
     /**
@@ -262,11 +257,6 @@ class node{
     toggleToAbstract(){
         this.detailed = false;
         this.reloadEdges();
-        // this.children
-        //     .filter(child => child.edge !== undefined)
-        //     .forEach(function (child) {
-        //         child.edge.reload();
-        // })
     }
 
     /**
