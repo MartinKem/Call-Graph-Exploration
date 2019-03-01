@@ -11,35 +11,170 @@ document.body.innerHTML =
     '</div><div id="currentVisibleNodes">Current Nodes:</div><div id="currentVisibleEdges">Current Edges:</div></div></div>';
 
 //const jsonPars = require('./jsonPars');
-const nodes = require('./nodes.js');
+const index = require("./index");
+const nodes = require('./nodes');
 
-test('Test hide of nodes', () => {
+test('Test hide of nodes 1', () => {
 
     // create graphs
-    let rootNode = new nodes.node(null,"Main.main",["Sub2.sub1","Sub2.sub2"],[{numberOfTargets: 1, line: 4},{numberOfTargets: 1, line: 5}],["int"],"int");
-    let sub2Sub1 = rootNode.addChild(0,"Sub2.sub1",["Sub3.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
-    let sub2Sub2 = rootNode.addChild(0,"Sub2.sub2",["Subn.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+    let SubRootNode = new nodes.node(null,"Main.main",["Sub2.sub1","Sub2.sub2"],[{numberOfTargets: 1, line: 4},{numberOfTargets: 1, line: 5}],["int"],"int");
+    index.nodeMap.set("Main.main", SubRootNode);
+    SubRootNode.placeCentrally();
+    let sub2Sub1 = SubRootNode.addChild(0,"Sub2.sub1",["Sub3.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+    index.nodeMap.set("Sub2.sub1", sub2Sub1);
+    let sub2Sub2 = SubRootNode.addChild(1,"Sub2.sub2",["Subn.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+    index.nodeMap.set("Sub2.sub2", sub2Sub2);
     let sub3Sub1 = sub2Sub1.addChild(0,"Sub3.sub1",["Subn.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+    index.nodeMap.set("Sub3.sub1", sub3Sub1);
     let subnSub1 = sub3Sub1.addChild(0,"Subn.sub1",["Sub2.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
-    sub2Sub2.addChild(0,"Subn.sub1",["Sub2.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
-    subnSub1.addChild(0,"Sub2.sub1",["Sub3.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+    index.nodeMap.set("Subn.sub1", subnSub1);
 
     //show the Nodes
-    rootNode.showNode();
-    sub2Sub1.showNode();
+    SubRootNode.showNode();
+    SubRootNode.placeChildNodes(0);  //SubRootNode.showChildNodes(0); geht leider nicht
+    SubRootNode.placeChildNodes(1);
     sub2Sub2.showNode();
+    sub2Sub1.showNode();
+    sub2Sub1.placeChildNodes(0);
     sub3Sub1.showNode();
+    sub3Sub1.placeChildNodes(0);
     subnSub1.showNode();
 
+    
+
     // make sure it works
-    expect(rootNode.getVisibility()).toBe(true);
+    expect(SubRootNode.getVisibility()).toBe(true);
     expect(sub2Sub1.getVisibility()).toBe(true);
     expect(sub2Sub2.getVisibility()).toBe(true);
     expect(sub3Sub1.getVisibility()).toBe(true);
     expect(subnSub1.getVisibility()).toBe(true);
 
     //hide some nodes
+    sub2Sub2.hideNode();
 
     //make sure the right ones are hidden
+    expect(SubRootNode.getVisibility()).toBe(true);
+    expect(sub2Sub1.getVisibility()).toBe(true);
+    expect(sub2Sub2.getVisibility()).toBe(false);
+    expect(sub3Sub1.getVisibility()).toBe(true);
+    expect(subnSub1.getVisibility()).toBe(true);
+
+    //show the Nodes
+    SubRootNode.showNode();
+    sub2Sub2.showNode();
+    sub2Sub1.showNode();
+    subnSub1.showNode();
+    sub3Sub1.showNode();
+
+    //hide some nodes
+    sub2Sub1.hideNode();
+
+    //make sure the right ones are hidden
+    expect(SubRootNode.getVisibility()).toBe(true);
+    expect(sub2Sub1.getVisibility()).toBe(false);
+    expect(sub2Sub2.getVisibility()).toBe(true);
+    expect(sub3Sub1.getVisibility()).toBe(false);
+    expect(subnSub1.getVisibility()).toBe(false);
+
+    //show the Nodes
+    SubRootNode.showNode();
+    sub2Sub2.showNode();
+    sub2Sub1.showNode();
+    subnSub1.showNode();
+    sub3Sub1.showNode();
+
+    //hide some nodes
+    sub3Sub1.hideNode();
+
+    //make sure the right ones are hidden
+    expect(SubRootNode.getVisibility()).toBe(true);
+    expect(sub2Sub1.getVisibility()).toBe(true);
+    expect(sub2Sub2.getVisibility()).toBe(true);
+    expect(sub3Sub1.getVisibility()).toBe(false);
+    expect(subnSub1.getVisibility()).toBe(false);
+    
+});
+
+
+
+test('Test hide of nodes 2', () => {
+
+    // create graphs
+    let SubRootNode = new nodes.node(null,"Main.main",["Sub2.sub1","Sub2.sub2"],[{numberOfTargets: 1, line: 4},{numberOfTargets: 1, line: 5}],["int"],"int");
+    index.nodeMap.set("Main.main", SubRootNode);
+    SubRootNode.placeCentrally();
+    let sub2Sub1 = SubRootNode.addChild(0,"Sub2.sub1",["Sub3.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+    index.nodeMap.set("Sub2.sub1", sub2Sub1);
+    let sub2Sub2 = SubRootNode.addChild(1,"Sub2.sub2",["Subn.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+    index.nodeMap.set("Sub2.sub2", sub2Sub2);
+    let sub3Sub1 = sub2Sub1.addChild(0,"Sub3.sub1",["Subn.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+    index.nodeMap.set("Sub3.sub1", sub3Sub1);
+    let subnSub1 = sub3Sub1.addChild(0,"Subn.sub1",["Sub2.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+    index.nodeMap.set("Subn.sub1", subnSub1);
+    sub2Sub2.addChild(0,"Subn.sub1",["Sub2.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+    subnSub1.addChild(0,"Sub2.sub1",["Sub3.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+
+    //show the Nodes
+    SubRootNode.showNode();
+    SubRootNode.placeChildNodes(0);
+    SubRootNode.placeChildNodes(1);
+    sub2Sub2.showNode();
+    sub2Sub1.showNode();
+    sub2Sub2.placeChildNodes(0);
+    subnSub1.showNode();
+    sub2Sub1.placeChildNodes(0);
+    sub3Sub1.showNode(); 
+    
+
+    // make sure it works
+    expect(SubRootNode.getVisibility()).toBe(true);
+    expect(sub2Sub1.getVisibility()).toBe(true);
+    expect(sub2Sub2.getVisibility()).toBe(true);
+    expect(sub3Sub1.getVisibility()).toBe(true);
+    expect(subnSub1.getVisibility()).toBe(true);
+
+    //hide some nodes
+    sub2Sub2.hideNode();
+
+    //make sure the right ones are hidden
+    expect(SubRootNode.getVisibility()).toBe(true);
+    expect(sub2Sub1.getVisibility()).toBe(true);
+    expect(sub2Sub2.getVisibility()).toBe(false);
+    expect(sub3Sub1.getVisibility()).toBe(true);
+    expect(subnSub1.getVisibility()).toBe(true);
+
+    //show the Nodes
+    SubRootNode.showNode();
+    sub2Sub2.showNode();
+    sub2Sub1.showNode();
+    subnSub1.showNode();
+    sub3Sub1.showNode();
+
+    //hide some nodes
+    sub2Sub1.hideNode();
+
+    //make sure the right ones are hidden
+    expect(SubRootNode.getVisibility()).toBe(true);
+    expect(sub2Sub1.getVisibility()).toBe(false);
+    expect(sub2Sub2.getVisibility()).toBe(true);
+    expect(sub3Sub1.getVisibility()).toBe(false);
+    expect(subnSub1.getVisibility()).toBe(true);
+
+    //show the Nodes
+    SubRootNode.showNode();
+    sub2Sub2.showNode();
+    sub2Sub1.showNode();
+    subnSub1.showNode();
+    sub3Sub1.showNode();
+
+    //hide some nodes
+    sub3Sub1.hideNode();
+
+    //make sure the right ones are hidden
+    expect(SubRootNode.getVisibility()).toBe(true);
+    expect(sub2Sub1.getVisibility()).toBe(true);
+    expect(sub2Sub2.getVisibility()).toBe(true);
+    expect(sub3Sub1.getVisibility()).toBe(false);
+    expect(subnSub1.getVisibility()).toBe(true);
     
 });

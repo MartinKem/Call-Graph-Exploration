@@ -53,7 +53,6 @@ class node{
         this.nodeData = data;
         this.callSites = callSites;
         this.sizes = {x: undefined, y: undefined, width: nodeWidth, height: nodeHeightEmpty + callSiteHeight*this.callSites.length};
-        // if(parent) this.parents.push(parent);
         this.children = [];		// target nodes
         this.callSiteStats = callSiteStats;
         this.detailed = true;
@@ -81,7 +80,6 @@ class node{
      * adds a child node to the current node where parent and container are given by this node
      * this node also updates its own children and callSiteStats
      *
-     * @param {number} callsiteIndex - call-site-index of parent-node
      * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} nodeData - signature of this node
      * @param {string[]} callSites - string array with the name of the call sites
      * @param {{numberOfTargets: number, line: number}[]} callSiteStats - holds for each callsite to number of targets and the line, where the site is called
