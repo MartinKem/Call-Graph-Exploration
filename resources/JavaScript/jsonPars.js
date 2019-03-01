@@ -384,7 +384,7 @@ function createNodeInstance(nodeData, parentNode, index) {
 		}
 		if (!parentNode) {
 			// If parentNode doesn't exist, the user generates a new node through the search field.
-			newNode = new node(null, nodeData, callSites, callSiteStats);
+			newNode = new node(nodeData, callSites, callSiteStats);
 		}
 		else {
             newNode = parentNode.addChild(index, nodeData, callSites, callSiteStats);

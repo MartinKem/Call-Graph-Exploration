@@ -35,60 +35,57 @@ class Edge{
     }
 
     getBorderPoints(){
-        let nodeSizes = this.getNodeSizes();
-        let node1 = nodeSizes.n1;
-        let node2 = nodeSizes.n2;
+        function singlePoint(node1, node2){
+            let center1 = {x: node1.x + node1.width/2, y: node1.y + node1.height/2};
+            let center2 = {x: node2.x + node2.width/2, y: node2.y + node2.height/2};
 
-        let center1 = {x: node1.x + node1.width/2, y: node1.y + node1.height/2};
-        let center2 = {x: node2.x + node2.width/2, y: node2.y + node2.height/2};
+            let xRes = 0, yRes = 0;
 
-        function f1(x){
-            return (node1.height/node1.width) * (x - center1.x) + center1.y;
-        }
-
-        function f2(x){
-            return -(node1.height/node1.width) * (x - center1.x) + center1.y;
-        }
-
-        function lineFunction(value, ret){ // f(x) = m*x + b -> center-to-center line function
-            let m;
-            if(center2.x-center1.x === 0){
-                m = (center2.y - center1.y) / 0.0000000000001
-            } else {
-                m = (center2.y - center1.y) / (center2.x - center1.x);
-
-            }
-            let b = (center2.y) - m*(center2.x);
-            if(ret === "y") return m*value + b; // return y-value of given x-value (= m*x + b)
-            if(ret === "x") return (value - b)/m; // return x-value of given y-value (= (f(x) - b)/m)
-        }
-        function singlePoint(node) {
-            let x1Res = 0, y1Res = 0;
             if(center2.y >= f1(center2.x)){
                 if(center2.y >= f2(center2.x)){
-                    y1Res = node.y + node.height;	// case bottom
-                    x1Res = lineFunction(y1Res, "x");
+                    yRes = node1.y + node1.height;	// case bottom
+                    xRes = lineFunction(yRes, "x");
                 } else {
-                    x1Res = node.x;					// case left
-                    y1Res = lineFunction(x1Res, "y");
+                    xRes = node1.x;					// case left
+                    yRes = lineFunction(xRes, "y");
                 }
             } else {
                 if(center2.y >= f2(center2.x)){
-                    x1Res = node.x + node.width;	// case right
-                    y1Res = lineFunction(x1Res, "y");
+                    xRes = node1.x + node1.width;	// case right
+                    yRes = lineFunction(xRes, "y");
                 } else {
-                    y1Res = node.y;					// case top
-                    x1Res = lineFunction(y1Res, "x");
+                    yRes = node1.y;					// case top
+                    xRes = lineFunction(yRes, "x");
                 }
             }
-            return {x: x1Res, y: y1Res};
+
+            function f1(x){
+                return (node1.height/node1.width) * (x - center1.x) + center1.y;
+            }
+
+            function f2(x){
+                return -(node1.height/node1.width) * (x - center1.x) + center1.y;
+            }
+
+            function lineFunction(value, ret){ // f(x) = m*x + b -> center-to-center line function
+                let m;
+                if(center2.x-center1.x === 0){
+                    m = (center2.y - center1.y) / 0.0000000001
+                } else {
+                    m = (center2.y - center1.y) / (center2.x - center1.x);
+
+                }
+                var b = (center2.y) - m*(center2.x);
+                if(ret === "y") return m*value + b; // return y-value of given x-value (= m*x + b)
+                if(ret === "x") return (value - b)/m; // return x-value of given y-value (= (f(x) - b)/m)
+            }
+
+            return {x: xRes, y: yRes};
         }
-        let res1 = singlePoint(node1);
-        let temp = center1;
-        center1 = center2;
-        center2 = temp;
-        let res2 = singlePoint(node2);
-        return {xSource: res1.x, ySource: res1.y, xTarget: res2.x, yTarget: res2.y}
+        let res1 = singlePoint(this.getNodeSizes().n1, this.getNodeSizes().n2);
+        let res2 = singlePoint(this.getNodeSizes().n2, this.getNodeSizes().n1);
+
+        return {xSource: res1.x, ySource: res1.y, xTarget: res2.x, yTarget: res2.y};
     }
 
     sidePoint(){
@@ -109,18 +106,18 @@ class Edge{
             xRes = x1LeftBorder;
         }
         else{
-
             return bp;
         }
-        return {xSource: xRes, ySource: node1.y + node1.height/2, xTarget:bp.xTarget, yTarget:bp.yTarget};
+        return {xSource: xRes, ySource: node1.y + node1.height/2, xTarget: bp.xTarget, yTarget: bp.yTarget};
     }
 
     reload(){
         let edge = document.getElementById(this.id);
         if(edge){
-            if(this.visible === false){
+            if(!this.source.visible || !this.target.visible){
                 edge.style.display = "none";
             }
+            else edge.style.display = "block";
             let path = this.getPathString();
             edge.setAttribute("d", path);
         }
@@ -140,10 +137,7 @@ class Edge{
      * insertes an arrow from (xStart, yStart) to (xDest, yDest) into an svg-container
      */
     create(){
-        if(this.visible !== null){
-            this.reload();
-            return;
-        }
+        this.visible = true;
         let positions;
         if(this.source.detailed){
             positions = this.sidePoint();
@@ -170,8 +164,7 @@ class Edge{
                 .attr("d", "M5,4 L3,1 L10,4 L3,7 L5,4");
         }
 
-        let path = "M" + xStart + "," + yStart + "L" + xDest + "," + yDest;
-        if(this.curved) path = this.getCurvedPath();
+        let path = this.getPathString();
 
         svgCont.append("svg:path")
             .attr("d", path)
@@ -185,37 +178,38 @@ class Edge{
     }
 
     getPathString(){
-        let positions;
-        if(this.source.detailed){
-            positions = this.sidePoint();
-        }else{
-            positions = this.getBorderPoints();
-        }
-        let path = "M" + positions.xSource + "," + positions.ySource + "L" + positions.xTarget + "," + positions.yTarget;
-
+        let path;
         if(this.curved){
-            path = getCurvedPath();
-        }
-
-        function getCurvedPath(){
-            let sourceSize = this.source.getSizes();
-            let xStart = sourceSize.x;
-            let yStart = sourceSize.y + 60;
-            let xDest = xStart;
-            let yDest = sourceSize.y + 30;
-            if(this.source.detailed) {
-                let ns = this.getNodeSizes();
-                xStart = ns.n1.x;
-                yStart = ns.n1.y + callSiteHeight/2;
-                xDest = ns.n2.x;
-                yDest = ns.n1.y - 65;
+            path = this.getCurvedPath();
+        } else {
+            let positions;
+            if(this.source.detailed){
+                positions = this.sidePoint();
+            }else{
+                positions = this.getBorderPoints();
             }
-            return "M " + xStart + " " + (yStart).toString() +
-                " C " + (xStart-150).toString() + " " + (yStart+50).toString() +
-                ", " + (xDest-120).toString() + " " + (yDest-50).toString() +
-                ", " + (xDest).toString() + " " + (yDest).toString();
+            path = "M" + positions.xSource + "," + positions.ySource + "L" + positions.xTarget + "," + positions.yTarget;
         }
 
         return path;
+    }
+
+    getCurvedPath(){
+        let sourceSize = this.source.getSizes();
+        let xStart = sourceSize.x;
+        let yStart = sourceSize.y + 60;
+        let xDest = xStart;
+        let yDest = sourceSize.y + 30;
+        if(this.source.detailed) {
+            let ns = this.getNodeSizes();
+            xStart = ns.n1.x;
+            yStart = ns.n1.y + callSiteHeight/2;
+            xDest = ns.n2.x;
+            yDest = ns.n1.y - 65;
+        }
+        return "M " + xStart + " " + (yStart).toString() +
+            " C " + (xStart-150).toString() + " " + (yStart+50).toString() +
+            ", " + (xDest-120).toString() + " " + (yDest-50).toString() +
+            ", " + (xDest).toString() + " " + (yDest).toString();
     }
 }

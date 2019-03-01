@@ -44,18 +44,16 @@ const callSiteTopOffset = 120;
  */
 class node{
     /**
-     *
-     * @param {{node: node, index: number}} parent - parent-node, callsite-index of parent-node
      * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} data - signature of this node
      * @param {string[]} callSites - string array with the name of the call sites
      * @param {{numberOfTargets: number, line: number}[]} callSiteStats - holds for each callsite to number of targets and the line, where the site is called
      */
-    constructor(parent, data, callSites, callSiteStats){
+    constructor(data, callSites, callSiteStats){
         this.parents = [];
         this.nodeData = data;
         this.callSites = callSites;
         this.sizes = {x: undefined, y: undefined, width: nodeWidth, height: nodeHeightEmpty + callSiteHeight*this.callSites.length};
-        if(parent) this.parents.push(parent);
+        // if(parent) this.parents.push(parent);
         this.children = [];		// target nodes
         this.callSiteStats = callSiteStats;
         this.detailed = true;
@@ -97,11 +95,11 @@ class node{
         let child = nodeMap.get(idString(nodeData));
 
         if(!child){		// new node-instance is only created, if it didn't exist yet
-            child = new node({node: this, index: callsiteIndex}, nodeData, callSites, callSiteStats);
+            child = new node(nodeData, callSites, callSiteStats);
         }
-        else child.addParent(this, callsiteIndex);		// if the child-node already existed, it just adds this as new parent
+        let edge = new Edge(this, child, callsiteIndex);
+        child.addParent(this, callsiteIndex, edge);
 
-        let edge = new Edge(this,child,callsiteIndex);
         this.children.push({node: child, index: callsiteIndex, edge: edge});
 		estGraphData();
         // this.reloadCallSites();
@@ -224,117 +222,35 @@ class node{
 			currentNodes--;
 			refreshGraphData();
             // this.visibleParentNodes = 0;	// visibleParentNodes is set to 0 because there is no node anymore with an edge to this node
-            for(var i = 0; i < this.children.length; i++){
-                let edgeID = idString(this.nodeData) + '#' + this.children[i].index + '->' + idString(this.children[i].node.getNodeData());
-                let edge = document.getElementById(edgeID);
-                if(edge != undefined
-                    && edge.style.display == 'block'
-                    && idString(this.children[i].node.getNodeData()) !== idString(this.nodeData)){
-						this.children[i].node.hideNode();
-						//updates number of current shown nodes
-					}
-            }
+            // for(var i = 0; i < this.children.length; i++){
+            //     let edgeID = idString(this.nodeData) + '#' + this.children[i].index + '->' + idString(this.children[i].node.getNodeData());
+            //     let edge = document.getElementById(edgeID);
+            //     if(edge != undefined
+            //         && edge.style.display === 'block'
+            //         && idString(this.children[i].node.getNodeData()) !== idString(this.nodeData)){
+			// 			this.children[i].node.hideNode();
+			// 			//updates number of current shown nodes
+			// 		}
+            // }
         }
-        this.reloadEdges("hideNode", null);
+        this.reloadEdges();
 		//updates the graph data with new number of shown nodes
     }
 
     /**
      * repositions all in- and outgoing edges of this node.
-     * if in "showChildNodes"-mode, only handles outgoing edges for a given call-site-index
-     *
-     * @param{string} mode - declares which and how edges shall be reloaded
-     * @param{number} callSiteIndex - function will only outgoing edges of the given call site
      */
-    reloadEdges(mode, callSiteIndex){
-        let thisNode = this;
-        this.children.forEach(function(child){
-            let edgeID = idString(thisNode.nodeData) + '#' + child.index + '->' + idString(child.node.getNodeData());
-            if((mode !== "showChildNodes" || callSiteIndex == child.index) && child.node.getVisibility() != null){  // if mode is "showChildNodes", the child must have the correct call-site-index
-                handleSingleEdge(edgeID, thisNode, child.node, child.index, mode);
-				
-            }
+    reloadEdges(){
+        this.children
+            .filter(child => child.edge.visible !== null)
+            .forEach(function(child){
+            child.edge.reload();
         });
-
-        if(mode !== "showChildNodes"){  // if mode is "showChildNodes" parent nodes are not affected
-            this.parents.forEach(function(parent){
-                // if edges shall just change their positions, it is necessary to adapt the mode to the parent's current detailed value
-                if(mode === "toDetailed" || mode === "toAbstract"){ mode = parent.node.getDetailed() ? "toDetailed" : "toAbstract"}
-                let edgeID = idString(parent.node.getNodeData()) + '#' + parent.index + '->' + idString(thisNode.nodeData);
-                handleSingleEdge(edgeID, parent.node, thisNode, parent.index, mode);
-            });
-        }
-
-        /**
-         * handles a single edge for reloadEdges()
-         *
-         * @param{string} edgeID - id of the affected edge
-         * @param{node} parentNode - start of the edge
-         * @param{node} childNode - destination of the edge
-         * @param{number} index - child's call-site-index
-         * @param{string} mode - declares how the edge shall be manipulated
-         */
-        function handleSingleEdge(edgeID, parentNode, childNode, index, mode){
-            let edge = document.getElementById(edgeID);
-
-            if(mode === "showChildNodes"){
-                //  a new edge is only created, if it didn't exist yet
-                if(!edge){
-                    method2nodeEdge(edgeID.split('->')[0], edgeID.split('->')[1]);
-                    toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)});
-                    edge = document.getElementById(edgeID);
-					currentEdges++;   //updating Graph stats
-					refreshGraphData();
-                }
-				if(edge.style.display !== "block"){ 		//updating Graph stats
-					currentEdges++;
-					refreshGraphData();
-				}
-				edge.style.display = 'block';
-            }
-            else if(mode === "hideNode"){
-                if(edge){
-					if(edge.style.display !== "none"){
-						currentEdges--;
-						refreshGraphData();
-					}
-					edge.style.display = 'none';
-				}
-            }
-            else if(mode === "toDetailed"){
-                if(edge){
-                    toggleToDetailed(edgeID, {source: divPosition(parentNode, index), dest: divPosition(childNode)});
-                }
-            }
-            else if(mode === "toAbstract"){
-                if(edge){
-                    toggleToAbstract(edgeID, {source: divPosition(parentNode), dest: divPosition(childNode)});
-                }
-            }
-
-        }
-
-        /**
-         * calculates the sizes of a given div, which can be a whole node or just a single call site
-         *
-         * @param{node} node - node instance, that represents the div
-         * @param{number} index - call-site-index
-         * @returns {{x: number, width: number, y: number, height: number}} sizes of the given div
-         */
-        function divPosition(node, index){
-            if(index === undefined){    // if undefined the sizes of the whole node shall be returned
-                let height = nodeHeightEmpty;
-                // height variates, if node is currently in detailed mode or not
-                if(node.getDetailed()) height += callSiteHeight*node.getCallSites().length;
-                return {x: node.getSizes().x, y: node.getSizes().y, width: nodeWidth, height: height};
-            }
-            else{   // in else block, the size of a single call site shall be returned
-                return {x: node.getSizes().x + (nodeWidth-callSiteWidth)/2,
-                            y: node.getSizes().y + callSiteTopOffset + callSiteHeight*index,
-                            width: callSiteWidth,
-                            height: callSiteHeight};
-            }
-        }
+        this.parents
+            .filter(parent => parent.edge.visible !== null)
+            .forEach(function(parent){
+            parent.edge.reload();
+        });
     }
 
     /**
@@ -358,33 +274,14 @@ class node{
     }
 
     /**
-     * uses toggleToDetailed() for this and all child nodes
-     */
-    allToDetailed(){
-        this.toggleToDetailed();
-        this.children.forEach(function(child){
-            if(!child.node.getDetailed()) child.node.allToDetailed();
-        });
-    }
-
-    /**
-     * uses toggleToAbstract() for this and all child nodes
-     */
-    allToAbstract(){
-        this.toggleToAbstract();
-        this.children.forEach(function(child){
-            if(!child.node.getDetailed()) child.node.allToAbstract();
-        });
-    }
-
-    /**
      * add a parent to the parent-array
      *
      * @param {node} parent - new parent
      * @param {number} index - call-site-index
+     * @param {edge} edge - references the edge from the parent node to this node
      */
-    addParent(parent, index){
-        this.parents.push({node: parent, index: index});
+    addParent(parent, index, edge){
+        this.parents.push({node: parent, index: index, edge: edge});
     }
 
     /**
