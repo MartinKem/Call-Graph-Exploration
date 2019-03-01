@@ -133,7 +133,7 @@ class node{
                     let edge = new Edge(thisNode, thisNode.children[i].node, thisNode.children[i].index);
                     edge.create();
                     thisNode.children[i].edge = edge;
-                    thisNode.children[i].node.addParent(this, thisNode.children[i].index, edge);
+                    thisNode.children[i].node.addParent(thisNode, thisNode.children[i].index, edge);
                 }
                 else if(thisNode.children[i].edge.visible === false){
                     thisNode.children[i].edge.reload();
@@ -243,7 +243,6 @@ class node{
                         let p = n.parents[i];
                         //console.log("pev: ",p.edge, p.edge.visible)
                         //console.log(p.node,(p.node.visible && !p.node.marked && p.edge.visible))
-                        console.log(p);
                         if(p.node.visible && !p.node.marked && p.edge !== undefined && p.edge.visible !== false){
                             n.marked = false;
                             markedArr.splice(markedArr.indexOf(n), 1);
@@ -266,7 +265,6 @@ class node{
                 deleteEdges(n);
 
             });
-            console.log(markedArr);
             markedArr.forEach(function (n) {
                 document.getElementById(idString(n.nodeData)).style.display = "none";
                 //document.getElementById(idString(n.nodeData)).style.backgroundColor = "red"
@@ -275,7 +273,6 @@ class node{
             });
         }
         function deleteEdges(node) {
-            console.log(node);
             node.reloadEdges();
             // for (let i = 0; i < node.parents.length; i++) {		// all edges to this node become hidden
             //     node.children
