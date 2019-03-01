@@ -253,7 +253,7 @@ class node{
                         let p = n.parents[i];
                         //console.log("pev: ",p.edge, p.edge.visible)
                         //console.log(p.node,(p.node.visible && !p.node.marked && p.edge.visible))
-                        if(p.node.visible && !p.node.marked && p.edge.visible !== false){
+                        if(p.node.visible && !p.node.marked && p.edge && p.edge.visible !== false){
                             n.marked = false;
                             markedArr.splice(markedArr.indexOf(n), 1);
                             if (n.children) {
