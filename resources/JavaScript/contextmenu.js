@@ -47,39 +47,66 @@ $("body").on("contextmenu","html:not(path)",function () {
 
 //mark last clicked
 $("body").on("click",".div_node",function () {
-    markedNode = this;
-    if(lastMarkedNode !== markedNode){
-        markLastClickedNode();
+    clickedNode = this;
+    switch (keyPressed) {
+        case 49:
+            changeColorNode('#ffc6c6');
+            break;
+        case 50:
+            changeColorNode('#beffbe');
+            break;
+        case 51:
+            changeColorNode('#abd3ff');
+            break;
+        case 52:
+            changeColorNode('#ffff9f');
+            break;
+        case 53:
+            changeColorNode('#FFFFFF');
+            break;
+        default:
+            markedNode = this;
+            if(lastMarkedNode !== markedNode){
+                markLastClickedNode();
+            }
     }
 });
 $("body").on("click","svg path",function () {
-    console.log(keyPressed)
+    console.log(keyPressed);
+    clickedEdge = this;
     switch (keyPressed) {
         case 49:
-            changeColorEdge("red");
+            changeColorEdge('#c24e4c');
             break;
         case 50:
-            changeColorEdge("green");
+            changeColorEdge('#429c44');
+            break;
+        case 51:
+            changeColorEdge('#3076b4');
+            break;
+        case 52:
+            changeColorEdge('#c4c931');
+            break;
+        case 53:
+            changeColorEdge('#000000');
             break;
         default:
-            markedEdge = this;
+            markedNode = this;
             if(lastMarkedEdge !== markedEdge){
                 markLastClickedEdge();
             }
     }
 });
 
-$(document).on({
-    keydown: function(e){
-        keyPressed = e.which;
-    },
-    keyup: function(e){
+$(document).on("keydown", function(e) {
+    keyPressed = e.which;
+
+});
+$(document).on("keyup", function(e){
         if(keyPressed === e.which){
             keyPressed = undefined;
         }
-    }
-}
-);
+});
 
 $("body").on("click",".node_inhalt button",function (e) {
     let node = nodeMap.get(this.parentNode.parentNode.getAttribute("id"));
@@ -106,11 +133,11 @@ function createNodeContextmenu(e) {
        // counter = 1;
        // if(counter > 0)console.log("contextmenu nicht mehr aktuell");
         $("body").append($("<div id='contextmenuNode'>        <div class=\"menuelement\" onclick=\"deleteNodes()\">Hide</div>" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Red<div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Green<div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Blue<div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Yellow<div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">White<div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode(this)\">Red<span class='hotKeySpan'>[1+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode(this)\">Green<span class='hotKeySpan'>[2+MouseLeft]</span><div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode(this)\">Blue<span class='hotKeySpan'>[3+MouseLeft]</span><div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode(this)\">Yellow<span class='hotKeySpan'>[4+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode(this)\">White<span class='hotKeySpan'>[5+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"switchContent()\">Details</div><div>"));
 
     $("#contextmenuNode").css({
@@ -123,8 +150,7 @@ function createNodeContextmenu(e) {
 
 }
 //changes color to the backgroundcolor of elem
-function colorChosen(elem) {
-    var color = $(elem).find(".color").css('backgroundColor');
+function changeColorNode(color) {
     $(clickedNode).css('background-color', color);
 }
 
@@ -169,11 +195,13 @@ function createEdgeContextmenu(e) {
 }
 
 function changeColorEdge(color) {
+    console.log("klahlf")
     if(lastMarkedEdge === clickedEdge) $(lastMarkedEdge).removeClass("lastClickedEdge");
     // var color = $(elem).find(".color").css('backgroundColor');
     if(color === '#000000'){
         $(clickedEdge).css('opacity', 0.5);
     }else{
+        console.log(clickedEdge)
         $(clickedEdge).css('opacity', 1);
     }
     $(clickedEdge).css('stroke', color);
