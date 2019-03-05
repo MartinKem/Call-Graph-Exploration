@@ -81,7 +81,7 @@ function createNodeContextmenu(e) {
     }catch (e) {*/
        // counter = 1;
        // if(counter > 0)console.log("contextmenu nicht mehr aktuell");
-        $("body").append($("<div id='contextmenuNode'>        <div class=\"menuelement\" onclick=\"deleteNodes()\">Ausblenden</div>" +
+        $("body").append($("<div id='contextmenuNode'>        <div class=\"menuelement\" onclick=\"deleteNodes()\">Hide</div>" +
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Red<div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Green<div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Blue<div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
@@ -172,6 +172,7 @@ function closeEdgeContextmenu() {
 }
 function closeCallSiteContextmenu(){
     if(callSiteMenuIsOpen){
+        document.getElementById("searchInput").removeAttribute("disabled", false);
         $("#contextmenuCallSite").remove();
         autocompleteMode = undefined;   // autocomplete shall work as usual, when the call site contextmenu closes
         callSiteMenuIsOpen = false;
@@ -207,7 +208,7 @@ function createCallSiteContextmenu(e, node, index){
 
     $("body").append(
         "<div id='contextmenuCallSite'>" +
-            "<h3 style='margin: 0px'>Choose targets for the call site <span style='color: blue'; word-break: break-word;>" + escapeSG(node.getCallSites()[index]) + "</span> to be shown:</h3>" +
+            "<h3 style='margin: 0px'>Choose targets for the call site <span style='color: blue'; word-break: break-word;>" + escapeSG(idString(node.getCallSites()[index].declaredTarget)) + "</span> to be shown:</h3>" +
             "<form autocomplete='off' onsubmit='return false' style='margin-top: 15px; overflow: auto; clear: both'>" +
                 "<input type='text' name='targetSearch' id='targetSearch' placeholder='add targets' spellcheck='false' style='width: 100%; height: 30px; padding: 5px; float: left'>" +
             "</form>" +
@@ -224,6 +225,7 @@ function createCallSiteContextmenu(e, node, index){
             "</div>"+
         "</div>");
 
+    document.getElementById("searchInput").setAttribute("disabled", true);
     autocompleteMode = "callSite";  // this global variable is used in the autocomplete function, that shall work a little bit different, when in call site mode
     autocomplete(document.getElementById("targetSearch"), availableTargets);
     callSiteMenuIsOpen = true;
