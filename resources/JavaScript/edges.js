@@ -157,16 +157,16 @@ class Edge{
     /**
      * insertes an arrow from (xStart, yStart) to (xDest, yDest) into an svg-container
      */
-    create(){
+    create() {
         this.visible = true;
         //update graph data
         currentEdges++;
         refreshGraphData();
         
         let positions;
-        if(this.source.detailed){
+        if (this.source.detailed) {
             positions = this.sidePoint();
-        }else{
+        } else {
             positions = this.getBorderPoints();
         }
 
@@ -176,7 +176,7 @@ class Edge{
         let xDest = positions.xTarget;
         let yDest = positions.yTarget;
 
-        if(document.getElementById("markerArrow") == null){
+        if (document.getElementById("markerArrow") == null) {
             d3.select("#definitions").append("svg:marker")
                 .attr("id", "markerArrow")
                 .attr("class", "arrowHead")
@@ -190,16 +190,24 @@ class Edge{
         }
 
         let path = this.getPathString();
+        let thisEdge = this;
 
         svgCont.append("svg:path")
             .attr("d", path)
             .attr("id", edgeID)
             .attr("class", "edge")
+            // .on("click", function() {
+            // })
             .style("fill", "none")	// necessary for recursive arrows
             .style("marker-end", "url(#markerArrow)")
             .style("opacity", "0.5")
             .style("display", "block")
             .style("visibility", "visible");
+
+        $("[id='" + edgeID + "']").dblclick(function () {
+            thisEdge.target.focus();
+        });
+
     }
 
     getPathString(){

@@ -8,6 +8,7 @@ var markedNode;
 var markedEdge;
 var lastMarkedNode;
 var lastMarkedEdge;
+var keyPressed;
 
 // -- these are used for the call site contextmenu --
 var availableTargets;
@@ -52,11 +53,34 @@ $("body").on("click",".div_node",function () {
     }
 });
 $("body").on("click","svg path",function () {
-    markedEdge = this;
-    if(lastMarkedEdge !== markedEdge){
-        markLastClickedEdge();
+    console.log(keyPressed)
+    switch (keyPressed) {
+        case 49:
+            changeColorEdge("red");
+            break;
+        case 50:
+            changeColorEdge("green");
+            break;
+        default:
+            markedEdge = this;
+            if(lastMarkedEdge !== markedEdge){
+                markLastClickedEdge();
+            }
     }
 });
+
+$(document).on({
+    keydown: function(e){
+        keyPressed = e.which;
+    },
+    keyup: function(e){
+        if(keyPressed === e.which){
+            keyPressed = undefined;
+        }
+    }
+}
+);
+
 $("body").on("click",".node_inhalt button",function (e) {
     let node = nodeMap.get(this.parentNode.parentNode.getAttribute("id"));
     let index = this.getAttribute("id").split("#");
@@ -127,11 +151,11 @@ function createEdgeContextmenu(e) {
     let y = e.pageY + "px";     // Get the vertical coordinate
 
     $("body").append("<div id='contextmenuEdge'>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Red <span class='hotKeySpan'>[1+MouseLeft]</span><div class=\"color\" style=\"background-color: #c24e4c \"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Green <span class='hotKeySpan'>[2+MouseLeft]</span><div class=\"color\" style=\"background-color: #429c44\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Blue <span class='hotKeySpan'>[3+MouseLeft]</span><div class=\"color\" style=\"background-color: #3076b4\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Yellow <span class='hotKeySpan'>[4+MouseLeft]</span><div class=\"color\" style=\"background-color: #c4c931\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Default <span class='hotKeySpan'>[5+MouseLeft]</span><div class=\"color\" style=\"background-color: #000000\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge('#C24E4C')\">Red <span class='hotKeySpan'>[1+MouseLeft]</span><div class=\"color\" style=\"background-color: #c24e4c \"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge('#429C44')\">Green <span class='hotKeySpan'>[2+MouseLeft]</span><div class=\"color\" style=\"background-color: #429c44\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge('#3076B4')\">Blue <span class='hotKeySpan'>[3+MouseLeft]</span><div class=\"color\" style=\"background-color: #3076b4\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge('#C4C931')\">Yellow <span class='hotKeySpan'>[4+MouseLeft]</span><div class=\"color\" style=\"background-color: #c4c931\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge('#000000')\">Default <span class='hotKeySpan'>[5+MouseLeft]</span><div class=\"color\" style=\"background-color: #000000\"></div></div>" +
         " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[0].split('#')[0]).focus()\" style=\"white-space: nowrap\">focus Source <span class='hotKeySpan'>[Ctrl+MouseLeft]</span></div>" +
         " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[1]).focus()\" style=\"white-space: nowrap\">focus Target <span class='hotKeySpan'>[Double Click]</span></div>" +
     "</div>");
@@ -144,9 +168,10 @@ function createEdgeContextmenu(e) {
     edgeMenuIsOpen = true;
 }
 
-function changeColorEdge(elem) {
-    var color = $(elem).find(".color").css('backgroundColor');
-    if(color === "rgb(0, 0, 0)"){
+function changeColorEdge(color) {
+    if(lastMarkedEdge === clickedEdge) $(lastMarkedEdge).removeClass("lastClickedEdge");
+    // var color = $(elem).find(".color").css('backgroundColor');
+    if(color === '#000000'){
         $(clickedEdge).css('opacity', 0.5);
     }else{
         $(clickedEdge).css('opacity', 1);
