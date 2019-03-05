@@ -368,6 +368,9 @@ function createNodeInstance(nodeData, parentNode, index) {
 		newNode = parentNode.addChild(index, nodeData, []);
 	}
 	else {
+		let callSitesSorted = jsonData.callSites;
+		callSitesSorted = sortByKey(callSitesSorted, 'line');
+
 		// In else case, the jsonData exists and the function always creates a new node. Now the call-site-information is copied for the new node.
 		// let callSites = [];
 		// let callSiteStats = [];
@@ -378,10 +381,10 @@ function createNodeInstance(nodeData, parentNode, index) {
 		// }
 		if (!parentNode) {
 			// If parentNode doesn't exist, the user generates a new node through the search field.
-			newNode = new node(nodeData, jsonData.callSites);
+			newNode = new node(nodeData, callSitesSorted);
 		}
 		else {
-			newNode = parentNode.addChild(index, nodeData, jsonData.callSites);
+			newNode = parentNode.addChild(index, nodeData, callSitesSorted);
 		}
 	}
 	if (newNode) nodeMap.set(idString(nodeData), newNode); // now the node object is added to the nodeMap
@@ -398,6 +401,7 @@ function createChildNodes(node) {
 	let jsonData = parsedJsonMap.get(idString(nodeData));
 	let callSites = [];
 	if (jsonData) callSites = jsonData.callSites;
+	callSites = sortByKey(callSites, 'line');
 
 	// for all targets of all call sites this function is called recursively, to create the nodes of the lower children generations too
 	for (let i = 0; i < callSites.length; i++) {
@@ -407,6 +411,19 @@ function createChildNodes(node) {
 			if (childNode) createChildNodes(childNode);
 		}
 	}
+}
+
+/**
+ *sorts an array of objects by a given key
+ *
+ * @param {object[]} array - an array of objects to be sorted
+ * @param {String} key - key by which to sort
+*/
+function sortByKey(array, key) {
+	return array.sort(function(a, b) {
+	var x = a[key]; var y = b[key];
+	return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+	});
 }
 
 /**
