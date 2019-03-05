@@ -1,3 +1,15 @@
+/**
+* (only for testing)
+* IMPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+
+    var refresh = require("./refresh");
+    var refreshGraphData = refresh.refreshGraphData;
+    var estGraphData = refresh.estGraphData;
+}
+
 class Edge{
 
     /**
@@ -115,23 +127,28 @@ class Edge{
         let edge = document.getElementById(this.id);
         if(edge){
             if(!this.source.visible || !this.target.visible){
-                edge.style.display = "none";
-                this.visible = false;
+                this.hide();
             }
             else{
-                edge.style.display = "block";
-                this.visible = true;
+                this.show();
             }
             let path = this.getPathString();
             edge.setAttribute("d", path);
         }
     }
     hide(){
+        //update graph data
+        if (this.visible) currentEdges--;
+        refreshGraphData();
         this.visible = false;
         let edge = document.getElementById(this.id);
         edge.style.display = "none";
+
     }
     show(){
+        //update graph data
+        if (!this.visible) currentEdges++;
+        refreshGraphData();
         this.visible = true;
         let edge = document.getElementById(this.id);
         edge.style.display = "block";
@@ -142,6 +159,10 @@ class Edge{
      */
     create(){
         this.visible = true;
+        //update graph data
+        currentEdges++;
+        refreshGraphData();
+        
         let positions;
         if(this.source.detailed){
             positions = this.sidePoint();

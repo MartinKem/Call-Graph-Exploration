@@ -85,7 +85,6 @@ class node{
         }
 
         this.children.push({node: child, index: callsiteIndex, edge: undefined});
-		estGraphData();
         // this.reloadCallSites();
         return this.children[this.children.length-1].node;
     }
@@ -230,6 +229,10 @@ class node{
                 document.getElementById(idString(n.nodeData)).style.display = "none";
                 //document.getElementById(idString(n.nodeData)).style.backgroundColor = "red"
                 n.visible = false;
+                //updates number of current shown nodes and edges
+                currentNodes--;
+                console.log("-1");
+                refreshGraphData();
                 n.reloadEdges();
                 n.marked = false;
             });
