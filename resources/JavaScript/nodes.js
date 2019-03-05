@@ -455,18 +455,31 @@ function createSingleNode(x, y, nodeData, callSites){
         .style("padding", "20px")
         .style("border-width", "5px");	// sizes must stay in js-file for later calculations;
 
-    var packageStr = nodeData.declaringClass.substring(0, nodeData.declaringClass.lastIndexOf('/'));
-    var classStr = nodeData.declaringClass.substring(nodeData.declaringClass.lastIndexOf('/')+1, nodeData.declaringClass.length);
-    var methodStr = nodeData.name;
+    // let idStr = idString(nodeData);
+    // let packageStr = nodeData.declaringClass.substring(0, nodeData.declaringClass.lastIndexOf('/'));
+    // let signatureStr = idStr.substring(idStr.lastIndexOf('/')+1, idStr.length);
+    let packageStr = nodeData.declaringClass;
+    let nameStr = nodeData.name;
+    let parameterStr = "";
+    for(let i = 0; i < nodeData.parameterTypes.length; i++){
+        if(i > 0) parameterStr += ", ";
+        parameterStr += nodeData.parameterTypes[i];
+    }
+    let returnStr = nodeData.returnType;
 
+    node.append("xhtml:h2")
+        .text(nameStr)
+        .style("text-align", "center");
+        // .style("word-wrap", "break-word");
     node.append("xhtml:h3")
-        .text(packageStr)
-        .style("text-align", "center")
-        .style("word-wrap", "break-word");
+        .text("Package: " + packageStr);
+        // .style("word-wrap", "break-word");
     node.append("xhtml:h3")
-        .text(classStr + "." + methodStr)
-        .style("text-align", "center")
-        .style("word-wrap", "break-word");
+        .text("Parameter Types: " + parameterStr);
+        // .style("word-wrap", "break-word");
+    node.append("xhtml:h3")
+        .text("Return Type: " + returnStr);
+        // .style("word-wrap", "break-word");
 
     node = node.append("xhtml:div")
         .attr("class","node_inhalt");
