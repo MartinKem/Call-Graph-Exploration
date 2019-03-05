@@ -32,8 +32,9 @@ node object
 var nodeMap = new Map();
 var placedNodesMap = new Map();
 
-
-var createdEdges = 0;
+var generatedNodes = 0;
+var totalNodes = 0;
+var totalEdges = 0;
 var currentNodes = 0;
 var currentEdges = 0;
 
@@ -51,7 +52,9 @@ if (typeof module !== 'undefined') {
     global.rootNodes = rootNodes;
     global.nodeMap = nodeMap;
     global.placedNodesMap = placedNodesMap;
-    global.createdEdges = createdEdges;
+    global.generatedNodes = generatedNodes;
+    global.totalNodes = totalNodes;
+    global.totalEdges = totalEdges;
     global.currentEdges = currentEdges;
     global.currentNodes = currentNodes;
 

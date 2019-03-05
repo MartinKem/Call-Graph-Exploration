@@ -6,8 +6,9 @@ document.getElementById("currentVisibleEdges").innerHTML = "Current Edges: " + S
 }
 
 function estGraphData(){
-document.getElementById("totalNodes").innerHTML = "Total Nodes: " + String(createdNodes);
-document.getElementById("totalEdges").innerHTML = "Total Edges: " + "undefined";
+document.getElementById("totalNodes").innerHTML = "Total Nodes: " + String(totalNodes);
+document.getElementById("totalEdges").innerHTML = "Total Edges: " + String(totalEdges);
+document.getElementById("generatedNodes").innerHTML = "Generated Nodes: " + String(generatedNodes);
 }
 
 

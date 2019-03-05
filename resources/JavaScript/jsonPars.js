@@ -147,6 +147,13 @@ function parseFile(file, callback) {
 			correctClassNames(parsedJson); // remove 'L' and ';' out of the class names
 			console.log("Done parsing file");
 			console.log(parsedJson);
+			//put Total Nodes / reachableMethods in graph stats
+			totalNodes = parsedJson.reachableMethods.length;
+			//put Total Edges / Edges from reachableMethods in graph stats
+			parsedJson.reachableMethods.forEach(function(element){
+				if (element.callSites) totalEdges += element.callSites.length;
+			});
+			estGraphData();
 			//map rechableMethods to HashMap
 			parsedJsonMap = new Map();
 			parsedJson.reachableMethods.forEach(function (element) {
@@ -435,12 +442,13 @@ function createGraph() {
     if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
 	if (rootNode) {
 		if (!rootNode.getSizes().x) rootNode.placeCentrally();
-		rootNode.showNode();
+		if (!rootNode.visible) rootNode.showNode();
 		rootNode.focus();
 		rootNodes.push(rootNode);
 		createChildNodes(rootNode);
 		console.log(createdNodes + " additional nodes created");
-		//update createdNodes in Graph Data
+		//update generatedNodes in Graph Data
+		generatedNodes += createdNodes;
 		estGraphData();
 		createdNodes = 0;
 	}
