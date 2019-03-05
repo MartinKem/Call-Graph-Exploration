@@ -37,7 +37,6 @@ class node{
     /**
      * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} data - signature of this node
      * @param {string[]} callSites - string array with the name of the call sites
-     * @param {{numberOfTargets: number, line: number}[]} callSiteStats - holds for each callsite to number of targets and the line, where the site is called
      */
     constructor(data, callSites){
         this.parents = [];
@@ -68,22 +67,21 @@ class node{
 
     /**
      * adds a child node to the current node where parent and container are given by this node
-     * this node also updates its own children and callSiteStats
+     * this node also updates its own children and callSites
      *
      * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} nodeData - signature of this node
-     * @param {string[]} callSites - string array with the name of the call sites
-     * @param {{numberOfTargets: number, line: number}[]} callSiteStats - holds for each callsite to number of targets and the line, where the site is called
+     * @param {{declaredTarget: {name: string, declaringClass: string, returnType: string, parameterTypes: string}, line: number, targets: {name: string, declaringClass: string, returnType: string, parameterTypes: string}[]}[]} callSites - array with callSite information
      *
      * @returns {node} - child node instance
      */
-    addChild(callsiteIndex, nodeData, callSites, callSiteStats){
+    addChild(callsiteIndex, nodeData, callSites){
         for(let i = 0; i < this.children.length; i++){	// child-node may only be created, if there doesn't exist a child with the given name yet
             if(idString(this.children[i].node.getNodeData()) === idString(nodeData)) return undefined;
         }
         let child = nodeMap.get(idString(nodeData));
 
         if(!child){		// new node-instance is only created, if it didn't exist yet
-            child = new node(nodeData, callSites, callSiteStats);
+            child = new node(nodeData, callSites);
         }
 
         this.children.push({node: child, index: callsiteIndex, edge: undefined});
@@ -346,7 +344,7 @@ class node{
     getParents(){ return this.parents; }
 
     /**
-     * @returns {string[]} - call sites
+     * @returns {{declaredTarget: {name: string, declaringClass: string, returnType: string, parameterTypes: string}, line: number, targets: {name: string, declaringClass: string, returnType: string, parameterTypes: string}[]}[]} - call sites
      */
     getCallSites(){ return this.callSites; }
 
@@ -400,10 +398,9 @@ class node{
  * @param {number} x - left distance
  * @param {number} y - top distance
  * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} nodeData - signature of this method
- * @param {string[]} callSites - string array with the name of the call sites
- * @param {{numberOfTargets: number, line: number}} callSiteStats - some information about each call-site
+ * @param {{declaredTarget: {name: string, declaringClass: string, returnType: string, parameterTypes: string}, line: number, targets: {name: string, declaringClass: string, returnType: string, parameterTypes: string}[]}[]} callSites - array with callSite information
  */
-function createSingleNode(x, y, nodeData, callSites, callSiteStats){
+function createSingleNode(x, y, nodeData, callSites){
     let lock = false;
     let nodeHeight = nodeHeightEmpty + callSiteHeight * callSites.length;
 
