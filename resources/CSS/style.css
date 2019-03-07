@@ -123,6 +123,18 @@ svg{
     background-color: #f0f0f0;
 }
 
+.nodeHeader{
+    overflow: hidden;
+    white-space: nowrap;
+    min-width: 100%;
+}
+
+.nodeHeader:hover{
+    background-color: white;
+    width: max-content;
+    padding-right: 15px;
+}
+
 .callSite{
 	max-width: 300px;
 	overflow: hidden;

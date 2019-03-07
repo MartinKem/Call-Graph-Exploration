@@ -25,10 +25,10 @@ if (typeof module !== 'undefined') {
 //----------------------------------- model section -------------------------------------
 //---------------------------------------------------------------------------------------
 const nodeWidth = 400;
-const nodeHeightEmpty = 144;
+const nodeHeightEmpty = 250;
 const callSiteWidth = nodeWidth-53;
 const callSiteHeight = 27;
-const callSiteTopOffset = 120;
+const callSiteTopOffset = 220;
 
 /**
  * models the methods as nodes in a directed graph
@@ -471,17 +471,34 @@ function createSingleNode(x, y, nodeData, callSites){
     let returnStr = nodeData.returnType;
 
     node.append("xhtml:h2")
-        .text(nameStr)
-        .style("text-align", "center");
+        .style("text-align", "center")
+        .append("u")
+        .text(nameStr);
+    let header = node.append("xhtml:div")
+        .attr("class", "nodeHeader");
         // .style("word-wrap", "break-word");
-    node.append("xhtml:h3")
-        .text("Package: " + packageStr);
+    let headerline = header.append("xhtml:h3")
+        // .style("white-space", "nowrap");
+    headerline.append("span")
+        .text("Package:  ")
+        .style("font-size", "12px");
+    headerline.append("span")
+        .text(packageStr);
         // .style("word-wrap", "break-word");
-    node.append("xhtml:h3")
-        .text("Parameter Types: " + parameterStr);
-        // .style("word-wrap", "break-word");
-    node.append("xhtml:h3")
-        .text("Return Type: " + returnStr);
+    headerline = header.append("xhtml:h3")
+        // .style("white-space", "nowrap");
+    headerline.append("span")
+        .text("Parameter Types:  ")
+        .style("font-size", "12px");
+    headerline.append("span")
+        .text(parameterStr);
+    headerline = header.append("xhtml:h3")
+        // .style("white-space", "nowrap");
+    headerline.append("span")
+        .text("Return Type:  ")
+        .style("font-size", "12px");
+    headerline.append("span")
+        .text(returnStr);
         // .style("word-wrap", "break-word");
 
     node = node.append("xhtml:div")

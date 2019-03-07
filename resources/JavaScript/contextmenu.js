@@ -72,7 +72,6 @@ $("body").on("click",".div_node",function () {
     }
 });
 $("body").on("click","svg path",function () {
-    console.log(keyPressed);
     clickedEdge = this;
     switch (keyPressed) {
         case 49:
@@ -195,13 +194,11 @@ function createEdgeContextmenu(e) {
 }
 
 function changeColorEdge(color) {
-    console.log("klahlf")
     if(lastMarkedEdge === clickedEdge) $(lastMarkedEdge).removeClass("lastClickedEdge");
     // var color = $(elem).find(".color").css('backgroundColor');
     if(color === '#000000'){
         $(clickedEdge).css('opacity', 0.5);
     }else{
-        console.log(clickedEdge)
         $(clickedEdge).css('opacity', 1);
     }
     $(clickedEdge).css('stroke', color);
