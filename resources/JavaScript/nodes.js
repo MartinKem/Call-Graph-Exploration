@@ -36,7 +36,10 @@ const callSiteTopOffset = 220;
 class node{
     /**
      * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} data - signature of this node
-     * @param {string[]} callSites - string array with the name of the call sites
+     * @param {{declaredTarget: {name: string, declaringClass: string, returnType: string, parameterTypes: string},
+     *          line: number,
+     *          targets: {name: string, declaringClass: string, returnType: string, parameterTypes: string}[]}[]} callSites - array with callSite information
+     *
      */
     constructor(data, callSites){
         this.parents = [];
@@ -69,8 +72,11 @@ class node{
      * adds a child node to the current node where parent and container are given by this node
      * this node also updates its own children and callSites
      *
+     * @param {number} callsiteIndex - index of the call site this node was called by
      * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} nodeData - signature of this node
-     * @param {{declaredTarget: {name: string, declaringClass: string, returnType: string, parameterTypes: string}, line: number, targets: {name: string, declaringClass: string, returnType: string, parameterTypes: string}[]}[]} callSites - array with callSite information
+     * @param {{declaredTarget: {name: string, declaringClass: string, returnType: string, parameterTypes: string},
+     *          line: number,
+     *          targets: {name: string, declaringClass: string, returnType: string, parameterTypes: string}[]}[]} callSites - array with callSite information
      *
      * @returns {node} - child node instance
      */
@@ -85,7 +91,6 @@ class node{
         }
 
         this.children.push({node: child, index: callsiteIndex, edge: undefined});
-        // this.reloadCallSites();
         return this.children[this.children.length-1].node;
     }
 
@@ -198,19 +203,6 @@ class node{
      * hides this node, if it was already displayed before
      * also hides all child-nodes of this node, if they don't have another visible parent
      */
-/*    hideNode2(){
-        if(this.visible === true){
-
-            let node = document.getElementById(idString(this.nodeData));	// now this node itself becomes hidden
-            node.style.display = "none";
-            this.visible = false;
-			//updates number of current shown nodes and edges
-			currentNodes--;
-			refreshGraphData();
-        }
-        this.reloadEdges();
-		//updates the graph data with new number of shown nodes
-    }*/
     hideNode(){
         if(this.visible === true){
             this.marked = true;
@@ -222,16 +214,11 @@ class node{
             });
 
             markedArr.push(this);
-            // markedArr.forEach(function (n) {
-            //     n.reloadEdges();
-            // });
             markedArr.forEach(function (n) {
                 document.getElementById(idString(n.nodeData)).style.display = "none";
-                //document.getElementById(idString(n.nodeData)).style.backgroundColor = "red"
                 n.visible = false;
                 //updates number of current shown nodes and edges
                 currentNodes--;
-                console.log("-1");
                 refreshGraphData();
                 n.reloadEdges();
                 n.marked = false;
@@ -245,7 +232,6 @@ class node{
                     .filter(child => child.node.visible && !child.node.marked)
                     .forEach(function (c) {
                         c.node.marked = true;
-                        //document.getElementById(idString(c.node.nodeData)).style.backgroundColor = "green"
                         markedArr.push(c.node);
                         markChildren(c.node);
                 });
@@ -256,8 +242,6 @@ class node{
             if(n.parents.length){
                 for(let i = 0; i < n.parents.length; i++){
                     let p = n.parents[i];
-                    //console.log("pev: ",p.edge, p.edge.visible)
-                    //console.log(p.node,(p.node.visible && !p.node.marked && p.edge.visible))
                     if(p.node.visible && !p.node.marked && p.edge !== undefined && p.edge.visible !== false){
                         n.marked = false;
                         markedArr.splice(markedArr.indexOf(n), 1);
@@ -476,30 +460,24 @@ function createSingleNode(x, y, nodeData, callSites){
         .text(nameStr);
     let header = node.append("xhtml:div")
         .attr("class", "nodeHeader");
-        // .style("word-wrap", "break-word");
-    let headerline = header.append("xhtml:h3")
-        // .style("white-space", "nowrap");
+    let headerline = header.append("xhtml:h3");
     headerline.append("span")
         .text("Package:  ")
         .style("font-size", "12px");
     headerline.append("span")
         .text(packageStr);
-        // .style("word-wrap", "break-word");
-    headerline = header.append("xhtml:h3")
-        // .style("white-space", "nowrap");
+    headerline = header.append("xhtml:h3");
     headerline.append("span")
         .text("Parameter Types:  ")
         .style("font-size", "12px");
     headerline.append("span")
         .text(parameterStr);
-    headerline = header.append("xhtml:h3")
-        // .style("white-space", "nowrap");
+    headerline = header.append("xhtml:h3");
     headerline.append("span")
         .text("Return Type:  ")
         .style("font-size", "12px");
     headerline.append("span")
         .text(returnStr);
-        // .style("word-wrap", "break-word");
 
     node = node.append("xhtml:div")
         .attr("class","node_inhalt");
