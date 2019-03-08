@@ -376,7 +376,7 @@ function createNodeInstance(nodeData, parentNode, index) {
 	}
 	else {
 		let callSitesSorted = jsonData.callSites;
-		callSitesSorted = sortByKey(callSitesSorted, 'line');
+		// callSitesSorted = sortByKey(callSitesSorted, 'line');
 
 		// In else case, the jsonData exists and the function always creates a new node. Now the call-site-information is copied for the new node.
 		// let callSites = [];
@@ -406,9 +406,9 @@ function createNodeInstance(nodeData, parentNode, index) {
 function createChildNodes(node) {
 	let nodeData = node.getNodeData();
 	let jsonData = parsedJsonMap.get(idString(nodeData));
+	if (!jsonData) return;
 	let callSites = [];
-	if (jsonData) callSites = jsonData.callSites;
-	callSites = sortByKey(callSites, 'line');
+	callSites = sortByKey(jsonData.callSites, 'line');
 
 	// for all targets of all call sites this function is called recursively, to create the nodes of the lower children generations too
 	for (let i = 0; i < callSites.length; i++) {
@@ -418,6 +418,22 @@ function createChildNodes(node) {
 			if (childNode) createChildNodes(childNode);
 		}
 	}
+
+	// version 2 - faster but with stack crash
+	// for (let i = 0; i < callSites.length; i++) {
+		// callSites[i].targets.forEach(function(target, i){
+		// 	let childNode = createNodeInstance(target, node, i);
+		// 	if(childNode) createChildNodes(childNode);
+		// });
+	// }
+
+	// version 3 - faster but with stack crash
+	// callSites.forEach(function(callSite){
+	// 	callSite.targets.forEach(function(target, i){
+	// 			let childNode = createNodeInstance(target, node, i);
+	// 			if(childNode) createChildNodes(childNode);
+	// 		});
+	// 	});
 }
 
 /**
@@ -445,8 +461,11 @@ function createGraph() {
 		if (!rootNode.visible) rootNode.showNode();
 		rootNode.focus();
 		rootNodes.push(rootNode);
+		let time = Date.now();
 		createChildNodes(rootNode);
+		time = Date.now() - time;
 		console.log(createdNodes + " additional nodes created");
+		console.log("time needed for creating nodes: " + time + "ms");
 		//update generatedNodes in Graph Data
 		generatedNodes += createdNodes;
 		estGraphData();

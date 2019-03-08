@@ -72,7 +72,7 @@ class node{
      * adds a child node to the current node where parent and container are given by this node
      * this node also updates its own children and callSites
      *
-     * @param {number} callsiteIndex - index of the call site this node was called by
+     * @param {number} callSiteIndex - index of the call site this node was called by
      * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} nodeData - signature of this node
      * @param {{declaredTarget: {name: string, declaringClass: string, returnType: string, parameterTypes: string},
      *          line: number,
@@ -80,17 +80,23 @@ class node{
      *
      * @returns {node} - child node instance
      */
-    addChild(callsiteIndex, nodeData, callSites){
-        for(let i = 0; i < this.children.length; i++){	// child-node may only be created, if there doesn't exist a child with the given name yet
-            if(idString(this.children[i].node.getNodeData()) === idString(nodeData)) return undefined;
-        }
+    addChild(callSiteIndex, nodeData, callSites){
+        // for(let i = 0; i < this.children.length; i++){	// child-node may only be created, if there doesn't exist a child with the given name yet
+        //     if(idString(this.children[i].node.getNodeData()) === idString(nodeData) && callSiteIndex !== this.children[i].index) return undefined;
+        // }
+        let alreadyExisting = this.children
+            .filter(child => child.index === callSiteIndex)
+            .filter(child => idString(child.node.nodeData) === idString(nodeData))
+            .length;
+        if(alreadyExisting) return undefined;
+
         let child = nodeMap.get(idString(nodeData));
 
         if(!child){		// new node-instance is only created, if it didn't exist yet
             child = new node(nodeData, callSites);
         }
 
-        this.children.push({node: child, index: callsiteIndex, edge: undefined});
+        this.children.push({node: child, index: callSiteIndex, edge: undefined});
         return this.children[this.children.length-1].node;
     }
 
