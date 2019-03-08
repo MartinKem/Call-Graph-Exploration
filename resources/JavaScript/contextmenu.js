@@ -151,6 +151,7 @@ function createNodeContextmenu(e) {
 //changes color to the backgroundcolor of elem
 function changeColorNode(color) {
     $(clickedNode).css('background-color', color);
+    $(clickedNode).children(".nodeHeader").css("background-color", color);
 }
 
 function deleteNodes() {
