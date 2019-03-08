@@ -5,9 +5,7 @@
 * *******
 */
 if (typeof module !== 'undefined') {
-    var index = require("./index");
-	var svgCont = index.svgCont;
-    var d3 = index.d3;
+    var d3 = require('d3');
 }
 
 var links = [];
@@ -42,8 +40,8 @@ function initForce(svg, nodeArr, linkArr){
 	var force = d3.layout.force()
 		.charge(-100000)
 		.linkDistance(1500)
-		.gravity(0.005)
-		// .linkStrength(0.001)
+		.gravity(0.001)
+		.linkStrength(1)
 		.size([width, height])
 		.nodes(nodeArr)
 		.links(linkArr)

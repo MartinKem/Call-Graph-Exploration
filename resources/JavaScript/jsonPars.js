@@ -4,16 +4,7 @@
 * *******
 */
 if (typeof module !== 'undefined') {
-	const index = require("./index");
-	var createdNodes = index.createdNodes;
-	var svgCont = index.svgCont;
-	var defsCont = index.defsCont;
-	var rootNodeString = index.rootNodeString;
-	var rootNode = index.rootNode;
-	var rootNodes = index.rootNodes;
-	var nodeMap = index.nodeMap;
-	var open_close = index.open_close;
-	var i = index.i;
+
 }
 
 
@@ -22,11 +13,9 @@ var strJson = "";
 var arr = [];
 var parsedJsonMap;
 var isLoading = false;
+var autocompleteMode;
 
-//Add the events for the drop zone
-var dropZone = document.getElementById('dropZone');
-dropZone.addEventListener('dragover', handleDragOver, false);
-dropZone.addEventListener('drop', handleFileSelect, false);
+
 
 /**
  * 
@@ -39,20 +28,6 @@ function setProgBar(percent) {
 	progress.textContent = percent + '%';
 }
 
-function handleDragOver(evt) {
-	evt.stopPropagation();
-	evt.preventDefault();
-	evt.dataTransfer.dropEffect = 'copy'; //shows it is a copy
-}
-
-function handleFileSelect(evt) {
-	evt.stopPropagation();
-	evt.preventDefault();
-
-	var files = evt.dataTransfer.files; // FileList object.
-
-	document.getElementById('fileinput').files = files; // set new file
-}
 
 var setString = function (str) {
 	strJson += str;
@@ -81,14 +56,14 @@ function loadFile() {
 }
 
 function parseString() {
-	var rest = "";
-	var finalarray;
+	let rest = "";
+	let finalarray;
 
 	arr.push(strJson);
 	arr.forEach(function (a) {
 		a = rest + a;
-		var first = a.indexOf("\n    \"method\" : {") - 1;
-		var last = a.lastIndexOf("\n    \"method\" : {") - 3;
+		let first = a.indexOf("\n    \"method\" : {") - 1;
+		let last = a.lastIndexOf("\n    \"method\" : {") - 3;
 
 		if (finalarray == null) { finalarray = JSON.parse("{\n  \"reachableMethods\" : [ " + a.slice(first, last) + " ]\n}").reachableMethods; }
 		else { Array.prototype.push.apply(finalarray, JSON.parse("{\n  \"reachableMethods\" : [ " + a.slice(first, last) + " ]\n}").reachableMethods) }
@@ -108,7 +83,7 @@ function parseString() {
 }
 
 function correctClassNames(methods) {
-	for (var i = 0; i < methods.reachableMethods.length; i++) {
+	for (let i = 0; i < methods.reachableMethods.length; i++) {
 		correctSingleMethod(methods.reachableMethods[i].method);
 		methods.reachableMethods[i].callSites.forEach(function (site) {
 			correctSingleMethod(site.declaredTarget);
@@ -129,7 +104,12 @@ function correctClassNames(methods) {
 	}
 }
 
-
+function resetFileRead() {
+	arr = [];
+	strJson = "";
+	isLoading = false;
+	setProgBar(0);
+}
 
 
 function parseFile(file, callback) {
@@ -148,11 +128,32 @@ function parseFile(file, callback) {
 		}
 		if (offset >= fileSize) {
 			console.log("Done reading file");
-			let parsedJson = parseString();
+
+			let parsedJson;
+			try {
+				parsedJson = parseString();
+			} catch (e) {
+				if (e instanceof SyntaxError) {
+					alert("File could not be read. \n-Is the Json-File saved as UNIX (LF)? \n-Is the Json-File properly formatted? \n" + e);
+					resetFileRead();
+					return;
+				} else {
+					resetFileRead();
+					return;
+				}
+			}
+
 
 			correctClassNames(parsedJson); // remove 'L' and ';' out of the class names
 			console.log("Done parsing file");
 			console.log(parsedJson);
+			//put Total Nodes / reachableMethods in graph stats
+			totalNodes = parsedJson.reachableMethods.length;
+			//put Total Edges / Edges from reachableMethods in graph stats
+			parsedJson.reachableMethods.forEach(function(element){
+				if (element.callSites) totalEdges += element.callSites.length;
+			});
+			estGraphData();
 			//map rechableMethods to HashMap
 			parsedJsonMap = new Map();
 			parsedJson.reachableMethods.forEach(function (element) {
@@ -183,7 +184,7 @@ function parseFile(file, callback) {
 		// of to the next chunk
 
 		chunkReaderBlock(offset, chunkSize, file);
-	}
+	};
 
 	chunkReaderBlock = function (_offset, length, _file) {
 		var r = new FileReader();
@@ -200,7 +201,7 @@ function parseFile(file, callback) {
 			}
 		};
 		r.readAsText(blob);
-	}
+	};
 
 
 
@@ -209,25 +210,6 @@ function parseFile(file, callback) {
 
 	function getStructuredMethodList() {
 		return Array.from(parsedJsonMap.keys());
-
-		// this is used to reduce the size of the shown strings, but brings difficulties with identification later
-		// -- do not remove --
-
-		// let methodList = Array.from(parsedJsonMap.values());
-        // let result = [];
-		// for (var i = 0; i < methodList.length; i++) {
-		// 	let method = methodList[i].method;
-		// 	// if(method.declaringClass.includes('(')) console.log(method);
-		// 	let resultingString = method.declaringClass + '.' + method.name + '(';
-		// 	for(let j = 0; j < method.parameterTypes.length; j++){
-		// 		if(j > 0) resultingString += ', ';
-		// 		resultingString += method.parameterTypes[j].substring(method.parameterTypes[j].lastIndexOf('/')+1, method.parameterTypes[j].length);
-		// 	}
-		// 	resultingString += '): ' + method.returnType.substring(method.returnType.lastIndexOf('/')+1, method.returnType.length);
-		//
-		// 	result.push(resultingString);
-		// }
-        // return result;
 	}
 }
 function changeDiv() {
@@ -238,7 +220,7 @@ function changeDiv() {
 
 //Eingabe bei gegebenem Texteingabefeld mit gegebenem Stringarray autovervollständigen 
 function autocomplete(inp, arr) {
-    //2 Parameter, Textfeld und Array mit Vervollständigungsdaten
+	//2 Parameter, Textfeld und Array mit Vervollständigungsdaten
 
 	var currentFocus = 0;
 
@@ -247,14 +229,17 @@ function autocomplete(inp, arr) {
 	inp.addEventListener("focus", function (e) { autocompleteEvent(e, this); });
 
 	document.addEventListener("click", function (e) {
-		if (e.srcElement.id != "searchInput" && e.srcElement.id != "targetSearch"){
+		if (e.srcElement.id !== "searchInput" && e.srcElement.id !== "targetSearch") {
+			// console.log(mode);
 			closeAllLists(e.target);
+			if (e.srcElement.parentNode && e.srcElement.parentNode.id === "targetSearchautocomplete-list") {
+				inp.focus();
+			}
 		}
 	});
 
 	function autocompleteEvent(e, inputElem) {
 		var div, items, otherValue, thisArray, reducedArray = [], value = inputElem.value;
-		// reducedArray = arr; //arr[searchField];
 
 		//Alle offenen Listen schließen
 		closeAllLists();
@@ -267,13 +252,13 @@ function autocomplete(inp, arr) {
 		//Füge das DIV Element dem Container als Kindelement hinzu
 		inputElem.parentNode.appendChild(div);
 
-        Loop1:
-		for (var i = 0; i < arr.length; i++) {
+		Loop1:
+		for (let i = 0; i < arr.length; i++) {
 			//Prüfe, ob die eingegebenen Zeichen mit beliebigem Teilstring des Vorschlags übereinstimmen
 			Loop2:
-			for (var j = 0; j < arr[i].length - value.length + 1; j++){
-				if (arr[i].substr(j, value.length).toUpperCase() == value.toUpperCase()) {
-                    arr[i] = escapeSG(arr[i]);
+			for (let j = 0; j < arr[i].length - value.length + 1; j++) {
+				if (arr[i].substr(j, value.length).toUpperCase() === value.toUpperCase()) {
+					arr[i] = escapeSG(arr[i]);
 					//Erstelle DIV Element für jeden übereinstimmenden Vorschlag
 					items = document.createElement("DIV");
 					//Hebe übereinstimmende Zeichen als fettgedruckt hervor
@@ -284,13 +269,22 @@ function autocomplete(inp, arr) {
 					items.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
 					//Führe die übergebene Funktion bei Knopfdruck des Elements aus
 					items.addEventListener("click", function (e) {
-						//Füge den Vervollständigungsvorschlag in das Textfeld ein
-						inp.value = this.getElementsByTagName("input")[0].value;
-						//Alle offenen Listen schließen
-						closeAllLists();
+						if (autocompleteMode === "callSite") {
+							// Das Call-Site-Menü soll nur durch die eigenen Buttons und andere Call-Site-Menüs schließbar sein
+							//Füge den Vervollständigungsvorschlag in das Textfeld ein
+							inp.value = this.getElementsByTagName("input")[0].value;
+							addTargetToSelected();
+							inp.value = "";
+						} else {
+							//Füge den Vervollständigungsvorschlag in das Textfeld ein
+							inp.value = this.getElementsByTagName("input")[0].value;
+							//Alle offenen Listen schließen
+							closeAllLists();
+						}
+
 					});
 					div.appendChild(items);
-					
+
 					//Schleife unterbrechen wenn 10 Elemente gefunden wurden
 					if (div.childElementCount >= 10) { break Loop1; }
 					break Loop2;
@@ -300,24 +294,27 @@ function autocomplete(inp, arr) {
 	}
 	//Führe eine Funktion aus, wenn die Tastatur betätigt wird
 	inp.addEventListener("keydown", function (e) {
-		var x = document.getElementById(this.id + "autocomplete-list");
+		let x = document.getElementById(this.id + "autocomplete-list");
 		if (x) x = x.getElementsByTagName("div");
-		if (e.keyCode == 40) {
+		if (e.keyCode === 40) {
 			//Erhöhe aktuellen Fokus bei Pfeiltaste UNTEN
 			currentFocus++;
 			//Hebe aktuelles Listenelement hervor
 			addActive(x);
-		} else if (e.keyCode == 38) {
+		} else if (e.keyCode === 38) {
 			//Verringere aktuellen Fokus bei Pfeiltaste HOCH
 			currentFocus--;
 			//Hebe aktuelles Listenelement hervor
 			addActive(x);
-		} else if (e.keyCode == 13) {
+		} else if (e.keyCode === 13) {
 			//Verhindere, dass ein Formular gesendet wird, wenn ENTER gedrückt wird
 			if (currentFocus > -1) {
 				//Simuliere Klick auf Listenelement
 				e.preventDefault();
 				if (x) x[currentFocus].click();
+				currentFocus = -1;
+			} else if (this.value) {
+				document.getElementById("search").click();
 			}
 		}
 	});
@@ -333,14 +330,14 @@ function autocomplete(inp, arr) {
 	}
 	function removeActive(x) {
 		//Entferne die "aktiv" Klasse von allen Listenelementen
-		for (var i = 0; i < x.length; i++) {
+		for (let i = 0; i < x.length; i++) {
 			x[i].classList.remove("autocomplete-active");
 		}
 	}
 	function closeAllLists(elmnt) {
 		//Schließe alle offenen Autovervollständigungslisten mit Ausnahme der übergebenen
-		var x = document.getElementsByClassName("autocomplete-items");
-		for (var i = 0; i < x.length; i++) {
+		let x = document.getElementsByClassName("autocomplete-items");
+		for (let i = 0; i < x.length; i++) {
 			if (elmnt != x[i] && elmnt != inp) {
 				x[i].parentNode.removeChild(x[i]);
 			}
@@ -358,7 +355,7 @@ function autocomplete(inp, arr) {
  * @returns {node | null} - returns null, if node already existed, returns the new node otherwise
  */
 function createNodeInstance(nodeData, parentNode, index) {
-    var existingNode = nodeMap.get(idString(nodeData));
+	var existingNode = nodeMap.get(idString(nodeData));
 	var newNode;
 
 	if (existingNode) {
@@ -369,7 +366,7 @@ function createNodeInstance(nodeData, parentNode, index) {
 	}
 	var jsonData = parsedJsonMap.get(idString(nodeData));
 	if (!jsonData) {
-        // If there doesn't exist an entry in the json-map, the function just creates an empty node without call-sites.
+		// If there doesn't exist an entry in the json-map, the function just creates an empty node without call-sites.
 		if (!parentNode) {
 			// In case that parentNode doesn't exist too, the user tries to find a not existing node through the search field.
 			alert("\"" + rootNodeString + "\" does not exist in the JSON-file!");
@@ -378,19 +375,23 @@ function createNodeInstance(nodeData, parentNode, index) {
 		newNode = parentNode.addChild(index, nodeData, []);
 	}
 	else {
+		let callSitesSorted = jsonData.callSites;
+		callSitesSorted = sortByKey(callSitesSorted, 'line');
+
 		// In else case, the jsonData exists and the function always creates a new node. Now the call-site-information is copied for the new node.
-		let callSites = [];
-		let callSiteStats = [];
-		for (var i = 0; i < jsonData.callSites.length; i++) {
-			callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
-			callSiteStats.push({ numberOfTargets: jsonData.callSites[i].targets.length, line: jsonData.callSites[i].line });
-		}
+		// let callSites = [];
+		// let callSiteStats = [];
+		// for (let i = 0; i < jsonData.callSites.length; i++) {
+		// 	// callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
+		// 	callSites.push(jsonData.callSites[i].declaredTarget);
+		// 	callSiteStats.push({ numberOfTargets: jsonData.callSites[i].targets.length, line: jsonData.callSites[i].line });
+		// }
 		if (!parentNode) {
 			// If parentNode doesn't exist, the user generates a new node through the search field.
-			newNode = new node(null, nodeData, callSites, callSiteStats);
+			newNode = new node(nodeData, callSitesSorted);
 		}
 		else {
-            newNode = parentNode.addChild(index, nodeData, callSites, callSiteStats);
+			newNode = parentNode.addChild(index, nodeData, callSitesSorted);
 		}
 	}
 	if (newNode) nodeMap.set(idString(nodeData), newNode); // now the node object is added to the nodeMap
@@ -407,33 +408,47 @@ function createChildNodes(node) {
 	let jsonData = parsedJsonMap.get(idString(nodeData));
 	let callSites = [];
 	if (jsonData) callSites = jsonData.callSites;
+	callSites = sortByKey(callSites, 'line');
 
 	// for all targets of all call sites this function is called recursively, to create the nodes of the lower children generations too
-	for (var i = 0; i < callSites.length; i++) {
-		for (var j = 0; j < callSites[i].targets.length; j++) {
-			var target = callSites[i].targets[j];
-			var childNode = createNodeInstance(target, node, i);
+	for (let i = 0; i < callSites.length; i++) {
+		for (let j = 0; j < callSites[i].targets.length; j++) {
+			let target = callSites[i].targets[j];
+			let childNode = createNodeInstance(target, node, i);
 			if (childNode) createChildNodes(childNode);
 		}
 	}
 }
 
 /**
+ *sorts an array of objects by a given key
+ *
+ * @param {object[]} array - an array of objects to be sorted
+ * @param {String} key - key by which to sort
+*/
+function sortByKey(array, key) {
+	return array.sort(function(a, b) {
+	var x = a[key]; var y = b[key];
+	return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+	});
+}
+
+/**
  * initiates the generation of the graph through parsing the input of the search field and starting the node creation
  */
 function createGraph() {
+	let rootNodeString = document.getElementById("searchInput").value;
 	let rootNode = nodeMap.get(rootNodeString);
     if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
-	// rootNode = createNodeInstance({declaringClass: "tmr/Demo", name: "main", parameterTypes: ["java/lang/String"], returnType: "V"});
-	// rootNode = createNodeInstance("org/apache/xalan/xslt/Process", "main");
-	// rootNode = createNodeInstance("Lsun/tools/jar/Main$1;", "add");
 	if (rootNode) {
-		if (!rootNode.getX()) rootNode.placeCentrally();
-		rootNode.showNode();
+		if (!rootNode.getSizes().x) rootNode.placeCentrally();
+		if (!rootNode.visible) rootNode.showNode();
 		rootNode.focus();
-		createChildNodes(rootNode, 0);
+		rootNodes.push(rootNode);
+		createChildNodes(rootNode);
 		console.log(createdNodes + " additional nodes created");
-		//update createdNodes in Graph Data
+		//update generatedNodes in Graph Data
+		generatedNodes += createdNodes;
 		estGraphData();
 		createdNodes = 0;
 	}

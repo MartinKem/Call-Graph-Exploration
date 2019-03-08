@@ -60,17 +60,18 @@ svg{
 
 #contextmenuNode, #contextmenuEdge{
     z-index: 1000;
-    width:100px;
     background-color: #ececec;
     box-sizing: border-box;
     border: black 1px solid;
     border-bottom: 0px;
     margin:0;
     font-family: Helvetica;
+    overflow: auto;
 
 }
 .menuelement{
     height: 30px;
+    width: 250px;
     border-bottom: black 1px solid;
     padding: 5px;
     font-size: 15px;
@@ -81,6 +82,7 @@ svg{
     background-color: #d3d3d3;
     font-weight: bold;
 }
+
 .color{
     float: right;
     width: 20px;
@@ -89,6 +91,10 @@ svg{
     box-sizing: border-box;
     border-width: 1px;
     border-radius: 5px;
+}
+
+.hotKeySpan{
+    color: #919c8afc;
 }
 
 .methodButton{
@@ -115,6 +121,18 @@ svg{
 
 .methodButton:active{
     background-color: #f0f0f0;
+}
+
+.nodeHeader{
+    overflow: hidden;
+    white-space: nowrap;
+    min-width: 100%;
+}
+
+.nodeHeader:hover{
+    background-color: white;
+    width: max-content;
+    padding-right: 15px;
 }
 
 .callSite{
@@ -204,6 +222,8 @@ svg{
   background-color: DodgerBlue !important; 
   color: #ffffff; 
 }
+
+ul li:hover {cursor: pointer;}
 
 .edge{
     stroke: black;
