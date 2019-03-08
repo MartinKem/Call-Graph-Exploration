@@ -132,11 +132,11 @@ function createNodeContextmenu(e) {
        // counter = 1;
        // if(counter > 0)console.log("contextmenu nicht mehr aktuell");
         $("body").append($("<div id='contextmenuNode'>        <div class=\"menuelement\" onclick=\"deleteNodes()\">Hide</div>" +
-            "        <div class=\"menuelement\" onclick=\"changeColorNode(this)\">Red<span class='hotKeySpan'>[1+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"changeColorNode(this)\">Green<span class='hotKeySpan'>[2+MouseLeft]</span><div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"changeColorNode(this)\">Blue<span class='hotKeySpan'>[3+MouseLeft]</span><div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"changeColorNode(this)\">Yellow<span class='hotKeySpan'>[4+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"changeColorNode(this)\">White<span class='hotKeySpan'>[5+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffc6c6')\">Red<span class='hotKeySpan'>[1+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#beffbe')\">Green<span class='hotKeySpan'>[2+MouseLeft]</span><div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#abd3ff')\">Blue<span class='hotKeySpan'>[3+MouseLeft]</span><div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffff9f')\">Yellow<span class='hotKeySpan'>[4+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffffff')\">White<span class='hotKeySpan'>[5+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"switchContent()\">Details</div><div>"));
 
     $("#contextmenuNode").css({
