@@ -25,7 +25,7 @@ if (typeof module !== 'undefined') {
 //----------------------------------- model section -------------------------------------
 //---------------------------------------------------------------------------------------
 const nodeWidth = 400;
-const nodeHeightEmpty = 250;
+const nodeHeightEmpty = 247;
 const callSiteWidth = nodeWidth-53;
 const callSiteHeight = 27;
 const callSiteTopOffset = 220;
@@ -52,9 +52,9 @@ class node{
                                 // this.visible == false: this node has valid x- and y-values, but is currently invisible
                                 // this.visible == true: node has valid x- and y-values and is currently displayed
 
-        // this is only for logging
-        createdNodes++;
-        if(createdNodes % 1000 === 0) console.log(createdNodes + " nodes created");
+        // this is for the graph data
+        generatedNodes++;
+        estGraphData();
     }
 
     /**
@@ -81,9 +81,6 @@ class node{
      * @returns {node} - child node instance
      */
     addChild(callSiteIndex, nodeData, callSites){
-        // for(let i = 0; i < this.children.length; i++){	// child-node may only be created, if there doesn't exist a child with the given name yet
-        //     if(idString(this.children[i].node.getNodeData()) === idString(nodeData) && callSiteIndex !== this.children[i].index) return undefined;
-        // }
         let alreadyExisting = this.children
             .filter(child => child.index === callSiteIndex)
             .filter(child => idString(child.node.nodeData) === idString(nodeData))
@@ -107,46 +104,90 @@ class node{
      * @param {string[] | undefined} names - only these targets shall be shown, shows all children if undefined
      */
     showChildNodes(index, names){
-        let childArrayIndices = [];
+        let childrenToBeShown = [];
+        let thisNode = this;
+
         if(!names){
-            for(let i = 0; i < this.children.length; i++) childArrayIndices.push(i);
+            this.callSites[index].targets.forEach(function(target){
+                childrenToBeShown.push(target);
+            });
         }
         else{
-            for(let i = 0; i < this.children.length; i++){
-                if(names.includes(idString(this.children[i].node.getNodeData()))) childArrayIndices.push(i);
+            this.callSites[index].targets
+                .filter(target => names.includes(idString(target)))
+                .forEach(function(target){ childrenToBeShown.push(target); });
+        }
+
+        childrenToBeShown.forEach(function(target){
+            createNodeInstance(target, thisNode, index);
+        });
+
+        for(let i = 0; i < childrenToBeShown.length; i++){
+            if(!nodeMap.get(childrenToBeShown[i])){
+                this.placeChildNodes(index, childrenToBeShown);
+                break;
             }
         }
 
+        childrenToBeShown.forEach(function(target){
+            let child = nodeMap.get(idString(target));
+            let childArrayElem = getChildArrayElement(target);
+
+            if(!child.visible) child.showNode();
+            if(childArrayElem.edge === undefined){
+                childArrayElem.edge = new Edge(thisNode, child, index);
+                childArrayElem.edge.create();
+                // child.edge = edge;
+                child.addParent(thisNode, childArrayElem.index, childArrayElem.edge);
+            }
+            else if(childArrayElem.edge.visible === false){
+                childArrayElem.edge.reload();
+            }
+        });
+
+        function getChildArrayElement(target){
+            for(let i = 0; i < thisNode.children.length; i++){
+                if(idString(target) === idString(thisNode.children[i].node.nodeData)) return thisNode.children[i];
+            }
+        }
+        // if(!names){
+        //     for(let i = 0; i < this.children.length; i++) childArrayIndices.push(i);
+        // }
+        // else{
+        //     for(let i = 0; i < this.children.length; i++){
+        //         if(names.includes(idString(this.children[i].node.getNodeData()))) childArrayIndices.push(i);
+        //     }
+        // }
+
         // if there exists a child-node with the given source index, that has never been placed, it must be placed with respect on the existing force tree
-        let lock = false;
-        let thisNode = this;
-        childArrayIndices.forEach(function(i){
-            if(thisNode.children[i].index == index && !lock){
-                // console.log(i, thisNode.children[i].node.getVisibility());
-                if(thisNode.children[i].node.getVisibility() == null){ // if null, child-node has never been placed
-                    thisNode.placeChildNodes(index, childArrayIndices);
-                    lock = true;  // we break here, because the place-function places all child-nodes for the given index
-                }
-            }
-        });
+        // let lock = false;
+        // let thisNode = this;
+        // childArrayIndices.forEach(function(i){
+        //     if(thisNode.children[i].index == index && !lock){
+        //         if(thisNode.children[i].node.getVisibility() == null){ // if null, child-node has never been placed
+        //             thisNode.placeChildNodes(index, childArrayIndices);
+        //             lock = true;  // we break here, because the place-function places all child-nodes for the given index
+        //         }
+        //     }
+        // });
         // all child-nodes must be displayed right now
-        childArrayIndices.forEach(function(i){
-            if(thisNode.children[i].index == index){
-                //only call showNode if node is not already visible
-                if(!thisNode.children[i].node.visible) {
-                    thisNode.children[i].node.showNode();
-                }
-                if(thisNode.children[i].edge === undefined){
-                    let edge = new Edge(thisNode, thisNode.children[i].node, thisNode.children[i].index);
-                    edge.create();
-                    thisNode.children[i].edge = edge;
-                    thisNode.children[i].node.addParent(thisNode, thisNode.children[i].index, edge);
-                }
-                else if(thisNode.children[i].edge.visible === false){
-                    thisNode.children[i].edge.reload();
-                }
-            }
-        });
+        // childArrayIndices.forEach(function(i){
+        //     if(thisNode.children[i].index == index){
+        //         //only call showNode if node is not already visible
+        //         if(!thisNode.children[i].node.visible) {
+        //             thisNode.children[i].node.showNode();
+        //         }
+        //         if(thisNode.children[i].edge === undefined){
+        //             let edge = new Edge(thisNode, thisNode.children[i].node, thisNode.children[i].index);
+        //             edge.create();
+        //             thisNode.children[i].edge = edge;
+        //             thisNode.children[i].node.addParent(thisNode, thisNode.children[i].index, edge);
+        //         }
+        //         else if(thisNode.children[i].edge.visible === false){
+        //             thisNode.children[i].edge.reload();
+        //         }
+        //     }
+        // });
 		
     }
 
@@ -155,15 +196,15 @@ class node{
      *
      * @param {number} index - index of the call-site-array
      */
-    placeChildNodes(index, childArrayIndices){
+    placeChildNodes(index, childrenToBeShown){
         let childArray = [];
         let idArray = [];	// first an array with all the child-ids is created
         let thisNode = this;
-        childArrayIndices.forEach(function(i){
-            let childIndex = thisNode.children[i].index;
-            if(childIndex == index && thisNode.children[i].node.getVisibility() == null){
-                childArray.push(thisNode.children[i]);
-                idArray.push(idString(thisNode.children[i].node.getNodeData()));
+        childrenToBeShown.forEach(function(target){
+            let child = nodeMap.get(idString(target));
+            if(child.getVisibility() == null){
+                childArray.push(child);
+                idArray.push(idString(target));
             }
         });
         let positions = addNodeToForceTree(idString(this.nodeData), idArray);	// this function from the ForceTree.js file extends for each node in
@@ -171,9 +212,9 @@ class node{
 
         for(let i = 0; i < childArray.length; i++){		// in the end the affected child-nodes are placed at the calculated positions
             let centerX = positions[i].x - nodeWidth/2;
-            let centerY = positions[i].y - (nodeHeightEmpty + callSiteHeight*childArray[i].node.getCallSites().length)/2;
-            childArray[i].node.setPosition(centerX, centerY);
-            childArray[i].node.setForceNodeIndex(positions[i].index);
+            let centerY = positions[i].y - (nodeHeightEmpty + callSiteHeight*childArray[i].callSites.length)/2;
+            childArray[i].setPosition(centerX, centerY);
+            childArray[i].setForceNodeIndex(positions[i].index);
         }
     }
 
@@ -407,7 +448,7 @@ function createSingleNode(x, y, nodeData, callSites){
         })
         .on("dragend", function() {
             if (!lock){
-                let node = nodeMap.get(this.childNodes[0].id);
+                let node = nodeMap.get(this.id);
                 let xCenter = node.getSizes().x + node.getSizes().width / 2;
                 let yCenter = node.getSizes().y + node.getSizes().height / 2;
 
@@ -423,27 +464,27 @@ function createSingleNode(x, y, nodeData, callSites){
         })
         .on("drag", function() {
             if(!lock){
-                let newX = parseInt(this.getAttribute("x")) + parseInt(d3.event.dx);
-                let newY = parseInt(this.getAttribute("y")) + parseInt(d3.event.dy);
+                let newX = parseInt(this.parentNode.getAttribute("x")) + parseInt(d3.event.dx);
+                let newY = parseInt(this.parentNode.getAttribute("y")) + parseInt(d3.event.dy);
 
-                this.setAttribute("x", newX);
-                this.setAttribute("y", newY);
+                this.parentNode.setAttribute("x", newX);
+                this.parentNode.setAttribute("y", newY);
 
-                let node = nodeMap.get(this.childNodes[0].id);
+                let node = nodeMap.get(this.id);
                 node.setPosition(newX, newY);
-                node.reloadEdges(node.getDetailed() ? "toDetailed" : "toAbstract");
+                node.reloadEdges();
 
             }
         });
 
     let foreignObjectCont = svgCont.append("foreignObject")
         .attr("x", x)
-        .attr("y", y)
-        .call(drag);
+        .attr("y", y);
 
     let node = foreignObjectCont.append("xhtml:div")
         .attr("id", idString(nodeData))
         .attr("class","div_node")
+        .call(drag)
         .style("width", nodeWidth + "px")
         .style("padding", "20px")
         .style("border-width", "5px");	// sizes must stay in js-file for later calculations;
@@ -461,11 +502,15 @@ function createSingleNode(x, y, nodeData, callSites){
     let returnStr = nodeData.returnType;
 
     node.append("xhtml:h2")
+        .on("mouseover", function(){ foreignObjectCont.attr("width", 2000); })
+        .on("mouseout", function(){ foreignObjectCont.attr("width", 400); })
         .style("text-align", "center")
         .append("u")
         .text(nameStr);
     let header = node.append("xhtml:div")
-        .attr("class", "nodeHeader");
+        .attr("class", "nodeHeader")
+        .on("mouseover", function(){ foreignObjectCont.attr("width", 2000); })
+        .on("mouseout", function(){ foreignObjectCont.attr("width", 400); });
     let headerline = header.append("xhtml:h3");
     headerline.append("span")
         .text("Package:  ")
@@ -486,7 +531,9 @@ function createSingleNode(x, y, nodeData, callSites){
         .text(returnStr);
 
     node = node.append("xhtml:div")
-        .attr("class","node_inhalt");
+        .attr("class","node_inhalt")
+        .on("mouseover", function(){ foreignObjectCont.attr("width", 2000); })
+        .on("mouseout", function(){ foreignObjectCont.attr("width", 400); });
 
     for(let i=0; i < callSites.length; i++){
         var entry = node.append("xhtml:button")
@@ -511,7 +558,7 @@ function createSingleNode(x, y, nodeData, callSites){
     }
 
     foreignObjectCont
-        .attr("width", foreignObjectCont[0][0].childNodes[0].offsetWidth+1000)
+        .attr("width", foreignObjectCont[0][0].childNodes[0].offsetWidth)
         .attr("height", foreignObjectCont[0][0].childNodes[0].offsetHeight);
 }
 
