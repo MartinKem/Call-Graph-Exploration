@@ -329,6 +329,7 @@ class node{
      * toggles this detailed-attribute to true and reloads this node's edges
      */
     toggleToDetailed(){
+        document.getElementById(idString(this.nodeData)).parentNode.setAttribute("height", this.sizes.height);
         this.detailed = true;
         this.reloadEdges();
     }
@@ -337,6 +338,7 @@ class node{
      * toggles this detailed attribute to false and reloads this node's edges
      */
     toggleToAbstract(){
+        document.getElementById(idString(this.nodeData)).parentNode.setAttribute("height", nodeHeightEmpty);
         this.detailed = false;
         this.reloadEdges();
     }
