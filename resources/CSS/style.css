@@ -144,18 +144,11 @@ svg{
 #dropZone{
 	text-align: center;
 	color: #aaa;
+    height: 80%;
 	border: 2px dashed #aaa;
 	border-radius: 5px;
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
-	border-bottom-right-radius: 5px;
-	border-bottom-left-radius: 5px;
 
 	padding: 25px;
-	padding-top: 25px;
-	padding-right: 25px;
-	padding-bottom: 25px;
-	padding-left: 25px;
 }
 
 #progress_bar{
