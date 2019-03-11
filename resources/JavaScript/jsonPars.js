@@ -369,7 +369,7 @@ function createNodeInstance(nodeData, parentNode, index) {
 		// If there doesn't exist an entry in the json-map, the function just creates an empty node without call-sites.
 		if (!parentNode) {
 			// In case that parentNode doesn't exist too, the user tries to find a not existing node through the search field.
-			alert("\"" + rootNodeString + "\" does not exist in the JSON-file!");
+			alert("\"" + document.getElementById("searchInput").value + "\" does not exist in the JSON-file!");
 			return;
 		}
 		newNode = parentNode.addChild(index, nodeData, []);
