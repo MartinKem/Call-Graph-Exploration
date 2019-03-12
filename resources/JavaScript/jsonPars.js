@@ -4,14 +4,25 @@
 * *******
 */
 if (typeof module !== 'undefined') {
-
+ var index = require('./index');
+ var idString = index.idString;
+ //var node = require('./nodes');
 }
 
 
 
 var strJson = "";
 var arr = [];
-var parsedJsonMap;
+
+/**
+ * methodSign := {name: string, declaringClass: string, parameterTypes: string[], returnType: string}
+ *
+ * key [string]: declaringClass.name(parameterTypes[0],...,parameterTypes[n]):returnType
+ *
+ * value [object]: {callSites: {declaredTarget: methodSign, line: number, targets: methodSign[]}
+ *                  method: methodSign}
+ */
+var parsedJsonMap = new Map();
 var isLoading = false;
 var autocompleteMode;
 
@@ -35,7 +46,7 @@ var setString = function (str) {
 		arr.push(strJson);
 		strJson = "";
 	}
-}
+};
 
 
 function loadFile() {
@@ -348,15 +359,14 @@ function autocomplete(inp, arr) {
 /**
  * creates a new node object, if there didn't exist one with given class and name before
  *
- * @param {string} declaringClass - package and class of the method
- * @param {string} name - name of the method
+ * @param {{name: string, declaringClass: string, parameterTypes: string[], returnType: string}} nodeData - data of this single method
  * @param {node} parentNode - node object the new node shall become a child of
  * @param {number} index - call-site-index of the child
  * @returns {node | null} - returns null, if node already existed, returns the new node otherwise
  */
 function createNodeInstance(nodeData, parentNode, index) {
-	var existingNode = nodeMap.get(idString(nodeData));
-	var newNode;
+	let existingNode = nodeMap.get(idString(nodeData));
+	let newNode;
 
 	if (existingNode) {
 		/* The node has already been created before, so it is just added as child to the parent node.
@@ -364,60 +374,28 @@ function createNodeInstance(nodeData, parentNode, index) {
 		newNode = parentNode.addChild(index, nodeData, null);
 		return undefined;
 	}
-	var jsonData = parsedJsonMap.get(idString(nodeData));
+	let jsonData = parsedJsonMap.get(idString(nodeData));
 	if (!jsonData) {
 		// If there doesn't exist an entry in the json-map, the function just creates an empty node without call-sites.
 		if (!parentNode) {
 			// In case that parentNode doesn't exist too, the user tries to find a not existing node through the search field.
-			alert("\"" + rootNodeString + "\" does not exist in the JSON-file!");
+			alert("\"" + document.getElementById("searchInput").value + "\" does not exist in the JSON-file!");
 			return;
 		}
 		newNode = parentNode.addChild(index, nodeData, []);
 	}
 	else {
-		let callSitesSorted = jsonData.callSites;
-		callSitesSorted = sortByKey(callSitesSorted, 'line');
-
-		// In else case, the jsonData exists and the function always creates a new node. Now the call-site-information is copied for the new node.
-		// let callSites = [];
-		// let callSiteStats = [];
-		// for (let i = 0; i < jsonData.callSites.length; i++) {
-		// 	// callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
-		// 	callSites.push(jsonData.callSites[i].declaredTarget);
-		// 	callSiteStats.push({ numberOfTargets: jsonData.callSites[i].targets.length, line: jsonData.callSites[i].line });
-		// }
+		let callSites = sortByKey(jsonData.callSites, 'line');
 		if (!parentNode) {
 			// If parentNode doesn't exist, the user generates a new node through the search field.
-			newNode = new node(nodeData, callSitesSorted);
+			newNode = new node(nodeData, callSites);
 		}
 		else {
-			newNode = parentNode.addChild(index, nodeData, callSitesSorted);
+			newNode = parentNode.addChild(index, nodeData, callSites);
 		}
 	}
 	if (newNode) nodeMap.set(idString(nodeData), newNode); // now the node object is added to the nodeMap
 	return newNode;
-}
-
-/**
- * builds a graph of node objects based on the information of the json file
- *
- * @param {node} node - node object, where the creating build starts
- */
-function createChildNodes(node) {
-	let nodeData = node.getNodeData();
-	let jsonData = parsedJsonMap.get(idString(nodeData));
-	let callSites = [];
-	if (jsonData) callSites = jsonData.callSites;
-	callSites = sortByKey(callSites, 'line');
-
-	// for all targets of all call sites this function is called recursively, to create the nodes of the lower children generations too
-	for (let i = 0; i < callSites.length; i++) {
-		for (let j = 0; j < callSites[i].targets.length; j++) {
-			let target = callSites[i].targets[j];
-			let childNode = createNodeInstance(target, node, i);
-			if (childNode) createChildNodes(childNode);
-		}
-	}
 }
 
 /**
@@ -428,8 +406,8 @@ function createChildNodes(node) {
 */
 function sortByKey(array, key) {
 	return array.sort(function(a, b) {
-	var x = a[key]; var y = b[key];
-	return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+		let x = a[key]; var y = b[key];
+		return ((x < y) ? -1 : ((x > y) ? 1 : 0));
 	});
 }
 
@@ -445,13 +423,22 @@ function createGraph() {
 		if (!rootNode.visible) rootNode.showNode();
 		rootNode.focus();
 		rootNodes.push(rootNode);
-		createChildNodes(rootNode);
-		console.log(createdNodes + " additional nodes created");
-		//update generatedNodes in Graph Data
-		generatedNodes += createdNodes;
-		estGraphData();
 		createdNodes = 0;
 	}
+	let pnm = Array.from(placedNodesMap.values());
+	pnm.pop();
+	pnm.forEach(function (node) {
+        node.callSites.forEach(function (c, i) {
+            c.targets.forEach(function (t) {
+                if(idString(t)=== idString(rootNode.nodeData)){
+                    node.showChildNodes(i, [idString(rootNode.nodeData)]);
+                }
+            })
+
+        })
+    })
+
+
 }
 
 
@@ -462,4 +449,5 @@ function createGraph() {
 */
 if (typeof module !== 'undefined') {
 	module.exports.setProgBar = setProgBar;
+	module.exports.createNodeInstance = createNodeInstance;
 }

@@ -4,8 +4,6 @@
 * *******
 */
 if (typeof module !== 'undefined') {
-	var $ = require('jquery');
-	var d3 = require('d3');
 	var global = require('./global');
 }
 
@@ -149,4 +147,5 @@ function open_close(currentValue) {
 if (typeof module !== 'undefined') {
 	module.exports.open_close = open_close;
 	module.exports.idString = idString;
+	module.exports.resizeSVGCont = resizeSVGCont;
 }

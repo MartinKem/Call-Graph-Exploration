@@ -151,6 +151,7 @@ function createNodeContextmenu(e) {
 //changes color to the backgroundcolor of elem
 function changeColorNode(color) {
     $(clickedNode).css('background-color', color);
+    $(clickedNode).children(".nodeHeader").css("background-color", color);
 }
 
 function deleteNodes() {
@@ -250,10 +251,13 @@ function createCallSiteContextmenu(e, node, index){
     callSiteIndex = index;  // the call site index of the clicked call site
     selectedTargets = [];   // array of node strings, that holds the childnodes, that shall be shown later
     availableTargets = [];  // array of node strings, that holds all possible child nodes, that belong to the clicked call site, but are not selected yet
-    node.children.forEach(function(child){
-        if(child.index === index){
-            availableTargets.push(idString(child.node.getNodeData()));
-        }
+    // node.children.forEach(function(child){
+    //     if(child.index === index){
+    //         availableTargets.push(idString(child.node.getNodeData()));
+    //     }
+    // });
+    node.callSites[index].targets.forEach(function(target){
+        availableTargets.push(idString(target));
     });
 
     $("body").append(
