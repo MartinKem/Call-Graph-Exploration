@@ -4,6 +4,8 @@
 * *******
 */
 if (typeof module !== 'undefined') {
+    var index = require('./index');
+    var idString = index.idString;
 
     var refresh = require("./refresh");
     var refreshGraphData = refresh.refreshGraphData;
@@ -245,4 +247,12 @@ class Edge{
             ", " + (xDest-120).toString() + " " + (yDest-50).toString() +
             ", " + (xDest).toString() + " " + (yDest).toString();
     }
+}
+
+/**
+* EXPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+	module.exports = Edge;
 }

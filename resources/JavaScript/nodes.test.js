@@ -36,34 +36,30 @@ document.body.innerHTML =
     '</div>';
 
 //const jsonPars = require('./jsonPars');
-const index = require("./index");
 const nodes = require('./nodes');
 
 test('Test hide of nodes 1', () => {
 
     // create graphs
-    let SubRootNode = new nodes.node(null,"Main.main",["Sub2.sub1","Sub2.sub2"],[{numberOfTargets: 1, line: 4},{numberOfTargets: 1, line: 5}],["int"],"int");
+    let SubRootNode = new nodes.node({declaringClass: "Main",name: "main", parameterTypes: [""], returnType: "int"},[{declaredTarget:{declaringClass: "Sub2", name: "sub1",parameterTypes:[],returnType:"int"}, line: 13,targets:[{declaringClass: "Sub2", name: "sub1",parameterTypes:[],returnType:"int"}]},
+                                                                                                                     {declaredTarget:{declaringClass: "Sub2", name: "sub2",parameterTypes:[],returnType:"int"}, line: 13,targets:[{declaringClass: "Sub2", name: "sub2",parameterTypes:[],returnType:"int"}]}]);
     nodeMap.set("Main.main", SubRootNode);
     SubRootNode.placeCentrally();
-    let sub2Sub1 = SubRootNode.addChild(0,"Sub2.sub1",["Sub3.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+    let sub2Sub1 = SubRootNode.addChild(0,{declaringClass:"Sub2",name:"sub1",parameterTypes:[],returnType:"int"},[{declaredTarget:{declaringClass:"Sub3",name:"sub1",parameterTypes:[],returnType:"int"},line:13,targets:[{declaringClass:"Sub3",name:"sub1",parameterTypes:[],returnType:"int"}]}]);
     nodeMap.set("Sub2.sub1", sub2Sub1);
-    let sub2Sub2 = SubRootNode.addChild(1,"Sub2.sub2",["Subn.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+    let sub2Sub2 = SubRootNode.addChild(1,{declaringClass: "Sub2", name: "sub2",parameterTypes:[],returnType:"int"},[{declaredTarget:{declaringClass:"Subn",name:"sub1",parameterTypes:[],returnType:"int"},line:13,targets:[{declaringClass:"Subn",name:"sub1",parameterTypes:[],returnType:"int"}]}]);
     nodeMap.set("Sub2.sub2", sub2Sub2);
-    let sub3Sub1 = sub2Sub1.addChild(0,"Sub3.sub1",["Subn.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+    let sub3Sub1 = sub2Sub1.addChild(0,{declaringClass:"Sub3",name:"sub1",parameterTypes:[],returnType:"int"},[{declaredTarget:{declaringClass:"Subn",name:"sub1",parameterTypes:[],returnType:"int"},line:13,targets:[{declaringClass:"Subn",name:"sub1",parameterTypes:[],returnType:"int"}]}]);
     nodeMap.set("Sub3.sub1", sub3Sub1);
-    let subnSub1 = sub3Sub1.addChild(0,"Subn.sub1",["Sub2.sub1"],[{numberOfTargets: 1, line: 2}],["int"],"int");
+    let subnSub1 = sub3Sub1.addChild(0,{declaringClass:"Subn",name:"sub1",parameterTypes:[],returnType:"int"},[{declaredTarget:{declaringClass: "Sub2", name: "sub1",parameterTypes:[],returnType:"int"},line:13,targets:[{declaringClass: "Sub2", name: "sub1",parameterTypes:[],returnType:"int"}]}]);
     nodeMap.set("Subn.sub1", subnSub1);
 
     //show the Nodes
     SubRootNode.showNode();
-    SubRootNode.placeChildNodes(0);  //SubRootNode.showChildNodes(0); geht leider nicht
-    SubRootNode.placeChildNodes(1);
-    sub2Sub2.showNode();
-    sub2Sub1.showNode();
-    sub2Sub1.placeChildNodes(0);
-    sub3Sub1.showNode();
-    sub3Sub1.placeChildNodes(0);
-    subnSub1.showNode();
+    SubRootNode.showChildNodes(0);
+    SubRootNode.showChildNodes(1);
+    sub2Sub1.showChildNodes(0);
+    sub3Sub1.showChildNodes(0);
 
     
 

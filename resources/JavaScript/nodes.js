@@ -4,10 +4,11 @@
 * *******
 */
 if (typeof module !== 'undefined') {
-    //var global = require('./global');
-
     var index = require('./index');
     var idString = index.idString;
+    var resizeSVGCont = index.resizeSVGCont;
+
+    var Edge = require("./edges");
 
     var refresh = require("./refresh");
     var refreshGraphData = refresh.refreshGraphData;
@@ -16,10 +17,7 @@ if (typeof module !== 'undefined') {
     var forceTree = require("./forceTree");
     var addNodeToForceTree = forceTree.addNodeToForceTree;
 
-    var edges = require("./edges");
-    var method2nodeEdge = edges.method2nodeEdge;
 }
-
 
 //---------------------------------------------------------------------------------------
 //----------------------------------- model section -------------------------------------
