@@ -6,12 +6,22 @@
 if (typeof module !== 'undefined') {
  var index = require('./index');
  var idString = index.idString;
+ //var node = require('./nodes');
 }
 
 
 
 var strJson = "";
 var arr = [];
+
+/**
+ * methodSign := {name: string, declaringClass: string, parameterTypes: string[], returnType: string}
+ *
+ * key [string]: declaringClass.name(parameterTypes[0],...,parameterTypes[n]):returnType
+ *
+ * value [object]: {callSites: {declaredTarget: methodSign, line: number, targets: methodSign[]}
+ *                  method: methodSign}
+ */
 var parsedJsonMap = new Map();
 var isLoading = false;
 var autocompleteMode;
