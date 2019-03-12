@@ -17,6 +17,10 @@ if (typeof module !== 'undefined') {
     var forceTree = require("./forceTree");
     var addNodeToForceTree = forceTree.addNodeToForceTree;
 
+    var jsonPars = require('./jsonPars');
+    var createNodeInstance = jsonPars.createNodeInstance;
+
+
 }
 
 //---------------------------------------------------------------------------------------
