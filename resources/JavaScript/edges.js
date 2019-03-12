@@ -12,6 +12,16 @@ if (typeof module !== 'undefined') {
     var estGraphData = refresh.estGraphData;
 }
 
+/**
+ * Is needed for testing, to be compatible with node and chrome
+ * @param {node} source : source node
+ * @param {node} target : target node
+ * @param {int} callSiteIndex : callSiteIndex
+ */
+function edgeConstructor(source, target, callSiteIndex){
+    return new Edge(source, target, callSiteIndex);
+}
+
 class Edge{
 
     /**
@@ -19,10 +29,10 @@ class Edge{
      * @param target : node
      * @param callsiteIndex : int
      */
-    constructor(source, target, callsiteIndex){
+    constructor(source, target, callSiteIndex){
         this.source = source;
         this.target = target;
-        this.callsiteIndex = callsiteIndex;
+        this.callsiteIndex = callSiteIndex;
         this.id = idString(source.getNodeData()) + '#' + callSiteIndex + '->' + idString(target.getNodeData());
         this.visible = null;
         this.curved = idString(source.getNodeData()) === idString(target.getNodeData());
@@ -209,6 +219,11 @@ class Edge{
         $("[id='" + edgeID + "']").dblclick(function () {
             thisEdge.target.focus();
         });
+        $("[id='" + edgeID + "']").click(function () {
+            if(keyPressed === 17 ) {
+                thisEdge.source.focus();
+            }
+        });
 
     }
 
@@ -254,5 +269,5 @@ class Edge{
 * *******
 */
 if (typeof module !== 'undefined') {
-	module.exports = Edge;
+	module.exports.edgeConstructor = edgeConstructor;
 }

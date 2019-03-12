@@ -6,6 +6,7 @@
 if (typeof module !== 'undefined') {
  var index = require('./index');
  var idString = index.idString;
+ //var node = require('./nodes');
 }
 
 

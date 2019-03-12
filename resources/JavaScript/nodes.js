@@ -8,7 +8,8 @@ if (typeof module !== 'undefined') {
     var idString = index.idString;
     var resizeSVGCont = index.resizeSVGCont;
 
-    var Edge = require("./edges");
+    var edges = require("./edges");
+    var edgeConstructor = edges.edgeConstructor;
 
     var refresh = require("./refresh");
     var refreshGraphData = refresh.refreshGraphData;
@@ -26,11 +27,7 @@ if (typeof module !== 'undefined') {
 //---------------------------------------------------------------------------------------
 //----------------------------------- model section -------------------------------------
 //---------------------------------------------------------------------------------------
-const nodeWidth = 400;
-const nodeHeightEmpty = 247;
-const callSiteWidth = nodeWidth-53;
-const callSiteHeight = 27;
-const callSiteTopOffset = 220;
+
 
 /**
  * models the methods as nodes in a directed graph
@@ -137,7 +134,7 @@ class node{
 
             if(!child.visible) child.showNode();
             if(childArrayElem.edge === undefined){
-                childArrayElem.edge = new Edge(thisNode, child, index);
+                childArrayElem.edge = edgeConstructor(thisNode, child, index);
                 childArrayElem.edge.create();
                 // child.edge = edge;
                 child.addParent(thisNode, childArrayElem.index, childArrayElem.edge);
