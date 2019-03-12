@@ -416,6 +416,20 @@ function createGraph() {
 		rootNodes.push(rootNode);
 		createdNodes = 0;
 	}
+	let pnm = Array.from(placedNodesMap.values());
+	pnm.pop();
+	pnm.forEach(function (node) {
+        node.callSites.forEach(function (c, i) {
+            c.targets.forEach(function (t) {
+                if(idString(t)=== idString(rootNode.nodeData)){
+                    node.showChildNodes(i, [idString(rootNode.nodeData)]);
+                }
+            })
+
+        })
+    })
+
+
 }
 
 
