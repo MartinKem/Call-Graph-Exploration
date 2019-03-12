@@ -207,6 +207,9 @@ class node{
         if(this.visible === true){
             this.marked = true;
             this.visible = false;
+            //updates number of current shown nodes
+            currentNodes--;
+            refreshGraphData();
             var markedArr = [];
             markChildren(this);
             markedArr.forEach(function(n){
@@ -216,10 +219,12 @@ class node{
             markedArr.push(this);
             markedArr.forEach(function (n) {
                 document.getElementById(idString(n.nodeData)).style.display = "none";
-                n.visible = false;
-                //updates number of current shown nodes and edges
-                currentNodes--;
-                refreshGraphData();
+                //updates number of current shown nodes
+                if(n.visible){
+                    currentNodes--;
+                    refreshGraphData();
+                }
+                n.visible = false;                
                 n.reloadEdges();
                 n.marked = false;
             });
