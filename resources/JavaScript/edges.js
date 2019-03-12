@@ -19,10 +19,10 @@ class Edge{
      * @param target : node
      * @param callsiteIndex : int
      */
-    constructor(source, target, callsiteIndex){
+    constructor(source, target, callSiteIndex){
         this.source = source;
         this.target = target;
-        this.callsiteIndex = callsiteIndex;
+        this.callsiteIndex = callSiteIndex;
         this.id = idString(source.getNodeData()) + '#' + callSiteIndex + '->' + idString(target.getNodeData());
         this.visible = null;
         this.curved = idString(source.getNodeData()) === idString(target.getNodeData());

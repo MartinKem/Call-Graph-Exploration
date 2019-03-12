@@ -38,6 +38,16 @@ var totalEdges = 0;
 var currentNodes = 0;
 var currentEdges = 0;
 
+
+const nodeWidth = 400;
+const nodeHeightEmpty = 247;
+const callSiteWidth = nodeWidth-53;
+const callSiteHeight = 27;
+const callSiteTopOffset = 220;
+
+var links = [];
+var nodes = [];
+
 /**
 * (only for testing)
 * EXPORT:
@@ -45,6 +55,13 @@ var currentEdges = 0;
 */
 if (typeof module !== 'undefined') {
 
+    global.links = links;
+    global.nodes = nodes;
+    global.nodeWidth  = nodeWidth;
+    global.nodeHeightEmpty  = nodeHeightEmpty;
+    global.callSiteWidth  = callSiteWidth;
+    global.callSiteHeight  = callSiteHeight;
+    global.callSiteTopOffset  = callSiteTopOffset; 
     global.d3 = d3;
     global.$ = $;
     global.f = f;

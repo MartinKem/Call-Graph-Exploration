@@ -26,11 +26,7 @@ if (typeof module !== 'undefined') {
 //---------------------------------------------------------------------------------------
 //----------------------------------- model section -------------------------------------
 //---------------------------------------------------------------------------------------
-const nodeWidth = 400;
-const nodeHeightEmpty = 247;
-const callSiteWidth = nodeWidth-53;
-const callSiteHeight = 27;
-const callSiteTopOffset = 220;
+
 
 /**
  * models the methods as nodes in a directed graph
