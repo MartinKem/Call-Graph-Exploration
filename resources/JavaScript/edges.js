@@ -219,6 +219,11 @@ class Edge{
         $("[id='" + edgeID + "']").dblclick(function () {
             thisEdge.target.focus();
         });
+        $("[id='" + edgeID + "']").click(function () {
+            if(keyPressed === 17 ) {
+                thisEdge.source.focus();
+            }
+        });
 
     }
 
