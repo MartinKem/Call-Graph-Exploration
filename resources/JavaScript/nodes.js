@@ -149,45 +149,6 @@ class node{
                 if(idString(target) === idString(thisNode.children[i].node.nodeData)) return thisNode.children[i];
             }
         }
-        // if(!names){
-        //     for(let i = 0; i < this.children.length; i++) childArrayIndices.push(i);
-        // }
-        // else{
-        //     for(let i = 0; i < this.children.length; i++){
-        //         if(names.includes(idString(this.children[i].node.getNodeData()))) childArrayIndices.push(i);
-        //     }
-        // }
-
-        // if there exists a child-node with the given source index, that has never been placed, it must be placed with respect on the existing force tree
-        // let lock = false;
-        // let thisNode = this;
-        // childArrayIndices.forEach(function(i){
-        //     if(thisNode.children[i].index == index && !lock){
-        //         if(thisNode.children[i].node.getVisibility() == null){ // if null, child-node has never been placed
-        //             thisNode.placeChildNodes(index, childArrayIndices);
-        //             lock = true;  // we break here, because the place-function places all child-nodes for the given index
-        //         }
-        //     }
-        // });
-        // all child-nodes must be displayed right now
-        // childArrayIndices.forEach(function(i){
-        //     if(thisNode.children[i].index == index){
-        //         //only call showNode if node is not already visible
-        //         if(!thisNode.children[i].node.visible) {
-        //             thisNode.children[i].node.showNode();
-        //         }
-        //         if(thisNode.children[i].edge === undefined){
-        //             let edge = new Edge(thisNode, thisNode.children[i].node, thisNode.children[i].index);
-        //             edge.create();
-        //             thisNode.children[i].edge = edge;
-        //             thisNode.children[i].node.addParent(thisNode, thisNode.children[i].index, edge);
-        //         }
-        //         else if(thisNode.children[i].edge.visible === false){
-        //             thisNode.children[i].edge.reload();
-        //         }
-        //     }
-        // });
-		
     }
 
     /**

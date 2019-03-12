@@ -13,6 +13,15 @@ if (typeof module !== 'undefined') {
 
 var strJson = "";
 var arr = [];
+
+/**
+ * methodSign := {name: string, declaringClass: string, parameterTypes: string[], returnType: string}
+ *
+ * key [string]: declaringClass.name(parameterTypes[0],...,parameterTypes[n]):returnType
+ *
+ * value [object]: {callSites: {declaredTarget: methodSign, line: number, targets: methodSign[]}
+ *                  method: methodSign}
+ */
 var parsedJsonMap = new Map();
 var isLoading = false;
 var autocompleteMode;
@@ -350,8 +359,7 @@ function autocomplete(inp, arr) {
 /**
  * creates a new node object, if there didn't exist one with given class and name before
  *
- * @param {string} declaringClass - package and class of the method
- * @param {string} name - name of the method
+ * @param {{name: string, declaringClass: string, parameterTypes: string[], returnType: string}} nodeData - data of this single method
  * @param {node} parentNode - node object the new node shall become a child of
  * @param {number} index - call-site-index of the child
  * @returns {node | null} - returns null, if node already existed, returns the new node otherwise
@@ -417,6 +425,20 @@ function createGraph() {
 		rootNodes.push(rootNode);
 		createdNodes = 0;
 	}
+	let pnm = Array.from(placedNodesMap.values());
+	pnm.pop();
+	pnm.forEach(function (node) {
+        node.callSites.forEach(function (c, i) {
+            c.targets.forEach(function (t) {
+                if(idString(t)=== idString(rootNode.nodeData)){
+                    node.showChildNodes(i, [idString(rootNode.nodeData)]);
+                }
+            })
+
+        })
+    })
+
+
 }
 
 
