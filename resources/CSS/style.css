@@ -123,6 +123,18 @@ svg{
     background-color: #f0f0f0;
 }
 
+.nodeHeader{
+    overflow: hidden;
+    white-space: nowrap;
+    min-width: 100%;
+}
+
+.nodeHeader:hover{
+    background-color: white;
+    width: max-content;
+    padding-right: 15px;
+}
+
 .callSite{
 	max-width: 300px;
 	overflow: hidden;
@@ -132,18 +144,11 @@ svg{
 #dropZone{
 	text-align: center;
 	color: #aaa;
+    height: 80%;
 	border: 2px dashed #aaa;
 	border-radius: 5px;
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
-	border-bottom-right-radius: 5px;
-	border-bottom-left-radius: 5px;
 
 	padding: 25px;
-	padding-top: 25px;
-	padding-right: 25px;
-	padding-bottom: 25px;
-	padding-left: 25px;
 }
 
 #progress_bar{
@@ -238,10 +243,12 @@ line {
     left: 10px;
 }
 
-#foot_fixed {
+#bottom_fixed {
     position: fixed;
-    bottom: 10px;
-    right: 10px;
+    bottom: 0px;
+    left: 0px;
+    background-color: rgba(255,255,255,0.9);
+    padding: 10px;
 }
 
 .lastClickedNode{

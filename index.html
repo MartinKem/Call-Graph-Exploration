@@ -14,10 +14,10 @@
 	<div id="load_page">
 		<!--Filereader für JSON Datei-->
 		<form id="jsonFile" name="jsonFile" enctype="multipart/form-data" method="post">
-			<fieldset>
+			<fieldset style="height: 100vh">
 				<h2>Json File</h2>
 			  	<div id="dropZone">You can Drop files here <br />
-				<input type='file' id='fileinput' onchange="loadFile()">
+				<input type='file' id='fileinput' onchange="this.setAttribute('disabled', true); loadFile()" style="position: relative; top: 40%">
 			  	</div> <br />
 
 			  	<div id="progress_bar">
@@ -41,14 +41,16 @@
 			</form>
 			<button id="btn" onclick="open_close(this.innerHTML)" style="margin-top: 10px">Hide Details</button>
 		</div>
-		<div id="bottom_fixed" style="position: fixed; bottom: 10px; left: 10px; margin-left: 5px">
+		<div id="bottom_fixed">
 			<div id="totalNodes">Total Nodes:
 			</div>
 			<div id="totalEdges">Total Edges:
 			</div>
-			<div id="currentVisibleNodes">Current Nodes:
+			<div id="generatedNodes">Generated Nodes:
 			</div>
-			<div id="currentVisibleEdges">Current Edges:
+			<div id="currentVisibleNodes">Currently Shown Nodes:
+			</div>
+			<div id="currentVisibleEdges">Currently Shown Edges:
 			</div>
 		</div>
 	</div>

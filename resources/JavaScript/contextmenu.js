@@ -8,6 +8,7 @@ var markedNode;
 var markedEdge;
 var lastMarkedNode;
 var lastMarkedEdge;
+var keyPressed;
 
 // -- these are used for the call site contextmenu --
 var availableTargets;
@@ -46,17 +47,66 @@ $("body").on("contextmenu","html:not(path)",function () {
 
 //mark last clicked
 $("body").on("click",".div_node",function () {
-    markedNode = this;
-    if(lastMarkedNode !== markedNode){
-        markLastClickedNode();
+    clickedNode = this;
+    switch (keyPressed) {
+        case 49:
+            changeColorNode('#ffc6c6');
+            break;
+        case 50:
+            changeColorNode('#beffbe');
+            break;
+        case 51:
+            changeColorNode('#abd3ff');
+            break;
+        case 52:
+            changeColorNode('#ffff9f');
+            break;
+        case 53:
+            changeColorNode('#FFFFFF');
+            break;
+        default:
+            markedNode = this;
+            if(lastMarkedNode !== markedNode){
+                markLastClickedNode();
+            }
     }
 });
 $("body").on("click","svg path",function () {
-    markedEdge = this;
-    if(lastMarkedEdge !== markedEdge){
-        markLastClickedEdge();
+    clickedEdge = this;
+    switch (keyPressed) {
+        case 49:
+            changeColorEdge('#c24e4c');
+            break;
+        case 50:
+            changeColorEdge('#429c44');
+            break;
+        case 51:
+            changeColorEdge('#3076b4');
+            break;
+        case 52:
+            changeColorEdge('#c4c931');
+            break;
+        case 53:
+            changeColorEdge('#000000');
+            break;
+        default:
+            markedNode = this;
+            if(lastMarkedEdge !== markedEdge){
+                markLastClickedEdge();
+            }
     }
 });
+
+$(document).on("keydown", function(e) {
+    keyPressed = e.which;
+
+});
+$(document).on("keyup", function(e){
+        if(keyPressed === e.which){
+            keyPressed = undefined;
+        }
+});
+
 $("body").on("click",".node_inhalt button",function (e) {
     let node = nodeMap.get(this.parentNode.parentNode.getAttribute("id"));
     let index = this.getAttribute("id").split("#");
@@ -81,12 +131,12 @@ function createNodeContextmenu(e) {
     }catch (e) {*/
        // counter = 1;
        // if(counter > 0)console.log("contextmenu nicht mehr aktuell");
-        $("body").append($("<div id='contextmenuNode'>        <div class=\"menuelement\" onclick=\"deleteNodes()\">Ausblenden</div>" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Red<div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Green<div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Blue<div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">Yellow<div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"colorChosen(this)\">White<div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
+        $("body").append($("<div id='contextmenuNode'>        <div class=\"menuelement\" onclick=\"deleteNodes()\">Hide</div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffc6c6')\">Red<span class='hotKeySpan'>[1+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#beffbe')\">Green<span class='hotKeySpan'>[2+MouseLeft]</span><div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#abd3ff')\">Blue<span class='hotKeySpan'>[3+MouseLeft]</span><div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffff9f')\">Yellow<span class='hotKeySpan'>[4+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffffff')\">White<span class='hotKeySpan'>[5+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"switchContent()\">Details</div><div>"));
 
     $("#contextmenuNode").css({
@@ -99,9 +149,9 @@ function createNodeContextmenu(e) {
 
 }
 //changes color to the backgroundcolor of elem
-function colorChosen(elem) {
-    var color = $(elem).find(".color").css('backgroundColor');
+function changeColorNode(color) {
     $(clickedNode).css('background-color', color);
+    $(clickedNode).children(".nodeHeader").css("background-color", color);
 }
 
 function deleteNodes() {
@@ -127,11 +177,11 @@ function createEdgeContextmenu(e) {
     let y = e.pageY + "px";     // Get the vertical coordinate
 
     $("body").append("<div id='contextmenuEdge'>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Red <span class='hotKeySpan'>[1+MouseLeft]</span><div class=\"color\" style=\"background-color: #c24e4c \"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Green <span class='hotKeySpan'>[2+MouseLeft]</span><div class=\"color\" style=\"background-color: #429c44\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Blue <span class='hotKeySpan'>[3+MouseLeft]</span><div class=\"color\" style=\"background-color: #3076b4\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Yellow <span class='hotKeySpan'>[4+MouseLeft]</span><div class=\"color\" style=\"background-color: #c4c931\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"changeColorEdge(this)\">Default <span class='hotKeySpan'>[5+MouseLeft]</span><div class=\"color\" style=\"background-color: #000000\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge('#C24E4C')\">Red <span class='hotKeySpan'>[1+MouseLeft]</span><div class=\"color\" style=\"background-color: #c24e4c \"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge('#429C44')\">Green <span class='hotKeySpan'>[2+MouseLeft]</span><div class=\"color\" style=\"background-color: #429c44\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge('#3076B4')\">Blue <span class='hotKeySpan'>[3+MouseLeft]</span><div class=\"color\" style=\"background-color: #3076b4\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge('#C4C931')\">Yellow <span class='hotKeySpan'>[4+MouseLeft]</span><div class=\"color\" style=\"background-color: #c4c931\"></div></div>" +
+        " <div class=\"menuelement\" onclick=\"changeColorEdge('#000000')\">Default <span class='hotKeySpan'>[5+MouseLeft]</span><div class=\"color\" style=\"background-color: #000000\"></div></div>" +
         " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[0].split('#')[0]).focus()\" style=\"white-space: nowrap\">focus Source <span class='hotKeySpan'>[Ctrl+MouseLeft]</span></div>" +
         " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[1]).focus()\" style=\"white-space: nowrap\">focus Target <span class='hotKeySpan'>[Double Click]</span></div>" +
     "</div>");
@@ -144,9 +194,10 @@ function createEdgeContextmenu(e) {
     edgeMenuIsOpen = true;
 }
 
-function changeColorEdge(elem) {
-    var color = $(elem).find(".color").css('backgroundColor');
-    if(color === "rgb(0, 0, 0)"){
+function changeColorEdge(color) {
+    if(lastMarkedEdge === clickedEdge) $(lastMarkedEdge).removeClass("lastClickedEdge");
+    // var color = $(elem).find(".color").css('backgroundColor');
+    if(color === '#000000'){
         $(clickedEdge).css('opacity', 0.5);
     }else{
         $(clickedEdge).css('opacity', 1);
@@ -172,6 +223,7 @@ function closeEdgeContextmenu() {
 }
 function closeCallSiteContextmenu(){
     if(callSiteMenuIsOpen){
+        document.getElementById("searchInput").removeAttribute("disabled", false);
         $("#contextmenuCallSite").remove();
         autocompleteMode = undefined;   // autocomplete shall work as usual, when the call site contextmenu closes
         callSiteMenuIsOpen = false;
@@ -199,15 +251,18 @@ function createCallSiteContextmenu(e, node, index){
     callSiteIndex = index;  // the call site index of the clicked call site
     selectedTargets = [];   // array of node strings, that holds the childnodes, that shall be shown later
     availableTargets = [];  // array of node strings, that holds all possible child nodes, that belong to the clicked call site, but are not selected yet
-    node.children.forEach(function(child){
-        if(child.index === index){
-            availableTargets.push(idString(child.node.getNodeData()));
-        }
+    // node.children.forEach(function(child){
+    //     if(child.index === index){
+    //         availableTargets.push(idString(child.node.getNodeData()));
+    //     }
+    // });
+    node.callSites[index].targets.forEach(function(target){
+        availableTargets.push(idString(target));
     });
 
     $("body").append(
         "<div id='contextmenuCallSite'>" +
-            "<h3 style='margin: 0px'>Choose targets for the call site <span style='color: blue'; word-break: break-word;>" + escapeSG(node.getCallSites()[index]) + "</span> to be shown:</h3>" +
+            "<h3 style='margin: 0px'>Choose targets for the call site <span style='color: blue'; word-break: break-word;>" + escapeSG(idString(node.getCallSites()[index].declaredTarget)) + "</span> to be shown:</h3>" +
             "<form autocomplete='off' onsubmit='return false' style='margin-top: 15px; overflow: auto; clear: both'>" +
                 "<input type='text' name='targetSearch' id='targetSearch' placeholder='add targets' spellcheck='false' style='width: 100%; height: 30px; padding: 5px; float: left'>" +
             "</form>" +
@@ -224,6 +279,7 @@ function createCallSiteContextmenu(e, node, index){
             "</div>"+
         "</div>");
 
+    document.getElementById("searchInput").setAttribute("disabled", true);
     autocompleteMode = "callSite";  // this global variable is used in the autocomplete function, that shall work a little bit different, when in call site mode
     autocomplete(document.getElementById("targetSearch"), availableTargets);
     callSiteMenuIsOpen = true;

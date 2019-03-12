@@ -35,7 +35,7 @@ var setString = function (str) {
 		arr.push(strJson);
 		strJson = "";
 	}
-}
+};
 
 
 function loadFile() {
@@ -147,6 +147,13 @@ function parseFile(file, callback) {
 			correctClassNames(parsedJson); // remove 'L' and ';' out of the class names
 			console.log("Done parsing file");
 			console.log(parsedJson);
+			//put Total Nodes / reachableMethods in graph stats
+			totalNodes = parsedJson.reachableMethods.length;
+			//put Total Edges / Edges from reachableMethods in graph stats
+			parsedJson.reachableMethods.forEach(function(element){
+				if (element.callSites) totalEdges += element.callSites.length;
+			});
+			estGraphData();
 			//map rechableMethods to HashMap
 			parsedJsonMap = new Map();
 			parsedJson.reachableMethods.forEach(function (element) {
@@ -348,8 +355,8 @@ function autocomplete(inp, arr) {
  * @returns {node | null} - returns null, if node already existed, returns the new node otherwise
  */
 function createNodeInstance(nodeData, parentNode, index) {
-	var existingNode = nodeMap.get(idString(nodeData));
-	var newNode;
+	let existingNode = nodeMap.get(idString(nodeData));
+	let newNode;
 
 	if (existingNode) {
 		/* The node has already been created before, so it is just added as child to the parent node.
@@ -357,31 +364,24 @@ function createNodeInstance(nodeData, parentNode, index) {
 		newNode = parentNode.addChild(index, nodeData, null);
 		return undefined;
 	}
-	var jsonData = parsedJsonMap.get(idString(nodeData));
+	let jsonData = parsedJsonMap.get(idString(nodeData));
 	if (!jsonData) {
 		// If there doesn't exist an entry in the json-map, the function just creates an empty node without call-sites.
 		if (!parentNode) {
 			// In case that parentNode doesn't exist too, the user tries to find a not existing node through the search field.
-			alert("\"" + rootNodeString + "\" does not exist in the JSON-file!");
+			alert("\"" + document.getElementById("searchInput").value + "\" does not exist in the JSON-file!");
 			return;
 		}
 		newNode = parentNode.addChild(index, nodeData, []);
 	}
 	else {
-		// In else case, the jsonData exists and the function always creates a new node. Now the call-site-information is copied for the new node.
-		// let callSites = [];
-		// let callSiteStats = [];
-		// for (let i = 0; i < jsonData.callSites.length; i++) {
-		// 	// callSites.push(jsonData.callSites[i].declaredTarget.declaringClass + '.' + jsonData.callSites[i].declaredTarget.name);
-		// 	callSites.push(jsonData.callSites[i].declaredTarget);
-		// 	callSiteStats.push({ numberOfTargets: jsonData.callSites[i].targets.length, line: jsonData.callSites[i].line });
-		// }
+		let callSites = sortByKey(jsonData.callSites, 'line');
 		if (!parentNode) {
 			// If parentNode doesn't exist, the user generates a new node through the search field.
-			newNode = new node(nodeData, jsonData.callSites);
+			newNode = new node(nodeData, callSites);
 		}
 		else {
-			newNode = parentNode.addChild(index, nodeData, jsonData.callSites);
+			newNode = parentNode.addChild(index, nodeData, callSites);
 		}
 	}
 	if (newNode) nodeMap.set(idString(nodeData), newNode); // now the node object is added to the nodeMap
@@ -389,24 +389,16 @@ function createNodeInstance(nodeData, parentNode, index) {
 }
 
 /**
- * builds a graph of node objects based on the information of the json file
+ *sorts an array of objects by a given key
  *
- * @param {node} node - node object, where the creating build starts
- */
-function createChildNodes(node) {
-	let nodeData = node.getNodeData();
-	let jsonData = parsedJsonMap.get(idString(nodeData));
-	let callSites = [];
-	if (jsonData) callSites = jsonData.callSites;
-
-	// for all targets of all call sites this function is called recursively, to create the nodes of the lower children generations too
-	for (let i = 0; i < callSites.length; i++) {
-		for (let j = 0; j < callSites[i].targets.length; j++) {
-			let target = callSites[i].targets[j];
-			let childNode = createNodeInstance(target, node, i);
-			if (childNode) createChildNodes(childNode);
-		}
-	}
+ * @param {object[]} array - an array of objects to be sorted
+ * @param {String} key - key by which to sort
+*/
+function sortByKey(array, key) {
+	return array.sort(function(a, b) {
+		let x = a[key]; var y = b[key];
+		return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+	});
 }
 
 /**
@@ -418,13 +410,9 @@ function createGraph() {
     if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
 	if (rootNode) {
 		if (!rootNode.getSizes().x) rootNode.placeCentrally();
-		rootNode.showNode();
+		if (!rootNode.visible) rootNode.showNode();
 		rootNode.focus();
 		rootNodes.push(rootNode);
-		createChildNodes(rootNode);
-		console.log(createdNodes + " additional nodes created");
-		//update createdNodes in Graph Data
-		estGraphData();
 		createdNodes = 0;
 	}
 }
