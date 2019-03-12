@@ -8,7 +8,8 @@ if (typeof module !== 'undefined') {
     var idString = index.idString;
     var resizeSVGCont = index.resizeSVGCont;
 
-    var Edge = require("./edges");
+    var edges = require("./edges");
+    var edgeConstructor = edges.edgeConstructor;
 
     var refresh = require("./refresh");
     var refreshGraphData = refresh.refreshGraphData;
@@ -133,7 +134,7 @@ class node{
 
             if(!child.visible) child.showNode();
             if(childArrayElem.edge === undefined){
-                childArrayElem.edge = new Edge(thisNode, child, index);
+                childArrayElem.edge = edgeConstructor(thisNode, child, index);
                 childArrayElem.edge.create();
                 // child.edge = edge;
                 child.addParent(thisNode, childArrayElem.index, childArrayElem.edge);

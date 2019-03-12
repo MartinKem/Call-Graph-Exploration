@@ -12,6 +12,16 @@ if (typeof module !== 'undefined') {
     var estGraphData = refresh.estGraphData;
 }
 
+/**
+ * Is needed for testing, to be compatible with node and chrome
+ * @param {node} source : source node
+ * @param {node} target : target node
+ * @param {int} callSiteIndex : callSiteIndex
+ */
+function edgeConstructor(source, target, callSiteIndex){
+    return new Edge(source, target, callSiteIndex);
+}
+
 class Edge{
 
     /**
@@ -254,5 +264,5 @@ class Edge{
 * *******
 */
 if (typeof module !== 'undefined') {
-	module.exports = Edge;
+	module.exports.edgeConstructor = edgeConstructor;
 }
