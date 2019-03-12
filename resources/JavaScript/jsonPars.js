@@ -4,14 +4,15 @@
 * *******
 */
 if (typeof module !== 'undefined') {
-
+ var index = require('./index');
+ var idString = index.idString;
 }
 
 
 
 var strJson = "";
 var arr = [];
-var parsedJsonMap;
+var parsedJsonMap = new Map();
 var isLoading = false;
 var autocompleteMode;
 
@@ -425,4 +426,5 @@ function createGraph() {
 */
 if (typeof module !== 'undefined') {
 	module.exports.setProgBar = setProgBar;
+	module.exports.createNodeInstance = createNodeInstance;
 }
