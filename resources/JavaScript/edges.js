@@ -1,3 +1,13 @@
+/**
+* (only for testing)
+* IMPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+    var index = require('./index');
+    var idString = index.idString;
+}
+
 class Edge{
 
     /**
@@ -216,4 +226,12 @@ class Edge{
             ", " + (xDest-120).toString() + " " + (yDest-50).toString() +
             ", " + (xDest).toString() + " " + (yDest).toString();
     }
+}
+
+/**
+* EXPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+	module.exports = Edge;
 }

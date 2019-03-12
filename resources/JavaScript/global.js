@@ -44,6 +44,8 @@ var currentEdges = 0;
 */
 if (typeof module !== 'undefined') {
 
+    global.d3 = d3;
+    global.$ = $;
     global.f = f;
     global.createdNodes = createdNodes;
     global.svgCont = svgCont;
