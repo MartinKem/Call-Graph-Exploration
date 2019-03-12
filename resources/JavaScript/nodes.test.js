@@ -54,7 +54,7 @@ test('Test hide of nodes 1', () => {
     let callSites5 = [{declaredTarget:{declaringClass: "Sub2", name: "sub1",parameterTypes:[],returnType:"int"},line:13,targets:[{declaringClass: "Sub2", name: "sub1",parameterTypes:[],returnType:"int"}]}];
 
     // create graphs
-    let SubRootNode = new nodes.node(data1, callSites1);
+    let SubRootNode = new nodes.node(nodeData1, callSites1);
     nodeMap.set(index.idString(nodeData1), SubRootNode);
     SubRootNode.placeCentrally();
     let sub2Sub1 = SubRootNode.addChild(0, nodeData2, callSites2);
