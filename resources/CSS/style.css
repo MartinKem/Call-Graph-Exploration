@@ -259,3 +259,103 @@ line {
     opacity: 1 !important;
     stroke: red !important;
 }
+
+/* styles for the call site contextmenu */
+
+#contextmenuCallSite {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    height: 100%;
+    width: 30%;
+    background-color: white;
+    border: solid;
+    border-width: 1px;
+    padding: 15px;
+}
+
+#contextmenuCallSite h3{
+    margin: 0px;
+}
+
+#contextmenuCallSite h3 span{
+    color: blue;
+    word-break: break-word;
+}
+
+#contextmenuCallSite form{
+    margin-top: 15px;
+    overflow: auto;
+    clear: both;
+}
+
+#contextmenuCallSite form input{
+    width: 100%;
+    height: 30px;
+    padding: 5px;
+    float: left;
+}
+
+#callSiteSelection{
+    margin-top: 15px;
+    height: 930px;
+}
+
+#selectedTargets{
+    border: solid 1px;
+    min-height: 80px;
+    max-height: 800px;
+    padding: 5px;
+}
+
+#selectedTargets h3{
+    text-align: center;
+    margin: 10px;
+}
+
+#contextmenuSubmit{
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    width: 100%;
+    overflow: auto;
+    padding: 15px;
+}
+
+#cmb1{
+    position: relative;
+    font-size: 15px;
+    margin-right: 15px;
+}
+
+#cmb2{
+    position: relative;
+    margin-right: 15px;
+    margin-top: 15px;
+    font-size: 15px;
+}
+
+#cmb3{
+    position: relative;
+    margin-top: 15px;
+    font-size: 15px;
+}
+
+#selectedTargetsList div{
+    word-break: break-word;
+    margin-bottom: 5px;
+}
+
+.rmx{
+    border: 1px solid gray;
+    border-radius: 3px;
+    float: left;
+    padding: 0px 5px 1px 5px;
+    margin: 0px 5px 0px 0px;
+}
+
+.rmx:hover {
+    cursor: pointer;
+}
+
+/* ------------------------------------ */

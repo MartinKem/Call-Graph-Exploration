@@ -262,20 +262,20 @@ function createCallSiteContextmenu(e, node, index){
 
     $("body").append(
         "<div id='contextmenuCallSite'>" +
-            "<h3 style='margin: 0px'>Choose targets for the call site <span style='color: blue'; word-break: break-word;>" + escapeSG(idString(node.getCallSites()[index].declaredTarget)) + "</span> to be shown:</h3>" +
-            "<form autocomplete='off' onsubmit='return false' style='margin-top: 15px; overflow: auto; clear: both'>" +
-                "<input type='text' name='targetSearch' id='targetSearch' placeholder='add targets' spellcheck='false' style='width: 100%; height: 30px; padding: 5px; float: left'>" +
+            "<h3>Choose targets for the call site <span>" + escapeSG(idString(node.getCallSites()[index].declaredTarget)) + "</span> to be shown:</h3>" +
+            "<form autocomplete='off' onsubmit='return false'>" +
+                "<input type='text' name='targetSearch' id='targetSearch' placeholder='add targets' spellcheck='false'>" +
             "</form>" +
-            "<div style='margin-top: 15px; height: 930px'>" +
-                "<div id='selectedTargets' style='border: solid 1px; min-height: 80px; max-height: 800px; /*overflow: auto;*/ padding-right: 5px'>" +
-                    "<h5 style='text-align: center; margin: 10px'>Selected Targets</h5>" +
-                    "<ul id='selectedTargetsList'></ul>" +
+            "<div id='callSiteSelection'>" +
+                "<div id='selectedTargets'>" +
+                    "<h3>Selected Targets</h3>" +
+                    "<div id='selectedTargetsList'></div>" +
                 "</div>" +
             "</div>" +
-            "<div style='position: absolute; bottom: 0; right: 0; width: 100%; overflow: auto; padding: 15px'>" +
-                "<button onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex)' style='position: relative; font-size: 15px;'>Show all possible Targets</button>" +
-                "<button onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex, selectedTargets)' style='position: relative; margin-left: 15px; font-size: 15px'>Show Selected Targets</button>" +
-                "<button onclick='closeCallSiteContextmenu()' style='position: relative; margin-left: 15px; font-size: 15px'>Close</button>" +
+            "<div id='contextmenuSubmit'>" +
+                "<button id='cmb1' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex)'>Show all possible Targets</button>" +
+                "<button id='cmb2' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex, selectedTargets)'>Show Selected Targets</button>" +
+                "<button id='cmb3' onclick='closeCallSiteContextmenu()'>Close</button>" +
             "</div>"+
         "</div>");
 
@@ -283,27 +283,21 @@ function createCallSiteContextmenu(e, node, index){
     autocompleteMode = "callSite";  // this global variable is used in the autocomplete function, that shall work a little bit different, when in call site mode
     autocomplete(document.getElementById("targetSearch"), availableTargets);
     callSiteMenuIsOpen = true;
-
-    $("#contextmenuCallSite").css({
-        "position":"fixed",
-        "top":0,
-        "right": 0,
-        "height":"100%",
-        "width":"30%",
-        "background-color": "white",
-        "border": "solid",
-        "border-width": 1,
-        "padding": 15
-    });
 }
 
 function addTargetToSelected(){
     let targetSearch = document.getElementById("targetSearch");
     let targetList = document.getElementById("selectedTargetsList");
     // add the selected target as html list element
-    targetList.innerHTML += "<li style='word-break: break-word' onclick='removeTargetFromSelected(this.textContent); this.remove()'>" + targetSearch.value + "</li>";
+    targetList.innerHTML += innerHTMLStr();
     availableTargets.splice( availableTargets.indexOf(targetSearch.value), 1);  // remove selected target from available
     selectedTargets.push(targetSearch.value);   // add selected target to selected
+
+    function innerHTMLStr(){
+        let resultStr = "<div><p class='rmx' onclick='removeTargetFromSelected(this.parentNode.childNodes[1].textContent); this.parentNode.remove()'>x</p>";
+        resultStr += "<p>" + targetSearch.value + "</p></div>";
+        return resultStr;
+    }
 }
 
 function removeTargetFromSelected(target){
