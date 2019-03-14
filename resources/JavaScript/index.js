@@ -98,7 +98,7 @@ function resizeSVGCont(node) {
 		Array.from(placedNodesMap.values()).forEach(function (node) {
 			node.setPosition(node.getSizes().x + 1000, node.getSizes().y);
 			document.getElementById(idString(node.getNodeData())).parentNode.setAttribute("x", node.getSizes().x);
-			node.reloadEdges(node.getDetailed() ? "toDetailed" : "toAbstract");
+			node.reloadEdges();
 		});
 		for (let i = 0; i < nodes.length; i++) {
 			nodes[i].px += 1000;

@@ -47,7 +47,7 @@ function initForce(svg, nodeArr, linkArr){
 		.on("end", function(e){ fix(e, linkSelection, nodeSelection); })
 		.start();
 
-	for(var i = 0; i < 1000; i++){
+	for(var i = 0; i < 298; i++){
 		force.tick();
 	}
 	force.stop();
@@ -175,7 +175,7 @@ function restartForceLayouting(ticks){
 		.on("end", function(e){ fix(e, linkSelection, nodeSelection); })
 		.start();
 
-	for(var i = 0; i < (ticks ? ticks : 500); i++){
+	for(var i = 0; i < (ticks ? ticks : 298); i++){
 		force.tick();
 	}
 	force.stop();

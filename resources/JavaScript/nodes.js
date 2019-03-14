@@ -144,6 +144,10 @@ class node{
             }
         });
 
+        childrenToBeShown.forEach(function(target){
+            resizeSVGCont(nodeMap.get(idString(target)));
+        });
+
         function getChildArrayElement(target){
             for(let i = 0; i < thisNode.children.length; i++){
                 if(idString(target) === idString(thisNode.children[i].node.nodeData)) return thisNode.children[i];
@@ -155,6 +159,7 @@ class node{
      * sets x and y values of all child nodes to a given call site index, but doesn't show these nodes yet
      *
      * @param {number} index - index of the call-site-array
+     * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}[]} childrenToBeShown - node signatures of the children
      */
     placeChildNodes(index, childrenToBeShown){
         let childArray = [];
@@ -175,6 +180,7 @@ class node{
             let centerY = positions[i].y - (nodeHeightEmpty + callSiteHeight*childArray[i].callSites.length)/2;
             childArray[i].setPosition(centerX, centerY);
             childArray[i].setForceNodeIndex(positions[i].index);
+            placedNodesMap.set(idString(childArray[i].nodeData), childArray[i]);
         }
     }
 
@@ -186,13 +192,13 @@ class node{
         this.sizes.x = position.x - this.sizes.width/2;
         this.sizes.y = position.y - this.sizes.height/2;
         this.forceNodeIndex = position.index;
+        placedNodesMap.set(idString(this.nodeData), this);
     }
 
     /**
      * displays this node
      */
     showNode(){
-        placedNodesMap.set(idString(this.nodeData), this);
         if(this.visible != null){	// just changes the css-display property if the node was already placed before
             document.getElementById(idString(this.nodeData)).style.display = "block";
         }
@@ -201,7 +207,6 @@ class node{
 		// updates the graph data with new number of shown nodes
 		currentNodes++;
 		refreshGraphData();
-        resizeSVGCont(this);
     }
 
 

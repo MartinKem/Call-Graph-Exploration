@@ -420,7 +420,10 @@ function createGraph() {
     if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
 	if (rootNode) {
 		if (!rootNode.getSizes().x) rootNode.placeCentrally();
-		if (!rootNode.visible) rootNode.showNode();
+		if (!rootNode.visible){
+			rootNode.showNode();
+			resizeSVGCont(rootNode);
+		}
 		rootNode.focus();
 		rootNodes.push(rootNode);
 		createdNodes = 0;
