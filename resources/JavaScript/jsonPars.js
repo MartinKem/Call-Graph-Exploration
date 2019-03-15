@@ -25,6 +25,7 @@ var arr = [];
 var parsedJsonMap = new Map();
 var isLoading = false;
 var autocompleteMode;
+var showWholeGraphSet;
 
 
 
@@ -440,6 +441,55 @@ function createGraph() {
 
         })
     });
+}
+
+function showWholeGraph(maxDepth){
+	if(!maxDepth) maxDepth = Number.MAX_VALUE;
+	showWholeGraphSet = new Set();
+
+	rootNodes.forEach(function(rootNode){
+		if(rootNode.visible) {
+			showAllChildNodes(rootNode, 0);
+		}
+	});
+
+	function showAllChildNodes(node, depth){
+		if(depth >= maxDepth) return;
+		node.callSites.forEach(function(callSite, index){
+			node.showChildNodes(index);
+			showWholeGraphSet.add(idString(node.nodeData));
+		});
+		node.callSites.forEach(function(callSite){
+			callSite.targets.forEach(function(target){
+				if(!showWholeGraphSet.has(idString(target))) showAllChildNodes(nodeMap.get(idString(target)), depth+1);
+			});
+		});
+	}
+}
+
+function countReachableNodes(){
+	showWholeGraphSet = new Set();
+	rootNodes.forEach(function(rootNode){
+		if(rootNode.visible){
+			showWholeGraphSet.add(idString(rootNode.nodeData));
+			countReachableGraph(parsedJsonMap.get(idString(rootNode.nodeData)));
+		}
+	});
+
+	function countReachableGraph(node) {
+		node.callSites.forEach(function (callSite) {
+			callSite.targets.forEach(function (target) {
+				let targetString = idString(target);
+				if (!showWholeGraphSet.has(targetString)) {
+					showWholeGraphSet.add(targetString);
+					let jsonTarget = parsedJsonMap.get(targetString);
+					if(jsonTarget) countReachableGraph(jsonTarget);
+				}
+			});
+		});
+	}
+
+	return showWholeGraphSet.size;
 }
 
 /**
