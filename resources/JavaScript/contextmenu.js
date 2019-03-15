@@ -45,23 +45,25 @@ $("body").on("contextmenu","html:not(path)",function () {
     closeEdgeContextmenu();
 });
 
-//mark last clicked
+/** ändert die Farbe der angeklickten Node wenn ein entsprechender Hotkey gedrückt wird.
+ *  die Hotkey sind 0,1,2,3,4. Esfunktionieren sowohl die normalen Zahlen, als auch die vom Numpad
+ *  */
 $("body").on("click",".div_node",function () {
     clickedNode = this;
     switch (keyPressed) {
-        case 49:
+        case 49||96: //0
             changeColorNode('#ffc6c6');
             break;
-        case 50:
+        case 50||97: //1
             changeColorNode('#beffbe');
             break;
-        case 51:
+        case 51||98: //2
             changeColorNode('#abd3ff');
             break;
-        case 52:
+        case 52||99: //3
             changeColorNode('#ffff9f');
             break;
-        case 53:
+        case 53||100: //4
             changeColorNode('#FFFFFF');
             break;
         default:
@@ -71,22 +73,26 @@ $("body").on("click",".div_node",function () {
             }
     }
 });
+
+/**ändert die Farbe der angeklickten Edge wenn ein entsprechender Hotkey gedrückt wird.
+ * die Hotkey sind 0,1,2,3,4. Esfunktionieren sowohl die normalen Zahlen, als auch die vom Numpad
+ * */
 $("body").on("click","svg path",function () {
     clickedEdge = this;
     switch (keyPressed) {
-        case 49:
+        case 49||96://0
             changeColorEdge('#c24e4c');
             break;
-        case 50:
+        case 50||97://1
             changeColorEdge('#429c44');
             break;
-        case 51:
+        case 51||98://2
             changeColorEdge('#3076b4');
             break;
-        case 52:
+        case 52||99://3
             changeColorEdge('#c4c931');
             break;
-        case 53:
+        case 53||100://4
             changeColorEdge('#000000');
             break;
         default:
