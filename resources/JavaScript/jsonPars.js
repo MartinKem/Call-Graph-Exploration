@@ -439,9 +439,14 @@ function createGraph() {
             })
 
         })
-    })
+    });
+}
 
-
+/**
+ * @param {{name: string, declaringClass: string, parameterTypes: string[], returnType: string}} methodData - data of this single method (without call sites and targets)
+ */
+function addJsonMapEntry(methodData){
+	parsedJsonMap.set(idString(methodData), methodData);
 }
 
 
