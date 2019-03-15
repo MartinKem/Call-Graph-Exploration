@@ -485,7 +485,7 @@ function createSingleNode(x, y, nodeData, callSites){
         .on("mouseout", function(){ foreignObjectCont.attr("width", 400); });
     let headerline = header.append("xhtml:h3");
     headerline.append("span")
-        .text("Package:  ")
+        .text("Declaring Class:  ")
         .style("font-size", "12px");
     headerline.append("span")
         .text(packageStr);
