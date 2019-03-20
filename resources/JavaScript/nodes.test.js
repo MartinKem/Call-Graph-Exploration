@@ -68,6 +68,7 @@ nodeMap.set(index.idString(nodeData5), subnSub1);
 test('Test hide of nodes 1', () => {
 
     //show the Nodes, no edge between Subn.sub1 to Sub2.sub1
+    SubRootNode.hideNode();
     SubRootNode.showNode();
     SubRootNode.showChildNodes(0);
     SubRootNode.showChildNodes(1);
@@ -93,6 +94,7 @@ test('Test hide of nodes 1', () => {
     expect(subnSub1.getVisibility()).toBe(true);
 
     //show the Nodes, all edges exept between Sub2.sub2 to Subn.Sub1
+    SubRootNode.hideNode();
     SubRootNode.showNode();
     SubRootNode.showChildNodes(0);
     SubRootNode.showChildNodes(1);
@@ -111,6 +113,7 @@ test('Test hide of nodes 1', () => {
     expect(subnSub1.getVisibility()).toBe(false);
 
     //show the Nodes, no edge between Sub2.sub2 to Subn.sub1
+    SubRootNode.hideNode();
     SubRootNode.showNode();
     SubRootNode.showChildNodes(0);
     SubRootNode.showChildNodes(1);
@@ -129,6 +132,7 @@ test('Test hide of nodes 1', () => {
     expect(subnSub1.getVisibility()).toBe(false);
 
     //show the Nodes, all edges
+    SubRootNode.hideNode();
     SubRootNode.showNode();
     SubRootNode.showChildNodes(0);
     SubRootNode.showChildNodes(1);
@@ -152,6 +156,7 @@ test('Test hide of nodes 1', () => {
 test('Test hide of nodes 2', () => {
 
     //show the Nodes, all edges exept subn.sub1 to sub2.sub1
+    SubRootNode.hideNode();
     SubRootNode.showNode();
     SubRootNode.showChildNodes(0);
     SubRootNode.showChildNodes(1);
@@ -178,6 +183,7 @@ test('Test hide of nodes 2', () => {
 
 
     //show the Nodes, all edges
+    SubRootNode.hideNode();
     SubRootNode.showNode();
     SubRootNode.showChildNodes(0);
     SubRootNode.showChildNodes(1);
@@ -205,6 +211,7 @@ test('Test hide of nodes 2', () => {
 
 
     //show the Nodes, all edges
+    SubRootNode.hideNode();
     SubRootNode.showNode();
     SubRootNode.showChildNodes(0);
     SubRootNode.showChildNodes(1);
