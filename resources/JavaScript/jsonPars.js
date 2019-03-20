@@ -4,16 +4,28 @@
 * *******
 */
 if (typeof module !== 'undefined') {
-
+ var index = require('./index');
+ var idString = index.idString;
+ //var node = require('./nodes');
 }
 
 
 
 var strJson = "";
 var arr = [];
-var parsedJsonMap;
+
+/**
+ * methodSign := {name: string, declaringClass: string, parameterTypes: string[], returnType: string}
+ *
+ * key [string]: declaringClass.name(parameterTypes[0],...,parameterTypes[n]):returnType
+ *
+ * value [object]: {callSites: {declaredTarget: methodSign, line: number, targets: methodSign[]}
+ *                  method: methodSign}
+ */
+var parsedJsonMap = new Map();
 var isLoading = false;
 var autocompleteMode;
+var showWholeGraphSet;
 
 
 
@@ -348,8 +360,7 @@ function autocomplete(inp, arr) {
 /**
  * creates a new node object, if there didn't exist one with given class and name before
  *
- * @param {string} declaringClass - package and class of the method
- * @param {string} name - name of the method
+ * @param {{name: string, declaringClass: string, parameterTypes: string[], returnType: string}} nodeData - data of this single method
  * @param {node} parentNode - node object the new node shall become a child of
  * @param {number} index - call-site-index of the child
  * @returns {node | null} - returns null, if node already existed, returns the new node otherwise
@@ -410,11 +421,82 @@ function createGraph() {
     if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
 	if (rootNode) {
 		if (!rootNode.getSizes().x) rootNode.placeCentrally();
-		if (!rootNode.visible) rootNode.showNode();
+		if (!rootNode.visible){
+			rootNode.showNode();
+			resizeSVGCont(rootNode);
+		}
 		rootNode.focus();
 		rootNodes.push(rootNode);
 		createdNodes = 0;
 	}
+	let pnm = Array.from(placedNodesMap.values());
+	pnm.pop();
+	pnm.forEach(function (node) {
+        node.callSites.forEach(function (c, i) {
+            c.targets.forEach(function (t) {
+                if(idString(t)=== idString(rootNode.nodeData)){
+                    node.showChildNodes(i, [idString(rootNode.nodeData)]);
+                }
+            })
+
+        })
+    });
+}
+
+function showWholeGraph(maxDepth){
+	if(!maxDepth) maxDepth = Number.MAX_VALUE;
+	showWholeGraphSet = new Set();
+
+	rootNodes.forEach(function(rootNode){
+		if(rootNode.visible) {
+			showAllChildNodes(rootNode, 0);
+		}
+	});
+
+	function showAllChildNodes(node, depth){
+		if(depth >= maxDepth) return;
+		node.callSites.forEach(function(callSite, index){
+			node.showChildNodes(index);
+			showWholeGraphSet.add(idString(node.nodeData));
+		});
+		node.callSites.forEach(function(callSite){
+			callSite.targets.forEach(function(target){
+				if(!showWholeGraphSet.has(idString(target))) showAllChildNodes(nodeMap.get(idString(target)), depth+1);
+			});
+		});
+	}
+}
+
+function countReachableNodes(){
+	showWholeGraphSet = new Set();
+	rootNodes.forEach(function(rootNode){
+		if(rootNode.visible){
+			showWholeGraphSet.add(idString(rootNode.nodeData));
+			countReachableGraph(parsedJsonMap.get(idString(rootNode.nodeData)));
+		}
+	});
+
+	function countReachableGraph(node) {
+		node.callSites.forEach(function (callSite) {
+			callSite.targets.forEach(function (target) {
+				let targetString = idString(target);
+				if (!showWholeGraphSet.has(targetString)) {
+					showWholeGraphSet.add(targetString);
+					let jsonTarget = parsedJsonMap.get(targetString);
+					if(jsonTarget) countReachableGraph(jsonTarget);
+				}
+			});
+		});
+	}
+
+	return showWholeGraphSet.size;
+}
+
+/**
+ * @param {{name: string, declaringClass: string, parameterTypes: string[], returnType: string}} methodData - data of this single method (without call sites and targets)
+ */
+function addJsonMapEntry(methodData){
+	parsedJsonMap.set(idString(methodData), methodData);
 }
 
 
@@ -425,4 +507,5 @@ function createGraph() {
 */
 if (typeof module !== 'undefined') {
 	module.exports.setProgBar = setProgBar;
+	module.exports.createNodeInstance = createNodeInstance;
 }

@@ -45,23 +45,25 @@ $("body").on("contextmenu","html:not(path)",function () {
     closeEdgeContextmenu();
 });
 
-//mark last clicked
+/** ändert die Farbe der angeklickten Node wenn ein entsprechender Hotkey gedrückt wird.
+ *  die Hotkey sind 0,1,2,3,4. Esfunktionieren sowohl die normalen Zahlen, als auch die vom Numpad
+ *  */
 $("body").on("click",".div_node",function () {
     clickedNode = this;
     switch (keyPressed) {
-        case 49:
+        case 49||96: //0
             changeColorNode('#ffc6c6');
             break;
-        case 50:
+        case 50||97: //1
             changeColorNode('#beffbe');
             break;
-        case 51:
+        case 51||98: //2
             changeColorNode('#abd3ff');
             break;
-        case 52:
+        case 52||99: //3
             changeColorNode('#ffff9f');
             break;
-        case 53:
+        case 53||100: //4
             changeColorNode('#FFFFFF');
             break;
         default:
@@ -71,22 +73,26 @@ $("body").on("click",".div_node",function () {
             }
     }
 });
+
+/**ändert die Farbe der angeklickten Edge wenn ein entsprechender Hotkey gedrückt wird.
+ * die Hotkey sind 0,1,2,3,4. Esfunktionieren sowohl die normalen Zahlen, als auch die vom Numpad
+ * */
 $("body").on("click","svg path",function () {
     clickedEdge = this;
     switch (keyPressed) {
-        case 49:
+        case 49||96://0
             changeColorEdge('#c24e4c');
             break;
-        case 50:
+        case 50||97://1
             changeColorEdge('#429c44');
             break;
-        case 51:
+        case 51||98://2
             changeColorEdge('#3076b4');
             break;
-        case 52:
+        case 52||99://3
             changeColorEdge('#c4c931');
             break;
-        case 53:
+        case 53||100://4
             changeColorEdge('#000000');
             break;
         default:
@@ -251,31 +257,27 @@ function createCallSiteContextmenu(e, node, index){
     callSiteIndex = index;  // the call site index of the clicked call site
     selectedTargets = [];   // array of node strings, that holds the childnodes, that shall be shown later
     availableTargets = [];  // array of node strings, that holds all possible child nodes, that belong to the clicked call site, but are not selected yet
-    // node.children.forEach(function(child){
-    //     if(child.index === index){
-    //         availableTargets.push(idString(child.node.getNodeData()));
-    //     }
-    // });
+
     node.callSites[index].targets.forEach(function(target){
         availableTargets.push(idString(target));
     });
 
     $("body").append(
         "<div id='contextmenuCallSite'>" +
-            "<h3 style='margin: 0px'>Choose targets for the call site <span style='color: blue'; word-break: break-word;>" + escapeSG(idString(node.getCallSites()[index].declaredTarget)) + "</span> to be shown:</h3>" +
-            "<form autocomplete='off' onsubmit='return false' style='margin-top: 15px; overflow: auto; clear: both'>" +
-                "<input type='text' name='targetSearch' id='targetSearch' placeholder='add targets' spellcheck='false' style='width: 100%; height: 30px; padding: 5px; float: left'>" +
+            "<h3>Choose targets for the call site <span>" + escapeSG(idString(node.getCallSites()[index].declaredTarget)) + "</span> to be shown:</h3>" +
+            "<form autocomplete='off' onsubmit='return false'>" +
+                "<input type='text' name='targetSearch' id='targetSearch' placeholder='add targets' spellcheck='false'>" +
             "</form>" +
-            "<div style='margin-top: 15px; height: 930px'>" +
-                "<div id='selectedTargets' style='border: solid 1px; min-height: 80px; max-height: 800px; /*overflow: auto;*/ padding-right: 5px'>" +
-                    "<h5 style='text-align: center; margin: 10px'>Selected Targets</h5>" +
-                    "<ul id='selectedTargetsList'></ul>" +
+            "<div id='callSiteSelection'>" +
+                "<div id='selectedTargets'>" +
+                    "<h3>Selected Targets</h3>" +
+                    "<div id='selectedTargetsList'></div>" +
                 "</div>" +
             "</div>" +
-            "<div style='position: absolute; bottom: 0; right: 0; width: 100%; overflow: auto; padding: 15px'>" +
-                "<button onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex)' style='position: relative; font-size: 15px;'>Show all possible Targets</button>" +
-                "<button onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex, selectedTargets)' style='position: relative; margin-left: 15px; font-size: 15px'>Show Selected Targets</button>" +
-                "<button onclick='closeCallSiteContextmenu()' style='position: relative; margin-left: 15px; font-size: 15px'>Close</button>" +
+            "<div id='contextmenuSubmit'>" +
+                "<button id='cmb1' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex)'>Show all possible Targets</button>" +
+                "<button id='cmb2' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex, selectedTargets)'>Show Selected Targets</button>" +
+                "<button id='cmb3' onclick='closeCallSiteContextmenu()'>Close</button>" +
             "</div>"+
         "</div>");
 
@@ -283,30 +285,39 @@ function createCallSiteContextmenu(e, node, index){
     autocompleteMode = "callSite";  // this global variable is used in the autocomplete function, that shall work a little bit different, when in call site mode
     autocomplete(document.getElementById("targetSearch"), availableTargets);
     callSiteMenuIsOpen = true;
-
-    $("#contextmenuCallSite").css({
-        "position":"fixed",
-        "top":0,
-        "right": 0,
-        "height":"100%",
-        "width":"30%",
-        "background-color": "white",
-        "border": "solid",
-        "border-width": 1,
-        "padding": 15
-    });
 }
 
 function addTargetToSelected(){
     let targetSearch = document.getElementById("targetSearch");
     let targetList = document.getElementById("selectedTargetsList");
     // add the selected target as html list element
-    targetList.innerHTML += "<li style='word-break: break-word' onclick='removeTargetFromSelected(this.textContent); this.remove()'>" + targetSearch.value + "</li>";
+    targetList.innerHTML += innerHTMLStr();
     availableTargets.splice( availableTargets.indexOf(targetSearch.value), 1);  // remove selected target from available
     selectedTargets.push(targetSearch.value);   // add selected target to selected
+
+    function innerHTMLStr(){
+        let resultStr = "<div><p class='rmx' onclick='removeTargetFromSelected(this.parentNode.childNodes[1].textContent); this.parentNode.remove()'>x</p>";
+        resultStr += "<p>" + targetSearch.value + "</p></div>";
+        return resultStr;
+    }
 }
 
 function removeTargetFromSelected(target){
     availableTargets.push(target);  // add selected target to available
     selectedTargets.splice( selectedTargets.indexOf(target), 1);    // rmove selected target from selected
+}
+
+function createWholeGraphContextmenu(){
+    if(rootNodes.length < 1) alert("There must be at least one starting node!");
+    $("body").append(
+        "<div id='wholeGraphContextMenu'>" +
+            "<h2>Warning!</h2>" +
+            "<p>Are you sure, that you want to create " + countReachableNodes() + " nodes?</p>" +
+            "<button onclick='deleteWholeGraphContextmenu(); showWholeGraph();'>Show</button>" +
+            "<button onclick='deleteWholeGraphContextmenu();'>Quit</button>" +
+        "</div>");
+}
+
+function deleteWholeGraphContextmenu(){
+    $("#wholeGraphContextMenu").remove();
 }

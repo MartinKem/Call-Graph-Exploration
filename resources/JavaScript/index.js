@@ -4,8 +4,6 @@
 * *******
 */
 if (typeof module !== 'undefined') {
-	var $ = require('jquery');
-	var d3 = require('d3');
 	var global = require('./global');
 }
 
@@ -100,7 +98,7 @@ function resizeSVGCont(node) {
 		Array.from(placedNodesMap.values()).forEach(function (node) {
 			node.setPosition(node.getSizes().x + 1000, node.getSizes().y);
 			document.getElementById(idString(node.getNodeData())).parentNode.setAttribute("x", node.getSizes().x);
-			node.reloadEdges(node.getDetailed() ? "toDetailed" : "toAbstract");
+			node.reloadEdges();
 		});
 		for (let i = 0; i < nodes.length; i++) {
 			nodes[i].px += 1000;
@@ -149,4 +147,5 @@ function open_close(currentValue) {
 if (typeof module !== 'undefined') {
 	module.exports.open_close = open_close;
 	module.exports.idString = idString;
+	module.exports.resizeSVGCont = resizeSVGCont;
 }

@@ -8,8 +8,6 @@ if (typeof module !== 'undefined') {
     var d3 = require('d3');
 }
 
-var links = [];
-var nodes = [/*{index: 0, x: svgCont.attr('width')/2, y: svgCont.attr('height')/2, fixed: true, id: "0"}*/];
 [force, nodeSelection, linkSelection] = initForce(svgCont, nodes, links);
 
 /*
@@ -49,7 +47,7 @@ function initForce(svg, nodeArr, linkArr){
 		.on("end", function(e){ fix(e, linkSelection, nodeSelection); })
 		.start();
 
-	for(var i = 0; i < 1000; i++){
+	for(var i = 0; i < 298; i++){
 		force.tick();
 	}
 	force.stop();
@@ -177,7 +175,7 @@ function restartForceLayouting(ticks){
 		.on("end", function(e){ fix(e, linkSelection, nodeSelection); })
 		.start();
 
-	for(var i = 0; i < (ticks ? ticks : 500); i++){
+	for(var i = 0; i < (ticks ? ticks : 298); i++){
 		force.tick();
 	}
 	force.stop();
