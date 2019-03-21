@@ -461,12 +461,9 @@ function createSingleNode(x, y, nodeData, callSites){
         .attr("class","div_node")
         .call(drag)
         .style("width", nodeWidth + "px")
-        .style("padding", "20px")
+        .style("padding", "10px")
         .style("border-width", "5px");	// sizes must stay in js-file for later calculations;
 
-    // let idStr = idString(nodeData);
-    // let packageStr = nodeData.declaringClass.substring(0, nodeData.declaringClass.lastIndexOf('/'));
-    // let signatureStr = idStr.substring(idStr.lastIndexOf('/')+1, idStr.length);
     let packageStr = nodeData.declaringClass;
     let nameStr = nodeData.name;
     let parameterStr = "";
@@ -476,32 +473,35 @@ function createSingleNode(x, y, nodeData, callSites){
     }
     let returnStr = nodeData.returnType;
 
-    node.append("xhtml:h2")
+    node.append("xhtml:h3")
         .on("mouseover", function(){ foreignObjectCont.attr("width", 2000); })
         .on("mouseout", function(){ foreignObjectCont.attr("width", 400); })
-        .style("text-align", "center")
+        .attr("class", "nameHeadline")
         .append("u")
         .text(nameStr);
     let header = node.append("xhtml:div")
         .attr("class", "nodeHeader")
         .on("mouseover", function(){ foreignObjectCont.attr("width", 2000); })
         .on("mouseout", function(){ foreignObjectCont.attr("width", 400); });
-    let headerline = header.append("xhtml:h3");
+    let headerline = header.append("xhtml:h4")
+        .attr("class", "nodeHeadline");
     headerline.append("span")
         .text("Declaring Class:  ")
-        .style("font-size", "12px");
+        .style("font-size", "10px");
     headerline.append("span")
         .text(packageStr);
-    headerline = header.append("xhtml:h3");
+    headerline = header.append("xhtml:h4")
+        .attr("class", "nodeHeadline");
     headerline.append("span")
         .text("Parameter Types:  ")
-        .style("font-size", "12px");
+        .style("font-size", "10px");
     headerline.append("span")
         .text(parameterStr);
-    headerline = header.append("xhtml:h3");
+    headerline = header.append("xhtml:h4")
+        .attr("class", "nodeHeadline");
     headerline.append("span")
         .text("Return Type:  ")
-        .style("font-size", "12px");
+        .style("font-size", "10px");
     headerline.append("span")
         .text(returnStr);
 

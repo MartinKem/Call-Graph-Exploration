@@ -56,11 +56,11 @@ var currentNodes = 0;
 var currentEdges = 0;
 
 
-const nodeWidth = 400;
-const nodeHeightEmpty = 247;
-const callSiteWidth = nodeWidth-53;
+const nodeWidth = 380;
+const nodeHeightEmpty = 143;
+const callSiteWidth = nodeWidth-33;
 const callSiteHeight = 27;
-const callSiteTopOffset = 220;
+const callSiteTopOffset = 128;
 
 var links = [];
 var nodes = [];

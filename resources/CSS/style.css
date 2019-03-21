@@ -27,6 +27,15 @@ body{
     box-sizing: border-box;
 }
 
+.nameHeadline{
+    text-align: center;
+    margin: 10px 0px 10px 0px;
+}
+
+.nodeHeadline{
+    margin: 5px 0px 5px 0px;
+}
+
 
 svg{
     /* width: 2000px; */
