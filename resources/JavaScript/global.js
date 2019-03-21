@@ -12,8 +12,25 @@ if (typeof module !== 'undefined') {
 let f = d3.layout.force;
 
 var createdNodes = 0;
+
+
+var svgDragLock = false;
+var svgDrag = d3.behavior.drag()
+    .on("drag", function(){
+        if(d3.event.sourceEvent.path[0].nodeName !== "svg") return;
+        if(svgDragLock){
+            svgDragLock = false;
+        }
+        else{
+            document.getElementsByTagName('html')[0].scrollLeft -= 2*parseInt(d3.event.dx);
+            document.getElementsByTagName('html')[0].scrollTop -= 2*parseInt(d3.event.dy);
+            svgDragLock = true;
+        }
+    });
+
 var svgCont = d3.select("#graph")
     .append("svg")
+    .call(svgDrag)
     .attr("width", 4000)
     .attr("height", 4000);
 
@@ -67,6 +84,8 @@ if (typeof module !== 'undefined') {
     global.f = f;
     global.createdNodes = createdNodes;
     global.svgCont = svgCont;
+    global.svgDragLock = svgDragLock;
+    global.svgDrag = svgDrag;
     global.defsCont = defsCont;
     global.rootNodes = rootNodes;
     global.nodeMap = nodeMap;

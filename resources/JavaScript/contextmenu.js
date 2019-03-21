@@ -304,7 +304,7 @@ function addTargetToSelected(){
 
 function removeTargetFromSelected(target){
     availableTargets.push(target);  // add selected target to available
-    selectedTargets.splice( selectedTargets.indexOf(target), 1);    // rmove selected target from selected
+    selectedTargets.splice( selectedTargets.indexOf(target), 1);    // remove selected target from selected
 }
 
 function createWholeGraphContextmenu(){

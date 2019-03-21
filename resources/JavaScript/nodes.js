@@ -412,9 +412,11 @@ function createSingleNode(x, y, nodeData, callSites){
 
     var drag = d3.behavior.drag()
         .on("dragstart", function(){
+            d3.event.sourceEvent.stopPropagation();
+            // svgDragLock = null;
             if(d3.event.sourceEvent.path[0].nodeName === "BUTTON"
                 || d3.event.sourceEvent.path[1].nodeName === "BUTTON"
-                || d3.event.sourceEvent.which != 1) {
+                || d3.event.sourceEvent.which !== 1) {
                 lock = true;
             }
         })
@@ -432,6 +434,7 @@ function createSingleNode(x, y, nodeData, callSites){
                 resizeSVGCont(node);
             }
 
+            // svgDragLock = false;
             lock = false;
         })
         .on("drag", function() {
