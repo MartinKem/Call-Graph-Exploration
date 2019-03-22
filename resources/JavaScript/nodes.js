@@ -510,14 +510,11 @@ function createSingleNode(x, y, nodeData, callSites){
         .on("mouseover", function(){ foreignObjectCont.attr("width", 2000); })
         .on("mouseout", function(){ foreignObjectCont.attr("width", 400); });
 
-    for(let i=0; i < callSites.length; i++){
+    for(let i = 0; i < callSites.length; i++){
         var entry = node.append("xhtml:button")
             .attr("id", idString(nodeData) + "#" + i)
             .attr("class", "methodButton")
-            .on("click", function(){
-                let index = this.getAttribute("id").split('#')[1];
-                var node = nodeMap.get(idString(nodeData));
-                if(node.callSites[i].targets.length < callSiteThreshold) node.showChildNodes(index); })
+            .on("click", function(){ onClickFunction(i); })
             .style("border-width", "2px")
             .style("border-top-width", (i === 0 ? "2px" : "0px"))
             .style("border-radius", "5px")
@@ -548,6 +545,26 @@ function createSingleNode(x, y, nodeData, callSites){
             node.toggleToDetailed();
         }
     });
+
+    function onClickFunction(index) {
+        let node = nodeMap.get(idString(nodeData));
+        let visibleTarget = false;
+        for (let j = 0; j < callSites[index].targets.length; j++) {
+            let target = nodeMap.get(idString(callSites[index].targets[j]));
+            if (target !== undefined && target.visible) {
+                visibleTarget = true;
+                break;
+            }
+        }
+        if (node.callSites[index].targets.length < callSiteThreshold) {
+            if (!visibleTarget) node.showChildNodes(index);
+            else {
+                node.callSites[index].targets.forEach(function (target) {
+                    nodeMap.get(idString(target)).hideNode();
+                });
+            }
+        }
+    }
 }
 
 

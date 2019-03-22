@@ -255,12 +255,19 @@ function createCallSiteContextmenu(e, node, index){
     // these variables are global, because local variables cannot be used in the following html-section
     selectedNode = node;    // the node, that holds the clicked call site
     callSiteIndex = index;  // the call site index of the clicked call site
-    selectedTargets = [];   // array of node strings, that holds the childnodes, that shall be shown later
-    availableTargets = [];  // array of node strings, that holds all possible child nodes, that belong to the clicked call site, but are not selected yet
+    selectedTargets = new Set();   // array of node strings, that holds the childnodes, that shall be shown later
+    availableTargets = new Set();  // array of node strings, that holds all possible child nodes, that belong to the clicked call site, but are not selected yet
 
     node.callSites[index].targets.forEach(function(target){
-        availableTargets.push(idString(target));
+        availableTargets.add(idString(target));
     });
+    node.children
+        .filter(child => child.index === index && child.node.visible)
+        .forEach(function(child){
+            availableTargets.delete(idString(child.nodeData));  // remove selected target from available
+            selectedTargets.add(idString(child.nodeData));   // add selected target to selected
+        });
+    // console.log(selectedTargets);
 
     $("body").append(
         "<div id='contextmenuCallSite'>" +
@@ -276,21 +283,23 @@ function createCallSiteContextmenu(e, node, index){
             "</div>" +
             "<div id='contextmenuSubmit'>" +
                 "<button id='cmb1' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex)'>Show all possible Targets</button>" +
-                "<button id='cmb2' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex, selectedTargets)'>Show Selected Targets</button>" +
-                "<button id='cmb3' onclick='closeCallSiteContextmenu()'>Close</button>" +
+                "<button id='cmb2' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex, selectedTargets)'>Show selected Targets</button><br>" +
+                "<button id='cmb3' onclick='closeCallSiteContextmenu(); hideTargets()'>Hide all visible Targets</button>" +
+                "<button id='cmb4' onclick='closeCallSiteContextmenu(); hideTargets(selectedTargets)'>Hide selected Targets</button><br>" +
+                "<button id='cmb5' onclick='closeCallSiteContextmenu()'>Close</button>" +
             "</div>"+
         "</div>");
 
     // targets, that are already visible, shall be shown in the selected list
     node.children
-        .filter(child => child.index === index/* && child.node.visible*/)
+        .filter(child => child.index === index && child.node.visible)
         .forEach(function(child){
             addTargetToSelected(idString(child.node.nodeData));
         });
 
     document.getElementById("searchInput").setAttribute("disabled", true);
     autocompleteMode = "callSite";  // this global variable is used in the autocomplete function, that shall work a little bit different, when in call site mode
-    autocomplete(document.getElementById("targetSearch"), availableTargets);
+    autocomplete(document.getElementById("targetSearch"), Array.from(availableTargets.values()));
     callSiteMenuIsOpen = true;
 }
 
@@ -306,13 +315,34 @@ function addTargetToSelected(targetString){
     let targetList = document.getElementById("selectedTargetsList");
     // add the selected target as html list element
     targetList.innerHTML += innerHTMLStr;
-    availableTargets.splice( availableTargets.indexOf(targetString), 1);  // remove selected target from available
-    selectedTargets.push(targetSearch.value);   // add selected target to selected
+    availableTargets.delete(targetString);  // remove selected target from available
+    selectedTargets.add(targetString);   // add selected target to selected
 }
 
 function removeTargetFromSelected(target){
-    availableTargets.push(target);  // add selected target to available
-    selectedTargets.splice( selectedTargets.indexOf(target), 1);    // remove selected target from selected
+    availableTargets.add(target);  // add selected target to available
+    selectedTargets.delete(target);    // remove selected target from selected
+}
+
+function hideTargets(targets){
+    if(targets === undefined){
+        selectedNode.callSites[callSiteIndex].targets.forEach(function(target){
+            let targetNode = nodeMap.get(idString(target));
+            if(targetNode !== undefined && targetNode.visible && idString(target) !== idString(selectedNode.nodeData)){
+                targetNode.hideNode();
+                removeTargetFromSelected(idString(target));
+            }
+        });
+    } else {
+        // console.log(targets);
+        targets.forEach(function(targetStr){
+            let targetNode = nodeMap.get(targetStr);
+            if(targetNode !== undefined && targetNode.visible && targetStr !== idString(selectedNode.nodeData)){
+                targetNode.hideNode();
+                removeTargetFromSelected(targetStr);
+            }
+        });
+    }
 }
 
 function createWholeGraphContextmenu(){
