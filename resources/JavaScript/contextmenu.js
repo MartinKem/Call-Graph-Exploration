@@ -281,25 +281,33 @@ function createCallSiteContextmenu(e, node, index){
             "</div>"+
         "</div>");
 
+    // targets, that are already visible, shall be shown in the selected list
+    node.children
+        .filter(child => child.index === index/* && child.node.visible*/)
+        .forEach(function(child){
+            addTargetToSelected(idString(child.node.nodeData));
+        });
+
     document.getElementById("searchInput").setAttribute("disabled", true);
     autocompleteMode = "callSite";  // this global variable is used in the autocomplete function, that shall work a little bit different, when in call site mode
     autocomplete(document.getElementById("targetSearch"), availableTargets);
     callSiteMenuIsOpen = true;
 }
 
-function addTargetToSelected(){
-    let targetSearch = document.getElementById("targetSearch");
+function addTargetToSelected(targetString){
+    if(!targetString) {
+        let targetSearch = document.getElementById("targetSearch");
+        targetString = targetSearch.value;
+    }
+
+    let innerHTMLStr = "<div><p class='rmx' onclick='removeTargetFromSelected(this.parentNode.childNodes[1].textContent); this.parentNode.remove()'>x</p>";
+    innerHTMLStr += "<p>" + targetString + "</p></div>";
+
     let targetList = document.getElementById("selectedTargetsList");
     // add the selected target as html list element
-    targetList.innerHTML += innerHTMLStr();
-    availableTargets.splice( availableTargets.indexOf(targetSearch.value), 1);  // remove selected target from available
+    targetList.innerHTML += innerHTMLStr;
+    availableTargets.splice( availableTargets.indexOf(targetString), 1);  // remove selected target from available
     selectedTargets.push(targetSearch.value);   // add selected target to selected
-
-    function innerHTMLStr(){
-        let resultStr = "<div><p class='rmx' onclick='removeTargetFromSelected(this.parentNode.childNodes[1].textContent); this.parentNode.remove()'>x</p>";
-        resultStr += "<p>" + targetSearch.value + "</p></div>";
-        return resultStr;
-    }
 }
 
 function removeTargetFromSelected(target){
