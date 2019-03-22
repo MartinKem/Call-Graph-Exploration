@@ -54,6 +54,7 @@ var totalNodes = 0;
 var totalEdges = 0;
 var currentNodes = 0;
 var currentEdges = 0;
+var maxSuggests = 10;
 
 
 const nodeWidth = 380;
@@ -95,6 +96,7 @@ if (typeof module !== 'undefined') {
     global.totalEdges = totalEdges;
     global.currentEdges = currentEdges;
     global.currentNodes = currentNodes;
+    global.maxSuggests = maxSuggests;
 
     //module.exports = {
     //    f,

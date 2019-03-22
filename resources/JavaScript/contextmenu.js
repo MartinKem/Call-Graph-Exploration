@@ -228,6 +228,7 @@ function closeEdgeContextmenu() {
     }
 }
 function closeCallSiteContextmenu(){
+    maxSuggests = 10;
     if(callSiteMenuIsOpen){
         document.getElementById("searchInput").removeAttribute("disabled", false);
         $("#contextmenuCallSite").remove();
@@ -251,6 +252,7 @@ function markLastClickedEdge() {
 }
 
 function createCallSiteContextmenu(e, node, index){
+    maxSuggests = 10;
 
     // these variables are global, because local variables cannot be used in the following html-section
     selectedNode = node;    // the node, that holds the clicked call site

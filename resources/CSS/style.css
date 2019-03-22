@@ -198,13 +198,10 @@ svg{
   border: 1px solid #d4d4d4;
   font-size: 13px;
   clear: both;
-  /* border-bottom: none; */
-  /* border-top: none; */
   z-index: 99;
+  overflow: auto;
+  max-height: 300px;
   /*position the autocomplete items to be the same width as the container:*/
-  /* top: 100%; */
-  /* left: 0; */
-  /* right: 0; */
 }
 
 .autocomplete-items div {

@@ -113,7 +113,7 @@ class node{
         }
         else{
             this.callSites[index].targets
-                .filter(target => names.includes(idString(target)))
+                .filter(target => names.has(idString(target)))
                 .forEach(function(target){ childrenToBeShown.push(target); });
         }
 
