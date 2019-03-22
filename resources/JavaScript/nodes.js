@@ -535,6 +535,19 @@ function createSingleNode(x, y, nodeData, callSites){
     foreignObjectCont
         .attr("width", foreignObjectCont[0][0].childNodes[0].offsetWidth)
         .attr("height", foreignObjectCont[0][0].childNodes[0].offsetHeight);
+
+    let nodeSelection = $("[id='" + idString(nodeData) + "']");
+    nodeSelection.dblclick(function () {
+        let node = nodeMap.get(idString(nodeData));
+        if(node.detailed){
+            nodeSelection.children(".node_inhalt").toggleClass("invis");
+            node.toggleToAbstract();
+        }
+        else {
+            nodeSelection.children(".node_inhalt").toggleClass("invis");
+            node.toggleToDetailed();
+        }
+    });
 }
 
 
