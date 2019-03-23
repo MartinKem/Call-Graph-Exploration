@@ -242,8 +242,8 @@ function autocomplete(inp, arr) {
 
 	if(!documentListener){
 		document.addEventListener("click", function (e) {
-			// console.log(e.path[3].id);
-			if (e.srcElement.id !== "searchInput" && e.srcElement.id !== "targetSearch" && e.path[3].id !== "contextmenuCallSite") {
+			let lock = e.path[3] === undefined || e.path[3].id !== "contextmenuCallSite";
+			if (e.srcElement.id !== "searchInput" && e.srcElement.id !== "targetSearch" && lock) {
 				// console.log("called");
 				closeAllLists(e.target);
 				if (e.srcElement.parentNode && e.srcElement.parentNode.id === "targetSearchautocomplete-list") {

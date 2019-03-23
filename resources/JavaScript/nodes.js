@@ -552,15 +552,18 @@ function createSingleNode(x, y, nodeData, callSites){
         for (let j = 0; j < callSites[index].targets.length; j++) {
             let target = nodeMap.get(idString(callSites[index].targets[j]));
             if (target !== undefined && target.visible) {
-                visibleTarget = true;
-                break;
+                let edge = document.getElementById(idString(node.nodeData) + '#' + index + '->' + idString(target.nodeData));
+                if(edge && edge.style.display === "block"){
+                    visibleTarget = true;
+                    break;
+                }
             }
         }
         if (node.callSites[index].targets.length < callSiteThreshold) {
             if (!visibleTarget) node.showChildNodes(index);
             else {
                 node.callSites[index].targets.forEach(function (target) {
-                    nodeMap.get(idString(target)).hideNode();
+                    if(idString(node.nodeData) !== idString(target)) nodeMap.get(idString(target)).hideNode();
                 });
             }
         }
