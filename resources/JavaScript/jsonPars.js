@@ -26,7 +26,7 @@ var parsedJsonMap = new Map();
 var isLoading = false;
 var autocompleteMode;
 var showWholeGraphSet;
-
+var documentListener = false;
 
 
 /**
@@ -240,19 +240,24 @@ function autocomplete(inp, arr) {
 	inp.addEventListener("input", function (e) { autocompleteEvent(e, this); });
 	inp.addEventListener("focus", function (e) { autocompleteEvent(e, this); });
 
-	document.addEventListener("click", function (e) {
-		if (e.srcElement.id !== "searchInput" && e.srcElement.id !== "targetSearch") {
-			// console.log(mode);
-			closeAllLists(e.target);
-			if (e.srcElement.parentNode && e.srcElement.parentNode.id === "targetSearchautocomplete-list") {
-				inp.focus();
+	if(!documentListener){
+		document.addEventListener("click", function (e) {
+			let lock = e.path[3] === undefined || e.path[3].id !== "contextmenuCallSite";
+			if (e.srcElement.id !== "searchInput" && e.srcElement.id !== "targetSearch" && lock) {
+				// console.log("called");
+				closeAllLists(e.target);
+				if (e.srcElement.parentNode && e.srcElement.parentNode.id === "targetSearchautocomplete-list") {
+					inp.focus();
+				}
 			}
-		}
-	});
+			documentListener = true;
+		});
+	}
 
-	function autocompleteEvent(e, inputElem) {
+	function autocompleteEvent(e, inputElem, scrollTop) {
 		var div, items, otherValue, thisArray, reducedArray = [], value = inputElem.value;
 
+		if(inputElem.name === "targetSearch") arr = Array.from(availableTargets.values());
 		//Alle offenen Listen schließen
 		closeAllLists();
 		//Unterbrechen, wenn das Textfeld leer ist
@@ -287,6 +292,8 @@ function autocomplete(inp, arr) {
 							inp.value = this.getElementsByTagName("input")[0].value;
 							addTargetToSelected();
 							inp.value = "";
+							e.preventDefault();
+							this.remove();
 						} else {
 							//Füge den Vervollständigungsvorschlag in das Textfeld ein
 							inp.value = this.getElementsByTagName("input")[0].value;
@@ -297,11 +304,29 @@ function autocomplete(inp, arr) {
 					});
 					div.appendChild(items);
 
-					//Schleife unterbrechen wenn 10 Elemente gefunden wurden
-					if (div.childElementCount >= 10) { break Loop1; }
+					//Schleife unterbrechen wenn maxSuggests Elemente gefunden wurden
+					if (div.childElementCount >= maxSuggests) {
+						items = document.createElement("DIV");
+						items.innerHTML += "<p id='showMoreButton' style='text-align: center; margin: 0px'><i>show more...</i></p>";
+						// items.innerHTML += "<input type='hidden' name='show more'>";
+						div.appendChild(items);
+						let showMoreButton = document.getElementById("showMoreButton").parentNode;
+						showMoreButton.addEventListener("click", function(event){
+							let scrollTop = showMoreButton.parentNode.scrollTop
+							showMoreButton.parentNode.remove();
+							maxSuggests += 10;
+							autocomplete(inp, arr);
+							autocompleteEvent(undefined, inputElem, scrollTop);
+							event.stopPropagation();
+						});
+						break Loop1;
+					}
 					break Loop2;
 				}
 			}
+		}
+		if(scrollTop){
+			document.getElementById(inp.id + "autocomplete-list").scrollTop = scrollTop;
 		}
 	}
 	//Führe eine Funktion aus, wenn die Tastatur betätigt wird
@@ -373,6 +398,12 @@ function createNodeInstance(nodeData, parentNode, index) {
 		/* The node has already been created before, so it is just added as child to the parent node.
          */
 		newNode = parentNode.addChild(index, nodeData, null);
+		if(newNode){
+			let newEdge = new Edge(parentNode, newNode, index);
+			parentNode.children[parentNode.children.length-1].edge = newEdge;
+			newNode.addParent(parentNode, index, newEdge);
+			newEdge.create();
+		}
 		return undefined;
 	}
 	let jsonData = parsedJsonMap.get(idString(nodeData));
@@ -416,6 +447,7 @@ function sortByKey(array, key) {
  * initiates the generation of the graph through parsing the input of the search field and starting the node creation
  */
 function createGraph() {
+	maxSuggests = 10;
 	let rootNodeString = document.getElementById("searchInput").value;
 	let rootNode = nodeMap.get(rootNodeString);
     if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));

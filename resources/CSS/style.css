@@ -27,6 +27,15 @@ body{
     box-sizing: border-box;
 }
 
+.nameHeadline{
+    text-align: center;
+    margin: 10px 0px 10px 0px;
+}
+
+.nodeHeadline{
+    margin: 5px 0px 5px 0px;
+}
+
 
 svg{
     /* width: 2000px; */
@@ -189,13 +198,10 @@ svg{
   border: 1px solid #d4d4d4;
   font-size: 13px;
   clear: both;
-  /* border-bottom: none; */
-  /* border-top: none; */
   z-index: 99;
+  overflow: auto;
+  max-height: 300px;
   /*position the autocomplete items to be the same width as the container:*/
-  /* top: 100%; */
-  /* left: 0; */
-  /* right: 0; */
 }
 
 .autocomplete-items div {
@@ -324,23 +330,43 @@ line {
     padding: 15px;
 }
 
-#cmb1{
+#contextmenuSubmit button{
     position: relative;
+    box-sizing: border-box;
+    border: #6464c0 outset;
     font-size: 15px;
-    margin-right: 15px;
+    background-color: #ededed;
+}
+
+#contextmenuSubmit button:hover{
+    background-color: #e2e2e2;
+}
+
+#cmb1{
+    font-size: 15px;
+    width: 47%;
 }
 
 #cmb2{
-    position: relative;
-    margin-right: 15px;
+    margin-left: 6%;
     margin-top: 15px;
-    font-size: 15px;
+    width: 47%;
 }
 
 #cmb3{
-    position: relative;
     margin-top: 15px;
-    font-size: 15px;
+    width: 47%;
+}
+
+#cmb4{
+    margin-left: 6%;
+    margin-top: 15px;
+    width: 47%;
+}
+
+#cmb5{
+    margin-top: 15px;
+    width: 100%;
 }
 
 #selectedTargetsList div{

@@ -8,7 +8,7 @@ if (typeof module !== 'undefined') {
     var d3 = require('d3');
 }
 
-[force, nodeSelection, linkSelection] = initForce(svgCont, nodes, links);
+var force = initForce(svgCont, nodes, links);
 
 /*
 initialized the force graph throw declaring a link selection, a node selection and the d3-force-layout
@@ -22,15 +22,15 @@ returns: [force, nodeSelection, linkSelection] initialized force instance and d3
 */
 function initForce(svg, nodeArr, linkArr){
 
-	var linkSelection = svg.selectAll("line")
-		.data(linkArr)
-		.enter().append("line");
-
-	var nodeSelection = svg.selectAll("circle")
-		.data(nodeArr)
-		.enter().append("circle")
-		.attr("r", 10 - .75)
-		.style("fill", "rgb(31, 119, 180)");
+	// var linkSelection = svg.selectAll("line")
+	// 	.data(linkArr)
+	// 	.enter().append("line");
+	//
+	// var nodeSelection = svg.selectAll("circle")
+	// 	.data(nodeArr)
+	// 	.enter().append("circle")
+	// 	.attr("r", 10 - .75)
+	// 	.style("fill", "rgb(31, 119, 180)");
 	
 	width = d3.select("svg").attr("width");
 	height = d3.select("svg").attr("height");
@@ -43,8 +43,7 @@ function initForce(svg, nodeArr, linkArr){
 		.size([width, height])
 		.nodes(nodeArr)
 		.links(linkArr)
-		// .on("tick", function(e){ tick(e, linkSelection, nodeSelection); })
-		.on("end", function(e){ fix(e, linkSelection, nodeSelection); })
+		.on("end", function(e){ fix(); })
 		.start();
 
 	for(var i = 0; i < 298; i++){
@@ -52,7 +51,7 @@ function initForce(svg, nodeArr, linkArr){
 	}
 	force.stop();
 
-	return [force, nodeSelection, linkSelection];
+	return force //, nodeSelection, linkSelection];
 }
 
 /*
@@ -94,18 +93,8 @@ linkSelection: d3 selection of links
 
 returns: void
 */
-function fix(e, linkSelection, nodeSelection){
-
-	nodeSelection.attr('r', 10)
-		.attr('cx', function(d) { return d.x; })
-		.attr('cy', function(d) { return d.y; });
-
-	linkSelection.attr('x1', function(d) { return d.source.x; })
-		.attr('y1', function(d) { return d.source.y; })
-		.attr('x2', function(d) { return d.target.x; })
-		.attr('y2', function(d) { return d.target.y; });
-
-	linkSelection.each(function(d) {
+function fix(){
+	links.forEach(function(d){
 		d.source.fixed = true;
 		d.target.fixed = true;
 	});
@@ -123,7 +112,7 @@ function addNodeToForceTree(sourceNodeID, targetNodeIDs){
     if(!targetNodeIDs){
         nodes.push({index: nodes.length, id: sourceNodeID});
         force.gravity(0.1);
-        restartForceLayouting();
+        restartForceLayouting(1);
         force.gravity(0.005);
         nodes[nodes.length-1].fixed = true;
         return {x: nodes[nodes.length-1].x, y: nodes[nodes.length-1].y, index: nodes.length-1};
@@ -143,7 +132,7 @@ function addNodeToForceTree(sourceNodeID, targetNodeIDs){
 		nodes.push({index: idx, id: targetNodeIDs[targetNodeIDs.length - count]});
 		links.push({source: sourceNode, target: idx});
 	} while(--count > 0);
-	restartForceLayouting();
+	restartForceLayouting(targetNodeIDs.length);
 	var positions = [];
 	for(var i = firstIdx; i < nodes.length; i++){
 		positions.push({x: nodes[i].x, y: nodes[i].y, index: i});
@@ -157,25 +146,24 @@ also starts the force-layouting
 
 returns: void
 */
-function restartForceLayouting(ticks){
-	nodeSelection = nodeSelection.data(nodes);
-
-	nodeSelection.enter().insert("circle", ".cursor")
-		.attr("r", 10 - .75)
-		.style("fill", "rgb(31, 119, 180)");
-
-	linkSelection = linkSelection.data(links);
-
-	linkSelection.enter().insert("line", ".node")
-		.attr("class", "link");
+function restartForceLayouting(newNodes){
+	// nodeSelection = nodeSelection.data(nodes);
+	//
+	// nodeSelection.enter().insert("circle", ".cursor")
+	// 	.attr("r", 10 - .75)
+	// 	.style("fill", "rgb(31, 119, 180)");
+	//
+	// linkSelection = linkSelection.data(links);
+	//
+	// linkSelection.enter().insert("line", ".node")
+	// 	.attr("class", "link");
 
 	force.nodes(nodes)
 		.links(links)
-		// .on("tick", function(e){ tick(e, linkSelection, nodeSelection); })
-		.on("end", function(e){ fix(e, linkSelection, nodeSelection); })
+		.on("end", function(e){ fix(); })
 		.start();
 
-	for(var i = 0; i < (ticks ? ticks : 298); i++){
+	for(var i = 0; i < 298; i++){
 		force.tick();
 	}
 	force.stop();

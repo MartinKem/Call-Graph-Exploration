@@ -113,9 +113,10 @@ class node{
         }
         else{
             this.callSites[index].targets
-                .filter(target => names.includes(idString(target)))
+                .filter(target => names.has(idString(target)))
                 .forEach(function(target){ childrenToBeShown.push(target); });
         }
+
 
         childrenToBeShown.forEach(function(target){
             createNodeInstance(target, thisNode, index);
@@ -412,9 +413,11 @@ function createSingleNode(x, y, nodeData, callSites){
 
     var drag = d3.behavior.drag()
         .on("dragstart", function(){
+            d3.event.sourceEvent.stopPropagation();
+            // svgDragLock = null;
             if(d3.event.sourceEvent.path[0].nodeName === "BUTTON"
                 || d3.event.sourceEvent.path[1].nodeName === "BUTTON"
-                || d3.event.sourceEvent.which != 1) {
+                || d3.event.sourceEvent.which !== 1) {
                 lock = true;
             }
         })
@@ -432,6 +435,7 @@ function createSingleNode(x, y, nodeData, callSites){
                 resizeSVGCont(node);
             }
 
+            // svgDragLock = false;
             lock = false;
         })
         .on("drag", function() {
@@ -458,12 +462,9 @@ function createSingleNode(x, y, nodeData, callSites){
         .attr("class","div_node")
         .call(drag)
         .style("width", nodeWidth + "px")
-        .style("padding", "20px")
+        .style("padding", "10px")
         .style("border-width", "5px");	// sizes must stay in js-file for later calculations;
 
-    // let idStr = idString(nodeData);
-    // let packageStr = nodeData.declaringClass.substring(0, nodeData.declaringClass.lastIndexOf('/'));
-    // let signatureStr = idStr.substring(idStr.lastIndexOf('/')+1, idStr.length);
     let packageStr = nodeData.declaringClass;
     let nameStr = nodeData.name;
     let parameterStr = "";
@@ -473,32 +474,35 @@ function createSingleNode(x, y, nodeData, callSites){
     }
     let returnStr = nodeData.returnType;
 
-    node.append("xhtml:h2")
+    node.append("xhtml:h3")
         .on("mouseover", function(){ foreignObjectCont.attr("width", 2000); })
         .on("mouseout", function(){ foreignObjectCont.attr("width", 400); })
-        .style("text-align", "center")
+        .attr("class", "nameHeadline")
         .append("u")
         .text(nameStr);
     let header = node.append("xhtml:div")
         .attr("class", "nodeHeader")
         .on("mouseover", function(){ foreignObjectCont.attr("width", 2000); })
         .on("mouseout", function(){ foreignObjectCont.attr("width", 400); });
-    let headerline = header.append("xhtml:h3");
+    let headerline = header.append("xhtml:h4")
+        .attr("class", "nodeHeadline");
     headerline.append("span")
         .text("Declaring Class:  ")
-        .style("font-size", "12px");
+        .style("font-size", "10px");
     headerline.append("span")
         .text(packageStr);
-    headerline = header.append("xhtml:h3");
+    headerline = header.append("xhtml:h4")
+        .attr("class", "nodeHeadline");
     headerline.append("span")
         .text("Parameter Types:  ")
-        .style("font-size", "12px");
+        .style("font-size", "10px");
     headerline.append("span")
         .text(parameterStr);
-    headerline = header.append("xhtml:h3");
+    headerline = header.append("xhtml:h4")
+        .attr("class", "nodeHeadline");
     headerline.append("span")
         .text("Return Type:  ")
-        .style("font-size", "12px");
+        .style("font-size", "10px");
     headerline.append("span")
         .text(returnStr);
 
@@ -507,14 +511,11 @@ function createSingleNode(x, y, nodeData, callSites){
         .on("mouseover", function(){ foreignObjectCont.attr("width", 2000); })
         .on("mouseout", function(){ foreignObjectCont.attr("width", 400); });
 
-    for(let i=0; i < callSites.length; i++){
+    for(let i = 0; i < callSites.length; i++){
         var entry = node.append("xhtml:button")
             .attr("id", idString(nodeData) + "#" + i)
             .attr("class", "methodButton")
-            .on("click", function(){
-                let index = this.getAttribute("id").split('#')[1];
-                var node = nodeMap.get(idString(nodeData));
-                if(node.callSites[i].targets.length < callSiteThreshold) node.showChildNodes(index); })
+            .on("click", function(){ onClickFunction(i); })
             .style("border-width", "2px")
             .style("border-top-width", (i === 0 ? "2px" : "0px"))
             .style("border-radius", "5px")
@@ -532,6 +533,42 @@ function createSingleNode(x, y, nodeData, callSites){
     foreignObjectCont
         .attr("width", foreignObjectCont[0][0].childNodes[0].offsetWidth)
         .attr("height", foreignObjectCont[0][0].childNodes[0].offsetHeight);
+
+    let nodeSelection = $("[id='" + idString(nodeData) + "']");
+    nodeSelection.dblclick(function () {
+        let node = nodeMap.get(idString(nodeData));
+        if(node.detailed){
+            nodeSelection.children(".node_inhalt").toggleClass("invis");
+            node.toggleToAbstract();
+        }
+        else {
+            nodeSelection.children(".node_inhalt").toggleClass("invis");
+            node.toggleToDetailed();
+        }
+    });
+
+    function onClickFunction(index) {
+        let node = nodeMap.get(idString(nodeData));
+        let visibleTarget = false;
+        for (let j = 0; j < callSites[index].targets.length; j++) {
+            let target = nodeMap.get(idString(callSites[index].targets[j]));
+            if (target !== undefined && target.visible) {
+                let edge = document.getElementById(idString(node.nodeData) + '#' + index + '->' + idString(target.nodeData));
+                if(edge && edge.style.display === "block"){
+                    visibleTarget = true;
+                    break;
+                }
+            }
+        }
+        if (node.callSites[index].targets.length < callSiteThreshold) {
+            if (!visibleTarget) node.showChildNodes(index);
+            else {
+                node.callSites[index].targets.forEach(function (target) {
+                    if(idString(node.nodeData) !== idString(target)) nodeMap.get(idString(target)).hideNode();
+                });
+            }
+        }
+    }
 }
 
 
