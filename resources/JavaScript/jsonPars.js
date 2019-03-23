@@ -280,7 +280,7 @@ function autocomplete(inp, arr) {
 					items = document.createElement("DIV");
 					//Hebe übereinstimmende Zeichen als fettgedruckt hervor
 					items.innerHTML = arr[i].substr(0, j);
-					// items.innerHTML += "<strong>" + arr[i].substr(j, value.length) + "</strong>";
+					items.innerHTML += "<strong>" + arr[i].substr(j, value.length) + "</strong>";
 					items.innerHTML += arr[i].substr(value.length + j);
 					//Erstelle INPUT Feld, das den aktuellen Wert der Vorschlags enthält
 					items.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
@@ -398,6 +398,12 @@ function createNodeInstance(nodeData, parentNode, index) {
 		/* The node has already been created before, so it is just added as child to the parent node.
          */
 		newNode = parentNode.addChild(index, nodeData, null);
+		if(newNode){
+			let newEdge = new Edge(parentNode, newNode, index);
+			parentNode.children[parentNode.children.length-1].edge = newEdge;
+			newNode.addParent(parentNode, index, newEdge);
+			newEdge.create();
+		}
 		return undefined;
 	}
 	let jsonData = parsedJsonMap.get(idString(nodeData));

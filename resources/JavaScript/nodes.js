@@ -117,6 +117,7 @@ class node{
                 .forEach(function(target){ childrenToBeShown.push(target); });
         }
 
+
         childrenToBeShown.forEach(function(target){
             createNodeInstance(target, thisNode, index);
         });
