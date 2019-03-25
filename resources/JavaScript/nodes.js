@@ -516,8 +516,10 @@ function createSingleNode(x, y, nodeData, callSites){
             .attr("id", idString(nodeData) + "#" + i)
             .attr("class", "methodButton")
             .on("click", function(){ onClickFunction(i); })
-            .style("border-width", "2px")
-            .style("border-top-width", (i === 0 ? "2px" : "0px"))
+            .style("border-width", "1px")
+            .style("box-sizing", "border-box")
+            // .style("border-top-width", (i === 0 ? "2px" : "0px"))
+            // .style("border-top-width", "1px")
             .style("border-radius", "5px")
             .style("padding", "5px");
         entry.append("xhtml:div")

@@ -43,9 +43,17 @@ class Edge{
         let source = this.source;
         let target = this.target;
         if(source.detailed){
-            node1 = {x: source.getSizes().x + (nodeWidth-callSiteWidth)/2,
-                y: source.getSizes().y + (callSiteTopOffset + callSiteHeight * this.callsiteIndex),
-                width: callSiteWidth, height: callSiteHeight}
+            let callSiteDiv = document.getElementById(idString(this.source.nodeData) + '#' + this.callsiteIndex);
+            let position = getGlobalOffset(callSiteDiv);
+            // node1 = {x: source.getSizes().x + (nodeWidth-callSiteWidth)/2,
+            //     y: source.getSizes().y + (callSiteTopOffset + callSiteHeight * this.callsiteIndex),
+            //     width: callSiteWidth, height: callSiteHeight};
+            node1 = {
+                x: position.left,
+                y: position.top,
+                width: callSiteWidth,
+                height: callSiteHeight
+            }
         }else{
             node1 = {x: source.getSizes().x, y: source.getSizes().y, width: nodeWidth, height: nodeHeightEmpty};
 
@@ -56,6 +64,18 @@ class Edge{
             node2 = {x: target.getSizes().x, y: target.getSizes().y, width: nodeWidth, height: nodeHeightEmpty};
         }
         return {n1: node1, n2: node2};
+
+        function getGlobalOffset(el) {
+            var x = 0, y = 0;
+            while (el.nodeName !== "foreignObject") {
+                x += el.offsetLeft;
+                y += el.offsetTop;
+                el = el.offsetParent;
+            }
+            x += parseInt(el.getAttribute("x")) + 4;
+            y += parseInt(el.getAttribute("y")) + 4;
+            return { left: x, top: y };
+        }
     }
 
     getBorderPoints(){
@@ -106,8 +126,9 @@ class Edge{
 
             return {x: xRes, y: yRes};
         }
-        let res1 = singlePoint(this.getNodeSizes().n1, this.getNodeSizes().n2);
-        let res2 = singlePoint(this.getNodeSizes().n2, this.getNodeSizes().n1);
+        let nodeSizes = this.getNodeSizes();
+        let res1 = singlePoint(nodeSizes.n1, nodeSizes.n2);
+        let res2 = singlePoint(nodeSizes.n2, nodeSizes.n1);
 
         return {xSource: res1.x, ySource: res1.y, xTarget: res2.x, yTarget: res2.y};
     }
