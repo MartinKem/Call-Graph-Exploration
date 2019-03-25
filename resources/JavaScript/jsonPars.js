@@ -460,21 +460,22 @@ function createGraph() {
 		rootNode.focus();
 		rootNodes.push(rootNode);
 		createdNodes = 0;
-	}
-	let pnm = Array.from(placedNodesMap.values());
-	pnm.pop();
-	pnm.forEach(function (node) {
-        node.callSites.forEach(function (c, i) {
-            c.targets.forEach(function (t) {
-                if(idString(t)=== idString(rootNode.nodeData)){
-                	let names = new Set();
-                	names.add(idString(rootNode.nodeData));
-                    node.showChildNodes(i, names);
-                }
-            })
 
-        })
-    });
+		let pnm = Array.from(placedNodesMap.values());
+		pnm.pop();
+		pnm.forEach(function (node) {
+			node.callSites.forEach(function (c, i) {
+				c.targets.forEach(function (t) {
+					if(idString(t)=== idString(rootNode.nodeData)){
+						let names = new Set();
+						names.add(idString(rootNode.nodeData));
+						node.showChildNodes(i, names);
+					}
+				})
+
+			})
+		});
+	}
 }
 
 function showWholeGraph(maxDepth){

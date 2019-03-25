@@ -440,7 +440,6 @@ function createSingleNode(x, y, nodeData, callSites){
                 node.reloadEdges();
             }
 
-            // svgDragLock = false;
             lock = false;
         })
         .on("drag", function() {
