@@ -169,8 +169,12 @@ function switchContent() {
     let nodeId= $(clickedNode).attr('id');
     let node = nodeMap.get(nodeId);
     $(clickedNode).children(".node_inhalt").toggleClass("invis");
-    if($(clickedNode).children(".node_inhalt").hasClass("invis")){ node.toggleToAbstract(); }
-    else{ node.toggleToDetailed(); }
+    if($(clickedNode).children(".node_inhalt").hasClass("invis")){
+        node.toggleToAbstract();
+        node.focus(); }
+    else{
+        node.toggleToDetailed();
+    }
     // for(var i = 0; i < node.parents.length; i++){		// first all edges to this node become hidden
     //     var edge = document.getElementById(node.parents[i].node.getName() + "#" + node.parents[i].index + '->' + nodeName);
     //     if(edge) edge.style.display = "none";

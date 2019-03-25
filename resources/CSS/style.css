@@ -314,6 +314,7 @@ line {
     min-height: 80px;
     max-height: 800px;
     padding: 5px;
+    overflow: auto;
 }
 
 #selectedTargets h3{

@@ -455,8 +455,8 @@ function createGraph() {
 		if (!rootNode.getSizes().x) rootNode.placeCentrally();
 		if (!rootNode.visible){
 			rootNode.showNode();
-			resizeSVGCont(rootNode);
 		}
+		resizeSVGCont(rootNode);
 		rootNode.focus();
 		rootNodes.push(rootNode);
 		createdNodes = 0;
@@ -467,7 +467,9 @@ function createGraph() {
         node.callSites.forEach(function (c, i) {
             c.targets.forEach(function (t) {
                 if(idString(t)=== idString(rootNode.nodeData)){
-                    node.showChildNodes(i, [idString(rootNode.nodeData)]);
+                	let names = new Set();
+                	names.add(idString(rootNode.nodeData));
+                    node.showChildNodes(i, names);
                 }
             })
 
