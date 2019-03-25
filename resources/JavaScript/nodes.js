@@ -417,6 +417,9 @@ function createSingleNode(x, y, nodeData, callSites){
 
     var drag = d3.behavior.drag()
         .on("dragstart", function(){
+            d3.select(this.parentNode).each(function() {
+                this.parentNode.appendChild(this);
+            });
             d3.event.sourceEvent.stopPropagation();
             // svgDragLock = null;
             if(d3.event.sourceEvent.path[0].nodeName === "BUTTON"
