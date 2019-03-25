@@ -120,6 +120,8 @@ function resetFileRead() {
 	arr = [];
 	strJson = "";
 	isLoading = false;
+	lockOnchange = false;
+	document.getElementById('fileinput').disabled = false;
 	setProgBar(0);
 }
 
@@ -161,6 +163,14 @@ function parseFile(file, callback) {
 			console.log(parsedJson);
 			//put Total Nodes / reachableMethods in graph stats
 			totalNodes = parsedJson.reachableMethods.length;
+
+			// if graph is empty
+			if (totalNodes <= 0){
+				alert("Graph is empty.  \n-Is the Json-File saved as UNIX (LF)? \n-Is the Json-File properly formatted? \n");
+				resetFileRead();
+				return;
+			}
+
 			//put Total Edges / Edges from reachableMethods in graph stats
 			parsedJson.reachableMethods.forEach(function(element){
 				if (element.callSites) totalEdges += element.callSites.length;
