@@ -415,17 +415,23 @@ function createSingleNode(x, y, nodeData, callSites){
     let lock = false;
     let nodeHeight = nodeHeightEmpty + callSiteHeight * callSites.length;
 
+    function raiseNode(t) {
+        console.log(t)
+        d3.select(t.parentNode).each(function() {
+            this.parentNode.appendChild(this);
+        });
+        nodeMap.get(idString(nodeData)).children.forEach(function (c) {
+            d3.select("[id='" + c.edge.id + "']").each(function () {
+                this.parentNode.appendChild(this);
+            })
+        });
+    }
+
+
     var drag = d3.behavior.drag()
         .on("dragstart", function(){
             //Verschiebt div und parent(foreignobject) in den Vordergrund
-            d3.select(this.parentNode).each(function() {
-                this.parentNode.appendChild(this);
-            });
-            nodeMap.get(idString(nodeData)).children.forEach(function (c) {
-                d3.select("[id='" + c.edge.id + "']").each(function () {
-                    this.parentNode.appendChild(this);
-                })
-            });
+            raiseNode(this);
             d3.event.sourceEvent.stopPropagation();
             // svgDragLock = null;
             if(d3.event.sourceEvent.path[0].nodeName === "BUTTON"
@@ -473,6 +479,7 @@ function createSingleNode(x, y, nodeData, callSites){
         .attr("id", idString(nodeData))
         .attr("class","div_node")
         .call(drag)
+        .on("mouseenter", function(){ raiseNode(this)})
         .style("width", nodeWidth + "px")
         .style("padding", "10px")
         .style("border-width", "5px");	// sizes must stay in js-file for later calculations;
