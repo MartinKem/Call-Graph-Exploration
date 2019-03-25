@@ -390,6 +390,10 @@ class node{
     focus(){
         let xCenter = this.sizes.x + this.sizes.width/2;
         let yCenter = this.sizes.y + this.sizes.height/2;
+        if(!this.detailed){
+            xCenter = this.sizes.x + nodeWidth/2;
+            yCenter = this.sizes.y + nodeHeightEmpty/2;
+        }
         document.getElementsByTagName('html')[0].scrollLeft = parseInt(xCenter - window.innerWidth/2);
         document.getElementsByTagName('html')[0].scrollTop = parseInt(yCenter - window.innerHeight/2);
     }
@@ -433,9 +437,9 @@ function createSingleNode(x, y, nodeData, callSites){
                 nodes[node.getForceNodeIndex()].py = yCenter;
 
                 resizeSVGCont(node);
+                node.reloadEdges();
             }
 
-            // svgDragLock = false;
             lock = false;
         })
         .on("drag", function() {
@@ -448,7 +452,6 @@ function createSingleNode(x, y, nodeData, callSites){
 
                 let node = nodeMap.get(this.id);
                 node.setPosition(newX, newY);
-                node.reloadEdges();
 
             }
         });
@@ -542,6 +545,7 @@ function createSingleNode(x, y, nodeData, callSites){
         if(node.detailed){
             nodeSelection.children(".node_inhalt").toggleClass("invis");
             node.toggleToAbstract();
+            node.focus();
         }
         else {
             nodeSelection.children(".node_inhalt").toggleClass("invis");

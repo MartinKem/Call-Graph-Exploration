@@ -67,14 +67,17 @@ class Edge{
 
         function getGlobalOffset(el) {
             var x = 0, y = 0;
-            while (el.nodeName !== "foreignObject") {
-                x += el.offsetLeft;
-                y += el.offsetTop;
-                el = el.offsetParent;
-            }
-            x += parseInt(el.getAttribute("x")) + 4;
-            y += parseInt(el.getAttribute("y")) + 4;
-            return { left: x, top: y };
+                while (el.nodeName !== "foreignObject") {
+                    x += el.offsetLeft;
+                    y += el.offsetTop;
+                    el = el.offsetParent;
+                    if(!el) break;
+                }
+                if(el){
+                    x += parseInt(el.getAttribute("x")) + 4;
+                    y += parseInt(el.getAttribute("y")) + 4;
+                }
+                return { left: x, top: y };
         }
     }
 
