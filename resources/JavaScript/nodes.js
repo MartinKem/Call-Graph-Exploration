@@ -417,8 +417,14 @@ function createSingleNode(x, y, nodeData, callSites){
 
     var drag = d3.behavior.drag()
         .on("dragstart", function(){
+            //Verschiebt div und parent(foreignobject) in den Vordergrund
             d3.select(this.parentNode).each(function() {
                 this.parentNode.appendChild(this);
+            });
+            nodeMap.get(idString(nodeData)).children.forEach(function (c) {
+                d3.select("[id='" + c.edge.id + "']").each(function () {
+                    this.parentNode.appendChild(this);
+                })
             });
             d3.event.sourceEvent.stopPropagation();
             // svgDragLock = null;
