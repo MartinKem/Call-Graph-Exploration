@@ -416,7 +416,6 @@ function createSingleNode(x, y, nodeData, callSites){
     let nodeHeight = nodeHeightEmpty + callSiteHeight * callSites.length;
 
     function raiseNode(t) {
-        console.log(t)
         d3.select(t.parentNode).each(function() {
             this.parentNode.appendChild(this);
         });
@@ -431,7 +430,6 @@ function createSingleNode(x, y, nodeData, callSites){
     var drag = d3.behavior.drag()
         .on("dragstart", function(){
             //Verschiebt div und parent(foreignobject) in den Vordergrund
-            raiseNode(this);
             d3.event.sourceEvent.stopPropagation();
             // svgDragLock = null;
             if(d3.event.sourceEvent.path[0].nodeName === "BUTTON"
