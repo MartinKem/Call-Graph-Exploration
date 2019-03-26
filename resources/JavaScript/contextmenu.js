@@ -137,12 +137,12 @@ function createNodeContextmenu(e) {
     }catch (e) {*/
        // counter = 1;
        // if(counter > 0)console.log("contextmenu nicht mehr aktuell");
-        $("body").append($("<div id='contextmenuNode'>        <div class=\"menuelement\" onclick=\"deleteNodes()\">Hide</div>" +
+        $("body").append($("<div id='contextmenuNode'>        <div class=\"menuelement\" onclick=\"deleteNodes()\" title=\"Click to hide this node and all childnodes without different parentnodes\">Hide</div>" +
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffc6c6')\">Red<span class='hotKeySpan'> [1+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#beffbe')\">Green<span class='hotKeySpan'> [2+MouseLeft]</span><div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#abd3ff')\">Blue<span class='hotKeySpan'> [3+MouseLeft]</span><div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffff9f')\">Yellow<span class='hotKeySpan'> [4+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffffff')\">White<span class='hotKeySpan'> [5+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffffff')\">Default<span class='hotKeySpan'> [5+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"switchContent()\">Details<span class='hotKeySpan'> [Double click]</span></div><div>"));
 
     $("#contextmenuNode").css({
@@ -278,7 +278,7 @@ function createCallSiteContextmenu(e, node, index){
         "<div id='contextmenuCallSite'>" +
             "<h3>Choose targets for the call site <span>" + escapeSG(idString(node.getCallSites()[index].declaredTarget)) + "</span> to be shown:</h3>" +
             "<form autocomplete='off' onsubmit='return false'>" +
-                "<input type='text' name='targetSearch' id='targetSearch' placeholder='add targets' spellcheck='false'>" +
+                "<input type='text' name='targetSearch' id='targetSearch' placeholder='Select Targets' spellcheck='false'>" +
             "</form>" +
             "<div id='callSiteSelection'>" +
                 "<div id='selectedTargets'>" +
@@ -352,14 +352,17 @@ function hideTargets(targets){
 }
 
 function createWholeGraphContextmenu(){
-    if(rootNodes.length < 1) alert("There must be at least one starting node!");
-    $("body").append(
-        "<div id='wholeGraphContextMenu'>" +
-            "<h2>Warning!</h2>" +
-            "<p>Are you sure, that you want to create " + countReachableNodes() + " nodes?</p>" +
-            "<button onclick='deleteWholeGraphContextmenu(); showWholeGraph();'>Show</button>" +
-            "<button onclick='deleteWholeGraphContextmenu();'>Quit</button>" +
-        "</div>");
+    if(rootNodes.length < 1){
+        alert("There must be at least one starting node!");
+    } else {
+        $("body").append(
+            "<div id='wholeGraphContextMenu'>" +
+                "<h2>Warning!</h2>" +
+                "<p>Are you sure, that you want to create " + countReachableNodes() + " nodes?</p>" +
+                "<button onclick='deleteWholeGraphContextmenu(); showWholeGraph();'>Show</button>" +
+                "<button onclick='deleteWholeGraphContextmenu();'>Quit</button>" +
+            "</div>");
+    }
 }
 
 function deleteWholeGraphContextmenu(){
