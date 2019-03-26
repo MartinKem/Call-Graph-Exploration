@@ -49,6 +49,7 @@ let callSites5 = [{ declaredTarget: { declaringClass: "Sub2", name: "sub1", para
 
 const nodes = require('./nodes');
 const index = require('./index');
+const global = require('./global');
 
 // create graphs
 let SubRootNode = new nodes.node(nodeData1, callSites1);
@@ -75,6 +76,16 @@ test('Test hide of nodes 1', () => {
     sub2Sub2.showChildNodes(0);
     sub2Sub1.showChildNodes(0);
     sub3Sub1.showChildNodes(0);
+
+    let numberOfGeneratedNodes = 0;
+    let numberOfGeneratedEdges = 0;
+    for(let i = 0; i < global.svgCont[0][0].childNodes.length; i++){
+        if(global.svgCont[0][0].childNodes[i].nodeName === "foreignObject") numberOfGeneratedNodes++;
+        else if(global.svgCont[0][0].childNodes[i].nodeName === "path") numberOfGeneratedEdges++;
+    }
+
+    expect(numberOfGeneratedEdges.toBe(5));
+    expect(numberOfGeneratedEdges.toBe(5));
 
     // make sure it works
     expect(SubRootNode.getVisibility()).toBe(true);
@@ -143,7 +154,6 @@ test('Test hide of nodes 1', () => {
 
     //hide some nodes
     sub3Sub1.hideNode();
-
     expect(SubRootNode.getVisibility()).toBe(true);
     expect(sub2Sub1.getVisibility()).toBe(true);
     expect(sub2Sub2.getVisibility()).toBe(true);
