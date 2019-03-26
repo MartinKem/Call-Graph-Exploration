@@ -289,8 +289,8 @@ function createCallSiteContextmenu(e, node, index){
             "<div id='contextmenuSubmit'>" +
                 "<button id='cmb1' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex)'>Show all possible Targets</button>" +
                 "<button id='cmb2' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex, selectedTargets)'>Show selected Targets</button><br>" +
-                "<button id='cmb3' onclick='closeCallSiteContextmenu(); hideTargets()'>Hide all visible Targets</button>" +
-                "<button id='cmb4' onclick='closeCallSiteContextmenu(); hideTargets(selectedTargets)'>Hide selected Targets</button><br>" +
+                "<button id='cmb3' onclick='closeCallSiteContextmenu(); selectedNode.hideCallsiteTargets(callSiteIndex)'>Hide all visible Targets</button>" +
+                "<button id='cmb4' onclick='closeCallSiteContextmenu(); selectedNode.hideCallsiteTargets(callSiteIndex,selectedTargets)'>Hide selected Targets</button><br>" +
                 "<button id='cmb5' onclick='closeCallSiteContextmenu()'>Close</button>" +
             "</div>"+
         "</div>");
