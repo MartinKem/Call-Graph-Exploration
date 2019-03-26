@@ -274,6 +274,84 @@ class node{
                     }
                 }
             }
+        }
+    }
+    hideCallsiteTargets(callsiteIndex,arrOfTargets){
+        if(arrOfTargets === undefined){
+            arrOfTargets = this.callSites[callsiteIndex].targets;
+        }
+        let thisNode = this;
+        function getChild(t){
+            let child;
+            thisNode.children.forEach(function (c) {
+                if(idString(t) === idString(c.node.nodeData) && c.index === callsiteIndex){
+                    child = c;
+                }
+            });
+            return child;
+        }
+        arrOfTargets.forEach(function (t) {
+            let child = getChild(t);
+            child.edge.hide();
+            child.node.hideChild();
+        })
+    }
+    hideChild(){
+        if(this.visible === true){
+            this.marked = true;
+            //updates number of current shown nodes
+            var markedArr = [];
+            markedArr.push(this);
+            markChildren(this);
+            markedArr.forEach(function(n){
+                unmark(n);
+            });
+
+            //markedArr.push(this);
+            markedArr.forEach(function (n) {
+                document.getElementById(idString(n.nodeData)).style.display = "none";
+                //updates number of current shown nodes
+                if(n.visible){
+                    currentNodes--;
+                    refreshGraphData();
+                }
+                n.visible = false;
+                n.reloadEdges();
+                n.marked = false;
+            });
+        }
+
+        function markChildren(n){
+
+            if(n.children.length > 0) {
+                n.children
+                    .filter(child => child.node.visible && !child.node.marked)
+                    .forEach(function (c) {
+                        c.node.marked = true;
+                        markedArr.push(c.node);
+                        markChildren(c.node);
+                    });
+            }
+        }
+
+        function unmark(n) {
+            if(n.parents.length){
+                for(let i = 0; i < n.parents.length; i++){
+                    let p = n.parents[i];
+                    if(p.node.visible && !p.node.marked && p.edge !== undefined && p.edge.visible !== false){
+                        n.marked = false;
+                        markedArr.splice(markedArr.indexOf(n), 1);
+                        if (n.children) {
+                            n.children.forEach(function (c) {
+                                if (c.node.marked === true && c.node.visible) {
+                                    unmark(c.node);
+                                }
+                            })
+                        }
+                        break;
+                    }
+                }
+            }
 
         }
     }
@@ -583,9 +661,10 @@ function createSingleNode(x, y, nodeData, callSites){
         if (node.callSites[index].targets.length < callSiteThreshold) {
             if (!visibleTarget) node.showChildNodes(index);
             else {
-                node.callSites[index].targets.forEach(function (target) {
+                node.hideCallsiteTargets(index)
+                /*node.callSites[index].targets.forEach(function (target) {
                     if(idString(node.nodeData) !== idString(target)) nodeMap.get(idString(target)).hideNode();
-                });
+                });*/
             }
         }
     }
