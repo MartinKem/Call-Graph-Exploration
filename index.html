@@ -15,7 +15,7 @@
 		<!--Filereader für JSON Datei-->
 		<form id="jsonFile" name="jsonFile" enctype="multipart/form-data" method="post">
 			<fieldset style="height: 100%">
-				<h2>Json File</h2>
+				<h2>Enter JSON file to start</h2>
 			  	<div id="dropZone">You can Drop files here <br />
 				<input type='file' id='fileinput' accept=".json" onchange="if (!lockOnchange){lockOnchange = true; this.setAttribute('disabled', true); loadFile()}" style="position: relative; top: 40%">
 			  	</div> 
@@ -32,15 +32,15 @@
 		<div id="top_fixed" style="position: fixed; top: 10px; left: 10px">
 			<form autocomplete="off" onsubmit="return false" style="overflow: auto;">
 				<div class="autocomplete" style="float: left; margin-right: 10px">
-				<input type="text" name="searchClass" id="searchInput" placeholder="Method" spellcheck="false">
+				<input title="Enter method information to generate a new node or focus a currently shown node" type="text" name="searchClass" id="searchInput" placeholder="Find Method" spellcheck="false">
 				</div>
 				<!--<div class="autocomplete" style="float: left; margin-right: 10px">-->
 				<!--<input type="text" name="searchMethod" id="methodInput" placeholder="Method">-->
 				<!--</div>-->
-				<input type="submit" id="search" value="Find" onclick="createGraph()" disabled>
+				<input title="Click to generate your entered node and to focus currently shown nodes" type="submit" id="search" value="Find" onclick="createGraph()" disabled>
 			</form>
-			<button id="btn" onclick="open_close(this.innerHTML)" style="margin-top: 10px">Hide Details</button>
-			<button id="showWholeGraph" onclick="createWholeGraphContextmenu();" style="margin-top: 10px">Show whole Graph ...</button>
+			<button title="Click to toggle between a detailed and an abstract view of all nodes" id="btn" onclick="open_close(this.innerHTML)" style="margin-top: 10px">Hide Details</button>
+			<button title="Click to show the entire subgraph that can be reached from the currently shown nodes" id="showWholeGraph" onclick="createWholeGraphContextmenu();" style="margin-top: 10px">Show Subgraph</button>
 		</div>
 		<div id="bottom_fixed">
 			<div id="totalNodes">Total Nodes:
