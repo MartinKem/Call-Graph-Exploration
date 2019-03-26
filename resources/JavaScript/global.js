@@ -66,6 +66,8 @@ const callSiteTopOffset = 128;
 var links = [];
 var nodes = [];
 
+var lockOnchange = false;
+
 /**
 * (only for testing)
 * EXPORT:
@@ -73,6 +75,7 @@ var nodes = [];
 */
 if (typeof module !== 'undefined') {
 
+    global.lockOnchange = lockOnchange;
     global.links = links;
     global.nodes = nodes;
     global.nodeWidth  = nodeWidth;

@@ -138,12 +138,12 @@ function createNodeContextmenu(e) {
        // counter = 1;
        // if(counter > 0)console.log("contextmenu nicht mehr aktuell");
         $("body").append($("<div id='contextmenuNode'>        <div class=\"menuelement\" onclick=\"deleteNodes()\">Hide</div>" +
-            "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffc6c6')\">Red<span class='hotKeySpan'>[1+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"changeColorNode('#beffbe')\">Green<span class='hotKeySpan'>[2+MouseLeft]</span><div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"changeColorNode('#abd3ff')\">Blue<span class='hotKeySpan'>[3+MouseLeft]</span><div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffff9f')\">Yellow<span class='hotKeySpan'>[4+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffffff')\">White<span class='hotKeySpan'>[5+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"switchContent()\">Details</div><div>"));
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffc6c6')\">Red<span class='hotKeySpan'> [1+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#beffbe')\">Green<span class='hotKeySpan'> [2+MouseLeft]</span><div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#abd3ff')\">Blue<span class='hotKeySpan'> [3+MouseLeft]</span><div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffff9f')\">Yellow<span class='hotKeySpan'> [4+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffffff')\">White<span class='hotKeySpan'> [5+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"switchContent()\">Details<span class='hotKeySpan'> [Double click]</span></div><div>"));
 
     $("#contextmenuNode").css({
         "position":"absolute",
@@ -169,8 +169,12 @@ function switchContent() {
     let nodeId= $(clickedNode).attr('id');
     let node = nodeMap.get(nodeId);
     $(clickedNode).children(".node_inhalt").toggleClass("invis");
-    if($(clickedNode).children(".node_inhalt").hasClass("invis")){ node.toggleToAbstract(); }
-    else{ node.toggleToDetailed(); }
+    if($(clickedNode).children(".node_inhalt").hasClass("invis")){
+        node.toggleToAbstract();
+        node.focus(); }
+    else{
+        node.toggleToDetailed();
+    }
     // for(var i = 0; i < node.parents.length; i++){		// first all edges to this node become hidden
     //     var edge = document.getElementById(node.parents[i].node.getName() + "#" + node.parents[i].index + '->' + nodeName);
     //     if(edge) edge.style.display = "none";
@@ -189,7 +193,7 @@ function createEdgeContextmenu(e) {
         " <div class=\"menuelement\" onclick=\"changeColorEdge('#C4C931')\">Yellow <span class='hotKeySpan'>[4+MouseLeft]</span><div class=\"color\" style=\"background-color: #c4c931\"></div></div>" +
         " <div class=\"menuelement\" onclick=\"changeColorEdge('#000000')\">Default <span class='hotKeySpan'>[5+MouseLeft]</span><div class=\"color\" style=\"background-color: #000000\"></div></div>" +
         " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[0].split('#')[0]).focus()\" style=\"white-space: nowrap\">focus Source <span class='hotKeySpan'>[Ctrl+MouseLeft]</span></div>" +
-        " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[1]).focus()\" style=\"white-space: nowrap\">focus Target <span class='hotKeySpan'>[Double Click]</span></div>" +
+        " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[1]).focus()\" style=\"white-space: nowrap\">Focus Target <span class='hotKeySpan'>[Double Click]</span></div>" +
     "</div>");
 
     $("#contextmenuEdge").css({
@@ -202,7 +206,6 @@ function createEdgeContextmenu(e) {
 
 function changeColorEdge(color) {
     if(lastMarkedEdge === clickedEdge) $(lastMarkedEdge).removeClass("lastClickedEdge");
-    // var color = $(elem).find(".color").css('backgroundColor');
     if(color === '#000000'){
         $(clickedEdge).css('opacity', 0.5);
     }else{
@@ -231,6 +234,7 @@ function closeCallSiteContextmenu(){
     maxSuggests = 10;
     if(callSiteMenuIsOpen){
         document.getElementById("searchInput").removeAttribute("disabled", false);
+        document.getElementById("search").removeAttribute("disabled", false);
         $("#contextmenuCallSite").remove();
         autocompleteMode = undefined;   // autocomplete shall work as usual, when the call site contextmenu closes
         callSiteMenuIsOpen = false;
@@ -269,7 +273,6 @@ function createCallSiteContextmenu(e, node, index){
             availableTargets.delete(idString(child.nodeData));  // remove selected target from available
             selectedTargets.add(idString(child.nodeData));   // add selected target to selected
         });
-    // console.log(selectedTargets);
 
     $("body").append(
         "<div id='contextmenuCallSite'>" +
@@ -300,6 +303,7 @@ function createCallSiteContextmenu(e, node, index){
         });
 
     document.getElementById("searchInput").setAttribute("disabled", true);
+    document.getElementById("search").setAttribute("disabled", true);
     autocompleteMode = "callSite";  // this global variable is used in the autocomplete function, that shall work a little bit different, when in call site mode
     autocomplete(document.getElementById("targetSearch"), Array.from(availableTargets.values()));
     callSiteMenuIsOpen = true;

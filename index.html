@@ -14,11 +14,11 @@
 	<div id="load_page">
 		<!--Filereader für JSON Datei-->
 		<form id="jsonFile" name="jsonFile" enctype="multipart/form-data" method="post">
-			<fieldset style="height: 100vh">
+			<fieldset style="height: 100%">
 				<h2>Json File</h2>
 			  	<div id="dropZone">You can Drop files here <br />
-				<input type='file' id='fileinput' accept=".json" onchange="this.setAttribute('disabled', true); loadFile()" style="position: relative; top: 40%">
-			  	</div> <br />
+				<input type='file' id='fileinput' accept=".json" onchange="if (!lockOnchange){lockOnchange = true; this.setAttribute('disabled', true); loadFile()}" style="position: relative; top: 40%">
+			  	</div> 
 
 			  	<div id="progress_bar">
 					<div id="progress" class="percent">0%</div>

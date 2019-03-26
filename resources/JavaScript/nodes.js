@@ -390,6 +390,10 @@ class node{
     focus(){
         let xCenter = this.sizes.x + this.sizes.width/2;
         let yCenter = this.sizes.y + this.sizes.height/2;
+        if(!this.detailed){
+            xCenter = this.sizes.x + nodeWidth/2;
+            yCenter = this.sizes.y + nodeHeightEmpty/2;
+        }
         document.getElementsByTagName('html')[0].scrollLeft = parseInt(xCenter - window.innerWidth/2);
         document.getElementsByTagName('html')[0].scrollTop = parseInt(yCenter - window.innerHeight/2);
     }
@@ -411,8 +415,23 @@ function createSingleNode(x, y, nodeData, callSites){
     let lock = false;
     let nodeHeight = nodeHeightEmpty + callSiteHeight * callSites.length;
 
+    function raiseNode(t) {
+        console.log(t)
+        d3.select(t.parentNode).each(function() {
+            this.parentNode.appendChild(this);
+        });
+        nodeMap.get(idString(nodeData)).children.forEach(function (c) {
+            d3.select("[id='" + c.edge.id + "']").each(function () {
+                this.parentNode.appendChild(this);
+            })
+        });
+    }
+
+
     var drag = d3.behavior.drag()
         .on("dragstart", function(){
+            //Verschiebt div und parent(foreignobject) in den Vordergrund
+            raiseNode(this);
             d3.event.sourceEvent.stopPropagation();
             // svgDragLock = null;
             if(d3.event.sourceEvent.path[0].nodeName === "BUTTON"
@@ -433,9 +452,9 @@ function createSingleNode(x, y, nodeData, callSites){
                 nodes[node.getForceNodeIndex()].py = yCenter;
 
                 resizeSVGCont(node);
+                node.reloadEdges();
             }
 
-            // svgDragLock = false;
             lock = false;
         })
         .on("drag", function() {
@@ -448,7 +467,6 @@ function createSingleNode(x, y, nodeData, callSites){
 
                 let node = nodeMap.get(this.id);
                 node.setPosition(newX, newY);
-                node.reloadEdges();
 
             }
         });
@@ -461,6 +479,7 @@ function createSingleNode(x, y, nodeData, callSites){
         .attr("id", idString(nodeData))
         .attr("class","div_node")
         .call(drag)
+        .on("mouseenter", function(){ raiseNode(this)})
         .style("width", nodeWidth + "px")
         .style("padding", "10px")
         .style("border-width", "5px");	// sizes must stay in js-file for later calculations;
@@ -542,6 +561,7 @@ function createSingleNode(x, y, nodeData, callSites){
         if(node.detailed){
             nodeSelection.children(".node_inhalt").toggleClass("invis");
             node.toggleToAbstract();
+            node.focus();
         }
         else {
             nodeSelection.children(".node_inhalt").toggleClass("invis");

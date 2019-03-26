@@ -26,6 +26,12 @@ function handleFileSelect(evt) {
 	var files = evt.dataTransfer.files; // FileList object.
 
 	document.getElementById('fileinput').files = files; // set new file
+
+	if (!lockOnchange) {
+		lockOnchange = true;
+		document.getElementById('fileinput').setAttribute('disabled', true);
+		loadFile();
+	}
 }
 
 

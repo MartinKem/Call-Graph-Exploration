@@ -4,9 +4,11 @@
 * *******
 */
 if (typeof module !== 'undefined') {
- var index = require('./index');
- var idString = index.idString;
- //var node = require('./nodes');
+	var index = require('./index');
+	var idString = index.idString;
+
+	var edges = require("./edges");
+	var edgeConstructor = edges.edgeConstructor;
 }
 
 
@@ -120,6 +122,8 @@ function resetFileRead() {
 	arr = [];
 	strJson = "";
 	isLoading = false;
+	lockOnchange = false;
+	document.getElementById('fileinput').disabled = false;
 	setProgBar(0);
 }
 
@@ -161,8 +165,16 @@ function parseFile(file, callback) {
 			console.log(parsedJson);
 			//put Total Nodes / reachableMethods in graph stats
 			totalNodes = parsedJson.reachableMethods.length;
+
+			// if graph is empty
+			if (totalNodes <= 0) {
+				alert("Graph is empty.  \n-Is the Json-File saved as UNIX (LF)? \n-Is the Json-File properly formatted? \n");
+				resetFileRead();
+				return;
+			}
+
 			//put Total Edges / Edges from reachableMethods in graph stats
-			parsedJson.reachableMethods.forEach(function(element){
+			parsedJson.reachableMethods.forEach(function (element) {
 				if (element.callSites) totalEdges += element.callSites.length;
 			});
 			estGraphData();
@@ -240,7 +252,7 @@ function autocomplete(inp, arr) {
 	inp.addEventListener("input", function (e) { autocompleteEvent(e, this); });
 	inp.addEventListener("focus", function (e) { autocompleteEvent(e, this); });
 
-	if(!documentListener){
+	if (!documentListener) {
 		document.addEventListener("click", function (e) {
 			let lock = e.path[3] === undefined || e.path[3].id !== "contextmenuCallSite";
 			if (e.srcElement.id !== "searchInput" && e.srcElement.id !== "targetSearch" && lock) {
@@ -257,7 +269,7 @@ function autocomplete(inp, arr) {
 	function autocompleteEvent(e, inputElem, scrollTop) {
 		var div, items, otherValue, thisArray, reducedArray = [], value = inputElem.value;
 
-		if(inputElem.name === "targetSearch") arr = Array.from(availableTargets.values());
+		if (inputElem.name === "targetSearch") arr = Array.from(availableTargets.values());
 		//Alle offenen Listen schließen
 		closeAllLists();
 		//Unterbrechen, wenn das Textfeld leer ist
@@ -311,7 +323,7 @@ function autocomplete(inp, arr) {
 						// items.innerHTML += "<input type='hidden' name='show more'>";
 						div.appendChild(items);
 						let showMoreButton = document.getElementById("showMoreButton").parentNode;
-						showMoreButton.addEventListener("click", function(event){
+						showMoreButton.addEventListener("click", function (event) {
 							let scrollTop = showMoreButton.parentNode.scrollTop
 							showMoreButton.parentNode.remove();
 							maxSuggests += 10;
@@ -325,7 +337,7 @@ function autocomplete(inp, arr) {
 				}
 			}
 		}
-		if(scrollTop){
+		if (scrollTop) {
 			document.getElementById(inp.id + "autocomplete-list").scrollTop = scrollTop;
 		}
 	}
@@ -398,9 +410,9 @@ function createNodeInstance(nodeData, parentNode, index) {
 		/* The node has already been created before, so it is just added as child to the parent node.
          */
 		newNode = parentNode.addChild(index, nodeData, null);
-		if(newNode){
-			let newEdge = new Edge(parentNode, newNode, index);
-			parentNode.children[parentNode.children.length-1].edge = newEdge;
+		if (newNode) {
+			let newEdge = edgeConstructor(parentNode, newNode, index);
+			parentNode.children[parentNode.children.length - 1].edge = newEdge;
 			newNode.addParent(parentNode, index, newEdge);
 			newEdge.create();
 		}
@@ -437,7 +449,7 @@ function createNodeInstance(nodeData, parentNode, index) {
  * @param {String} key - key by which to sort
 */
 function sortByKey(array, key) {
-	return array.sort(function(a, b) {
+	return array.sort(function (a, b) {
 		let x = a[key]; var y = b[key];
 		return ((x < y) ? -1 : ((x > y) ? 1 : 0));
 	});
@@ -450,59 +462,62 @@ function createGraph() {
 	maxSuggests = 10;
 	let rootNodeString = document.getElementById("searchInput").value;
 	let rootNode = nodeMap.get(rootNodeString);
-    if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
+	if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
 	if (rootNode) {
 		if (!rootNode.getSizes().x) rootNode.placeCentrally();
-		if (!rootNode.visible){
+		if (!rootNode.visible) {
 			rootNode.showNode();
-			resizeSVGCont(rootNode);
 		}
+		resizeSVGCont(rootNode);
 		rootNode.focus();
 		rootNodes.push(rootNode);
 		createdNodes = 0;
-	}
-	let pnm = Array.from(placedNodesMap.values());
-	pnm.pop();
-	pnm.forEach(function (node) {
-        node.callSites.forEach(function (c, i) {
-            c.targets.forEach(function (t) {
-                if(idString(t)=== idString(rootNode.nodeData)){
-                    node.showChildNodes(i, [idString(rootNode.nodeData)]);
-                }
-            })
 
-        })
-    });
+		let pnm = Array.from(placedNodesMap.values());
+		pnm.pop();
+		pnm.forEach(function (node) {
+			node.callSites.forEach(function (c, i) {
+				c.targets.forEach(function (t) {
+					if (idString(t) === idString(rootNode.nodeData)) {
+						let names = new Set();
+						names.add(idString(rootNode.nodeData));
+						node.showChildNodes(i, names);
+					}
+				})
+
+			})
+		});
+	}
 }
 
-function showWholeGraph(maxDepth){
-	if(!maxDepth) maxDepth = Number.MAX_VALUE;
+function showWholeGraph(maxDepth) {
+	if (!maxDepth) maxDepth = Number.MAX_VALUE;
 	showWholeGraphSet = new Set();
 
-	rootNodes.forEach(function(rootNode){
-		if(rootNode.visible) {
+	rootNodes.forEach(function (rootNode) {
+		if (rootNode.visible) {
 			showAllChildNodes(rootNode, 0);
 		}
 	});
 
-	function showAllChildNodes(node, depth){
-		if(depth >= maxDepth) return;
-		node.callSites.forEach(function(callSite, index){
+	function showAllChildNodes(node, depth) {
+		if (depth >= maxDepth) return;
+		node.callSites.forEach(function (callSite, index) {
 			node.showChildNodes(index);
 			showWholeGraphSet.add(idString(node.nodeData));
 		});
-		node.callSites.forEach(function(callSite){
-			callSite.targets.forEach(function(target){
-				if(!showWholeGraphSet.has(idString(target))) showAllChildNodes(nodeMap.get(idString(target)), depth+1);
+		node.callSites.forEach(function (callSite) {
+			callSite.targets.forEach(function (target) {
+				if (!showWholeGraphSet.has(idString(target))) showAllChildNodes(nodeMap.get(idString(target)), depth + 1);
 			});
 		});
 	}
 }
 
-function countReachableNodes(){
+function countReachableNodes() {
 	showWholeGraphSet = new Set();
-	rootNodes.forEach(function(rootNode){
-		if(rootNode.visible){
+	rootNodes.forEach(function (rootNode) {
+		if (rootNode.visible) {
 			showWholeGraphSet.add(idString(rootNode.nodeData));
 			countReachableGraph(parsedJsonMap.get(idString(rootNode.nodeData)));
 		}
@@ -515,7 +530,7 @@ function countReachableNodes(){
 				if (!showWholeGraphSet.has(targetString)) {
 					showWholeGraphSet.add(targetString);
 					let jsonTarget = parsedJsonMap.get(targetString);
-					if(jsonTarget) countReachableGraph(jsonTarget);
+					if (jsonTarget) countReachableGraph(jsonTarget);
 				}
 			});
 		});
@@ -527,7 +542,7 @@ function countReachableNodes(){
 /**
  * @param {{name: string, declaringClass: string, parameterTypes: string[], returnType: string}} methodData - data of this single method (without call sites and targets)
  */
-function addJsonMapEntry(methodData){
+function addJsonMapEntry(methodData) {
 	parsedJsonMap.set(idString(methodData), methodData);
 }
 
