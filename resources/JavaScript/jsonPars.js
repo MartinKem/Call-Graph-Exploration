@@ -66,6 +66,7 @@ function loadFile() {
 	isLoading = true;
 	setProgBar(0);
 	let input = document.getElementById('fileinput').files[0];
+	document.title = input.name;
 	parseFile(input, setString);
 }
 
@@ -236,6 +237,10 @@ function parseFile(file, callback) {
 		return Array.from(parsedJsonMap.keys());
 	}
 }
+
+/**
+ * changes the loading page to the graph page
+ */
 function changeDiv() {
 	$("#load_page").addClass("invis");
 	$("#graph_page").removeClass("invis");
