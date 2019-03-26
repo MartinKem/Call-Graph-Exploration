@@ -76,12 +76,25 @@ test('Test hide of nodes 1', () => {
     sub2Sub1.showChildNodes(0);
     sub3Sub1.showChildNodes(0);
 
+    //get the html elements
+    let SubRootNodeHtml = document.getElementById("Main.main():int");
+    let sub2Sub2Html = document.getElementById("Sub2.sub2():int");
+    let sub2Sub1Html = document.getElementById("Sub2.sub1():int");
+    let sub3Sub1Html = document.getElementById("Sub3.sub1():int");
+    let subnSub1Html = document.getElementById("Subn.sub1():int");
+
     // make sure it works
     expect(SubRootNode.getVisibility()).toBe(true);
     expect(sub2Sub1.getVisibility()).toBe(true);
     expect(sub2Sub2.getVisibility()).toBe(true);
     expect(sub3Sub1.getVisibility()).toBe(true);
     expect(subnSub1.getVisibility()).toBe(true);
+
+
+
+
+
+
 
     //hide some nodes    
     sub2Sub2.hideNode();
