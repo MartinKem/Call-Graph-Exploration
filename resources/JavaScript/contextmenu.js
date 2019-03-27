@@ -278,7 +278,7 @@ function createCallSiteContextmenu(e, node, index){
         availableTargets.add(idString(target));
     });
     node.children
-        .filter(child => child.index === index && child.node.visible)
+        .filter(child => (child.index === index && child.edge.visible))
         .forEach(function(child){
             availableTargets.delete(idString(child.node.nodeData));  // remove selected target from available
             selectedTargets.add(idString(child.node.nodeData));   // add selected target to selected
@@ -307,7 +307,7 @@ function createCallSiteContextmenu(e, node, index){
 
     // targets, that are already visible, shall be shown in the selected list
     node.children
-        .filter(child => child.index === index && child.node.visible)
+        .filter(child => child.index === index && child.edge.visible)
         .forEach(function(child){
             addTargetToSelected(idString(child.node.nodeData));
         });

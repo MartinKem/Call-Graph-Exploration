@@ -141,6 +141,7 @@ class node{
                 child.addParent(thisNode, childArrayElem.index, childArrayElem.edge);
             }
             else if(childArrayElem.edge.visible === false){
+                //console.log(childArrayElem);
                 childArrayElem.edge.reload();
             }
         });
@@ -151,7 +152,7 @@ class node{
 
         function getChildArrayElement(target){
             for(let i = 0; i < thisNode.children.length; i++){
-                if(idString(target) === idString(thisNode.children[i].node.nodeData)) return thisNode.children[i];
+                if(idString(target) === idString(thisNode.children[i].node.nodeData) && index === thisNode.children[i].index) return thisNode.children[i];
             }
         }
     }
