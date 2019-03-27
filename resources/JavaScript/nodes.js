@@ -279,12 +279,18 @@ class node{
     hideCallsiteTargets(callsiteIndex,arrOfTargets){
         if(arrOfTargets === undefined){
             arrOfTargets = this.callSites[callsiteIndex].targets;
+            let b  = [];
+            arrOfTargets.forEach(function (a) {
+                b.push(idString(a))
+            })
+            arrOfTargets = b;
         }
+
         let thisNode = this;
         function getChild(t){
             let child;
             thisNode.children.forEach(function (c) {
-                if(idString(t) === idString(c.node.nodeData) && c.index === callsiteIndex){
+                if(t === idString(c.node.nodeData) && c.index === callsiteIndex){
                     child = c;
                 }
             });

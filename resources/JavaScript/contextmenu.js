@@ -75,7 +75,7 @@ $("body").on("click",".div_node",function () {
 });
 
 /**ändert die Farbe der angeklickten Edge wenn ein entsprechender Hotkey gedrückt wird.
- * die Hotkey sind 0,1,2,3,4. Esfunktionieren sowohl die normalen Zahlen, als auch die vom Numpad
+ * die Hotkey sind 0,1,2,3,4. Es funktionieren sowohl die normalen Zahlen, als auch die vom Numpad
  * */
 $("body").on("click","svg path",function () {
     clickedEdge = this;
@@ -248,10 +248,10 @@ function markLastClickedNode() {
     lastMarkedNode = markedNode;
 }
 function markLastClickedEdge() {
-    $(markedEdge).addClass("lastClickedEdge");
-    if(lastMarkedEdge !== null || lastMarkedEdge === markedEdge){
+    if(lastMarkedEdge !== null){
         $(lastMarkedEdge).removeClass("lastClickedEdge");
     }
+    $(markedEdge).addClass("lastClickedEdge");
     lastMarkedEdge = markedEdge;
 }
 
@@ -270,8 +270,8 @@ function createCallSiteContextmenu(e, node, index){
     node.children
         .filter(child => child.index === index && child.node.visible)
         .forEach(function(child){
-            availableTargets.delete(idString(child.nodeData));  // remove selected target from available
-            selectedTargets.add(idString(child.nodeData));   // add selected target to selected
+            availableTargets.delete(idString(child.node.nodeData));  // remove selected target from available
+            selectedTargets.add(idString(child.node.nodeData));   // add selected target to selected
         });
 
     $("body").append(
@@ -290,7 +290,7 @@ function createCallSiteContextmenu(e, node, index){
                 "<button id='cmb1' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex)'>Show all possible Targets</button>" +
                 "<button id='cmb2' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex, selectedTargets)'>Show selected Targets</button><br>" +
                 "<button id='cmb3' onclick='closeCallSiteContextmenu(); selectedNode.hideCallsiteTargets(callSiteIndex)'>Hide all visible Targets</button>" +
-                "<button id='cmb4' onclick='closeCallSiteContextmenu(); selectedNode.hideCallsiteTargets(callSiteIndex,selectedTargets)'>Hide selected Targets</button><br>" +
+                "<button id='cmb4' onclick='closeCallSiteContextmenu(); selectedNode.hideCallsiteTargets(callSiteIndex,Array.from(selectedTargets))'>Hide selected Targets</button><br>" +
                 "<button id='cmb5' onclick='closeCallSiteContextmenu()'>Close</button>" +
             "</div>"+
         "</div>");
