@@ -149,9 +149,9 @@ class node {
             resizeSVGCont(nodeMap.get(idString(target)));
         });
 
-        function getChildArrayElement(target) {
-            for (let i = 0; i < thisNode.children.length; i++) {
-                if (idString(target) === idString(thisNode.children[i].node.nodeData)) return thisNode.children[i];
+        function getChildArrayElement(target){
+            for(let i = 0; i < thisNode.children.length; i++){
+                if(idString(target) === idString(thisNode.children[i].node.nodeData) && index === thisNode.children[i].index) return thisNode.children[i];
             }
         }
     }

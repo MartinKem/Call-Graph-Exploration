@@ -521,6 +521,9 @@ function showWholeGraph(maxDepth) {
 
 function countReachableNodes() {
 	showWholeGraphSet = new Set();
+	try {
+
+
 	rootNodes.forEach(function (rootNode) {
 		if (rootNode.visible) {
 			showWholeGraphSet.add(idString(rootNode.nodeData));
@@ -542,6 +545,16 @@ function countReachableNodes() {
 	}
 
 	return showWholeGraphSet.size;
+    }catch (e) {
+		if(e instanceof RangeError) {
+            alert("Subgraph zu groß");
+            return;
+        }else{
+	    	alert("Error");
+            console.log(e);
+            return;
+		}
+    }
 }
 
 /**

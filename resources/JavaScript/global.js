@@ -16,14 +16,14 @@ var createdNodes = 0;
 
 var svgDragLock = false;
 var svgDrag = d3.behavior.drag()
-    .on("drag", function(){
-        if(d3.event.sourceEvent.path[0].nodeName !== "svg") return;
-        if(svgDragLock){
+    .on("drag", function () {
+        if (d3.event.sourceEvent.path[0].nodeName !== "svg") return;
+        if (svgDragLock) {
             svgDragLock = false;
         }
-        else{
-            document.getElementsByTagName('html')[0].scrollLeft -= 2*parseInt(d3.event.dx);
-            document.getElementsByTagName('html')[0].scrollTop -= 2*parseInt(d3.event.dy);
+        else {
+            document.getElementsByTagName('html')[0].scrollLeft -= 2 * parseInt(d3.event.dx);
+            document.getElementsByTagName('html')[0].scrollTop -= 2 * parseInt(d3.event.dy);
             svgDragLock = true;
         }
     });
@@ -59,7 +59,7 @@ var maxSuggests = 10;
 
 const nodeWidth = 380;
 const nodeHeightEmpty = 143;
-const callSiteWidth = nodeWidth-33;
+const callSiteWidth = nodeWidth - 33;
 const callSiteHeight = 27;
 const callSiteTopOffset = 128;
 
@@ -78,11 +78,11 @@ if (typeof module !== 'undefined') {
     global.lockOnchange = lockOnchange;
     global.links = links;
     global.nodes = nodes;
-    global.nodeWidth  = nodeWidth;
-    global.nodeHeightEmpty  = nodeHeightEmpty;
-    global.callSiteWidth  = callSiteWidth;
-    global.callSiteHeight  = callSiteHeight;
-    global.callSiteTopOffset  = callSiteTopOffset; 
+    global.nodeWidth = nodeWidth;
+    global.nodeHeightEmpty = nodeHeightEmpty;
+    global.callSiteWidth = callSiteWidth;
+    global.callSiteHeight = callSiteHeight;
+    global.callSiteTopOffset = callSiteTopOffset;
     global.d3 = d3;
     global.$ = $;
     global.f = f;
@@ -100,18 +100,5 @@ if (typeof module !== 'undefined') {
     global.currentEdges = currentEdges;
     global.currentNodes = currentNodes;
     global.maxSuggests = maxSuggests;
-
-    //module.exports = {
-    //    f,
-    //    createdNodes,
-    //    svgCont,
-    //    defsCont,
-    //    rootNodes,
-    //    nodeMap,
-    //    placedNodesMap,
-    //    createdEdges,
-    //    currentEdges,
-    //    currentNodes
-    //}
 }
 
