@@ -285,6 +285,7 @@ class node{
             })
             arrOfTargets = b;
         }
+        console.log(arrOfTargets);
 
         let thisNode = this;
         function getChild(t){
@@ -298,8 +299,10 @@ class node{
         }
         arrOfTargets.forEach(function (t) {
             let child = getChild(t);
-            child.edge.hide();
-            child.node.hideChild();
+            if(child !== undefined){
+                child.edge.hide();
+                child.node.hideChild();
+            }
         })
     }
     hideChild(){
