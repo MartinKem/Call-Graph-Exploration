@@ -355,13 +355,16 @@ function createWholeGraphContextmenu(){
     if(rootNodes.length < 1){
         alert("There must be at least one starting node!");
     } else {
-        $("body").append(
-            "<div id='wholeGraphContextMenu'>" +
+        let reachableNodes = countReachableNodes()
+        if(reachableNodes) {
+            $("body").append(
+                "<div id='wholeGraphContextMenu'>" +
                 "<h2>Warning!</h2>" +
-                "<p>Are you sure, that you want to create " + countReachableNodes() + " nodes?</p>" +
+                "<p>Are you sure, that you want to create " + reachableNodes + " nodes?</p>" +
                 "<button onclick='deleteWholeGraphContextmenu(); showWholeGraph();'>Show</button>" +
                 "<button onclick='deleteWholeGraphContextmenu();'>Quit</button>" +
-            "</div>");
+                "</div>");
+        }
     }
 }
 
