@@ -276,18 +276,31 @@ class node{
             }
         }
     }
+
+    /**
+     * Hides targets of a callsite
+     * @param callsiteIndex: Int
+     * @param arrOfTargets: Array of idStrings of targets; Not needed
+     */
+
     hideCallsiteTargets(callsiteIndex,arrOfTargets){
+        //if no second parameter is used
         if(arrOfTargets === undefined){
             arrOfTargets = this.callSites[callsiteIndex].targets;
             let b  = [];
             arrOfTargets.forEach(function (a) {
                 b.push(idString(a))
-            })
+            });
             arrOfTargets = b;
         }
-        console.log(arrOfTargets);
 
         let thisNode = this;
+
+        /**
+         * finds the child for the given target
+         * @param t : idString of target
+         * @returns {*} child
+         */
         function getChild(t){
             let child;
             thisNode.children.forEach(function (c) {
