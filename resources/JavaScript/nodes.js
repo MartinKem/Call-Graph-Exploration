@@ -247,7 +247,7 @@ class node {
 
             if (n.children.length > 0) {
                 n.children
-                    .filter(child => child.node.visible && !child.node.marked)
+                    .filter(child => child.node.visible && !child.node.marked && child.edge.visible)
                     .forEach(function (c) {
                         c.node.marked = true;
                         markedArr.push(c.node);
