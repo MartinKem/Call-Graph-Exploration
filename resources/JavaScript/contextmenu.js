@@ -46,24 +46,29 @@ $("body").on("contextmenu","html:not(path)",function () {
 });
 
 /** ändert die Farbe der angeklickten Node wenn ein entsprechender Hotkey gedrückt wird.
- *  die Hotkey sind 0,1,2,3,4. Esfunktionieren sowohl die normalen Zahlen, als auch die vom Numpad
+ *  die Hotkey sind 1,2,3,4,5. Esfunktionieren sowohl die normalen Zahlen, als auch die vom Numpad
  *  */
 $("body").on("click",".div_node",function () {
     clickedNode = this;
     switch (keyPressed) {
-        case 49||96: //0
+        case 49: //1
+        case 97:
             changeColorNode('#ffc6c6');
             break;
-        case 50||97: //1
+        case 50: //2
+        case 98:
             changeColorNode('#beffbe');
             break;
-        case 51||98: //2
+        case 51: //3
+        case 99:
             changeColorNode('#abd3ff');
             break;
-        case 52||99: //3
+        case 52: //4
+        case 100:
             changeColorNode('#ffff9f');
             break;
-        case 53||100: //4
+        case 53: //5
+        case 101:
             changeColorNode('#FFFFFF');
             break;
         default:
@@ -75,24 +80,29 @@ $("body").on("click",".div_node",function () {
 });
 
 /**ändert die Farbe der angeklickten Edge wenn ein entsprechender Hotkey gedrückt wird.
- * die Hotkey sind 0,1,2,3,4. Esfunktionieren sowohl die normalen Zahlen, als auch die vom Numpad
+ * die Hotkey sind 1,2,3,4,5. Es funktionieren sowohl die normalen Zahlen, als auch die vom Numpad
  * */
 $("body").on("click","svg path",function () {
     clickedEdge = this;
     switch (keyPressed) {
-        case 49||96://0
+        case 49://1
+        case 97:
             changeColorEdge('#c24e4c');
             break;
-        case 50||97://1
+        case 50://2
+        case 98:
             changeColorEdge('#429c44');
             break;
-        case 51||98://2
+        case 51://3
+        case 99:
             changeColorEdge('#3076b4');
             break;
-        case 52||99://3
+        case 52://4
+        case 100:
             changeColorEdge('#c4c931');
             break;
-        case 53||100://4
+        case 53://5
+        case 101:
             changeColorEdge('#000000');
             break;
         default:
@@ -192,7 +202,7 @@ function createEdgeContextmenu(e) {
         " <div class=\"menuelement\" onclick=\"changeColorEdge('#3076B4')\">Blue <span class='hotKeySpan'>[3+MouseLeft]</span><div class=\"color\" style=\"background-color: #3076b4\"></div></div>" +
         " <div class=\"menuelement\" onclick=\"changeColorEdge('#C4C931')\">Yellow <span class='hotKeySpan'>[4+MouseLeft]</span><div class=\"color\" style=\"background-color: #c4c931\"></div></div>" +
         " <div class=\"menuelement\" onclick=\"changeColorEdge('#000000')\">Default <span class='hotKeySpan'>[5+MouseLeft]</span><div class=\"color\" style=\"background-color: #000000\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[0].split('#')[0]).focus()\" style=\"white-space: nowrap\">focus Source <span class='hotKeySpan'>[Ctrl+MouseLeft]</span></div>" +
+        " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[0].split('#')[0]).focus()\" style=\"white-space: nowrap\">Focus Source <span class='hotKeySpan'>[Ctrl+MouseLeft]</span></div>" +
         " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[1]).focus()\" style=\"white-space: nowrap\">Focus Target <span class='hotKeySpan'>[Double Click]</span></div>" +
     "</div>");
 
@@ -248,10 +258,10 @@ function markLastClickedNode() {
     lastMarkedNode = markedNode;
 }
 function markLastClickedEdge() {
-    $(markedEdge).addClass("lastClickedEdge");
-    if(lastMarkedEdge !== null || lastMarkedEdge === markedEdge){
+    if(lastMarkedEdge !== null){
         $(lastMarkedEdge).removeClass("lastClickedEdge");
     }
+    $(markedEdge).addClass("lastClickedEdge");
     lastMarkedEdge = markedEdge;
 }
 
@@ -268,10 +278,10 @@ function createCallSiteContextmenu(e, node, index){
         availableTargets.add(idString(target));
     });
     node.children
-        .filter(child => child.index === index && child.node.visible)
+        .filter(child => (child.index === index && child.edge.visible))
         .forEach(function(child){
-            availableTargets.delete(idString(child.nodeData));  // remove selected target from available
-            selectedTargets.add(idString(child.nodeData));   // add selected target to selected
+            availableTargets.delete(idString(child.node.nodeData));  // remove selected target from available
+            selectedTargets.add(idString(child.node.nodeData));   // add selected target to selected
         });
 
     $("body").append(
@@ -290,14 +300,14 @@ function createCallSiteContextmenu(e, node, index){
                 "<button id='cmb1' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex)'>Show all possible Targets</button>" +
                 "<button id='cmb2' onclick='closeCallSiteContextmenu(); selectedNode.showChildNodes(callSiteIndex, selectedTargets)'>Show selected Targets</button><br>" +
                 "<button id='cmb3' onclick='closeCallSiteContextmenu(); selectedNode.hideCallsiteTargets(callSiteIndex)'>Hide all visible Targets</button>" +
-                "<button id='cmb4' onclick='closeCallSiteContextmenu(); selectedNode.hideCallsiteTargets(callSiteIndex,selectedTargets)'>Hide selected Targets</button><br>" +
+                "<button id='cmb4' onclick='closeCallSiteContextmenu(); selectedNode.hideCallsiteTargets(callSiteIndex,Array.from(selectedTargets))'>Hide selected Targets</button><br>" +
                 "<button id='cmb5' onclick='closeCallSiteContextmenu()'>Close</button>" +
             "</div>"+
         "</div>");
 
     // targets, that are already visible, shall be shown in the selected list
     node.children
-        .filter(child => child.index === index && child.node.visible)
+        .filter(child => child.index === index && child.edge.visible)
         .forEach(function(child){
             addTargetToSelected(idString(child.node.nodeData));
         });
@@ -355,13 +365,16 @@ function createWholeGraphContextmenu(){
     if(rootNodes.length < 1){
         alert("There must be at least one starting node!");
     } else {
-        $("body").append(
-            "<div id='wholeGraphContextMenu'>" +
+        let reachableNodes = countReachableNodes()
+        if(reachableNodes) {
+            $("body").append(
+                "<div id='wholeGraphContextMenu'>" +
                 "<h2>Warning!</h2>" +
-                "<p>Are you sure, that you want to create " + countReachableNodes() + " nodes?</p>" +
+                "<p>Are you sure, that you want to create " + reachableNodes + " nodes?</p>" +
                 "<button onclick='deleteWholeGraphContextmenu(); showWholeGraph();'>Show</button>" +
                 "<button onclick='deleteWholeGraphContextmenu();'>Quit</button>" +
-            "</div>");
+                "</div>");
+        }
     }
 }
 
