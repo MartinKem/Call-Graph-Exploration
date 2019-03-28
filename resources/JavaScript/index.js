@@ -34,6 +34,15 @@ function handleFileSelect(evt) {
 	}
 }
 
+/**
+ * focus the page to the given coordinate
+ * 
+ * @param {{x,y}} coordinate 
+ */
+function focusWindowTo(coordinate){
+	document.getElementsByTagName('html')[0].scrollLeft = parseInt(coordinate.x - window.innerWidth / 2);
+    document.getElementsByTagName('html')[0].scrollTop = parseInt(coordinate.y - window.innerHeight / 2);
+}
 
 // returns the string, that identifies the node with the given data
 function idString(nodeData) {
