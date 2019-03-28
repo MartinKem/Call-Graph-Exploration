@@ -242,7 +242,7 @@ class node {
                 n.marked = false;
             });
         }
-
+        //marks every child of the node n
         function markChildren(n) {
 
             if (n.children.length > 0) {
@@ -255,7 +255,7 @@ class node {
                     });
             }
         }
-
+        //unmarks every child that should not be deleted
         function unmark(n) {
             if (n.parents.length) {
                 for (let i = 0; i < n.parents.length; i++) {
@@ -299,7 +299,7 @@ class node {
         /**
          * finds the child for the given target
          * @param t : idString of target
-         * @returns {*} child
+         * @returns child
          */
         function getChild(t) {
             let child;
@@ -318,6 +318,7 @@ class node {
             }
         })
     }
+    //similar to hidenode(), the node itself can stay
     hideChild() {
         if (this.visible === true) {
             this.marked = true;
@@ -515,6 +516,7 @@ function createSingleNode(x, y, nodeData, callSites) {
     let lock = false;
     let nodeHeight = nodeHeightEmpty + callSiteHeight * callSites.length;
 
+    //Verschiebt div und parent(foreignobject) in den Vordergrund
     function raiseNode(t) {
         d3.select(t.parentNode).each(function () {
             this.parentNode.appendChild(this);
@@ -529,7 +531,7 @@ function createSingleNode(x, y, nodeData, callSites) {
 
     var drag = d3.behavior.drag()
         .on("dragstart", function () {
-            //Verschiebt div und parent(foreignobject) in den Vordergrund
+
             d3.event.sourceEvent.stopPropagation();
             // svgDragLock = null;
             if (d3.event.sourceEvent.path[0].nodeName === "BUTTON"
