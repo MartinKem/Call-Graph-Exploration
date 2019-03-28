@@ -40,12 +40,12 @@ var defsCont = svgCont.append("defs").attr("id", "definitions");
 // var rootNode;	// global rootNode not used anymore
 var rootNodes = [];
 
-/*
-maps from following string:
-declaringClass.name(parameterTypes[0],...,parameterTypes[n]):returnType
-to:
-node object
- */
+/**
+* maps from following string:
+* declaringClass.name(parameterTypes[0],...,parameterTypes[n]):returnType
+* to:
+* node object
+*/
 var nodeMap = new Map();
 var placedNodesMap = new Map();
 
