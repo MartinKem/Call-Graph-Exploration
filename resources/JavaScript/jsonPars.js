@@ -91,9 +91,9 @@ function parseString() {
 	arr.push(strJson);
 
 	lengthOfArr = arr.length;
-	
-arr.forEach(function (a, i) {
-		setProgBar(Math.round((i/lengthOfArr)*100));	
+
+	arr.forEach(function (a, i) {
+		setProgBar(Math.round((i / lengthOfArr) * 100));
 		console.log("ProgBar value = " + document.getElementById("progress").textContent);
 
 		a = rest + a;
@@ -196,7 +196,7 @@ function parseFile(file, callback) {
 			// try to pars the file
 			let parsedJson;
 			document.getElementById("progress_bar_description").textContent = "Parsing file ..."
-			setProgBar(0);			
+			setProgBar(0);
 			try {
 				console.log("ProgBar value = " + document.getElementById("progress").textContent);
 				parsedJson = parseString();		//start parsing
@@ -283,7 +283,7 @@ function parseFile(file, callback) {
 				// Increase the progress bar length.
 				if (percentLoaded < 100) {
 					setProgBar(percentLoaded);
-				}else{
+				} else {
 					setProgBar(100);
 				}
 			}
@@ -587,37 +587,37 @@ function countReachableNodes() {
 	try {
 
 
-	rootNodes.forEach(function (rootNode) {
-		if (rootNode.visible) {
-			showWholeGraphSet.add(idString(rootNode.nodeData));
-			countReachableGraph(parsedJsonMap.get(idString(rootNode.nodeData)));
-		}
-	});
-
-	function countReachableGraph(node) {
-		node.callSites.forEach(function (callSite) {
-			callSite.targets.forEach(function (target) {
-				let targetString = idString(target);
-				if (!showWholeGraphSet.has(targetString)) {
-					showWholeGraphSet.add(targetString);
-					let jsonTarget = parsedJsonMap.get(targetString);
-					if (jsonTarget) countReachableGraph(jsonTarget);
-				}
-			});
+		rootNodes.forEach(function (rootNode) {
+			if (rootNode.visible) {
+				showWholeGraphSet.add(idString(rootNode.nodeData));
+				countReachableGraph(parsedJsonMap.get(idString(rootNode.nodeData)));
+			}
 		});
-	}
 
-	return showWholeGraphSet.size;
-    }catch (e) {
-		if(e instanceof RangeError) {
-            alert("Subgraph zu groß");
-            return;
-        }else{
-	    	alert("Error");
-            console.log(e);
-            return;
+		function countReachableGraph(node) {
+			node.callSites.forEach(function (callSite) {
+				callSite.targets.forEach(function (target) {
+					let targetString = idString(target);
+					if (!showWholeGraphSet.has(targetString)) {
+						showWholeGraphSet.add(targetString);
+						let jsonTarget = parsedJsonMap.get(targetString);
+						if (jsonTarget) countReachableGraph(jsonTarget);
+					}
+				});
+			});
 		}
-    }
+
+		return showWholeGraphSet.size;
+	} catch (e) {
+		if (e instanceof RangeError) {
+			alert("Subgraph zu groß");
+			return;
+		} else {
+			alert("Error");
+			console.log(e);
+			return;
+		}
+	}
 }
 
 /**
