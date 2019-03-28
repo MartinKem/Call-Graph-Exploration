@@ -145,7 +145,7 @@ svg{
 }
 
 .callSite{
-	max-width: 300px;
+	max-width: 300px; /* default 300px can be changed to adjust width of callsites when changing node width*/
 	overflow: hidden;
 	white-space: nowrap;
 }
