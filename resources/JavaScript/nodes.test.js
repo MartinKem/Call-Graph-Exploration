@@ -98,8 +98,8 @@ test('Test hide of nodes 1', () => {
     let numberOfGeneratedEdges = 0;
     let svg = document.getElementById("graph").firstChild;
     for (let i = 0; i < global.svgCont[0][0].childNodes.length; i++) {
-       if (svg[0][0].childNodes[i].nodeName === "foreignObject") numberOfGeneratedNodes++;
-       else if (svg[0][0].childNodes[i].nodeName === "path") numberOfGeneratedEdges++;
+       if (svg.childNodes[i].nodeName === "foreignObject") numberOfGeneratedNodes++;
+       else if (svg.childNodes[i].nodeName === "path") numberOfGeneratedEdges++;
     }
 
     expect(numberOfGeneratedEdges.toBe(5));
