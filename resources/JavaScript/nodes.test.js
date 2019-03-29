@@ -102,8 +102,8 @@ test('Test hide of nodes 1', () => {
        else if (svg.childNodes[i].nodeName === "path") numberOfGeneratedEdges++;
     }
 
-    expect(numberOfGeneratedEdges.toBe(5));
-    expect(numberOfGeneratedEdges.toBe(5));
+    expect(numberOfGeneratedEdges).toBe(5);
+    expect(numberOfGeneratedEdges).toBe(5);
 
 
 
