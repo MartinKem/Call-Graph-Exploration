@@ -94,6 +94,7 @@ test('Test hide of nodes 1', () => {
 
 
 
+    // tests for the actual number of generated nodes and edges in the svg container
     let numberOfGeneratedNodes = 0;
     let numberOfGeneratedEdges = 0;
     let svg = document.getElementById("graph").firstChild;
@@ -105,7 +106,15 @@ test('Test hide of nodes 1', () => {
     expect(numberOfGeneratedEdges).toBe(5);
     expect(numberOfGeneratedEdges).toBe(5);
 
+    sub2Sub2.hideNode();
 
+    expect(numberOfGeneratedEdges).toBe(5);
+    expect(numberOfGeneratedEdges).toBe(5);
+
+    open_close();
+
+    expect(numberOfGeneratedEdges).toBe(5);
+    expect(numberOfGeneratedEdges).toBe(5);
 
     // make sure it works
     expect(SubRootNode.getVisibility()).toBe(true);
