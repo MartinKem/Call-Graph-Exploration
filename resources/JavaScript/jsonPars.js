@@ -558,6 +558,11 @@ function createGraph() {
 	}
 }
 
+/**
+ * shows the whole graph from the shown root nodes
+ * 
+ * @param {number} [maxDepth = Number.MAX_VALUE] - max depth to go in the graph (children depth)
+ */
 function showWholeGraph(maxDepth) {
 	if (!maxDepth) maxDepth = Number.MAX_VALUE;
 	showWholeGraphSet = new Set();
@@ -582,6 +587,9 @@ function showWholeGraph(maxDepth) {
 	}
 }
 
+/**
+ * counts the nodes of the whole graph from the shown root nodes
+ */
 function countReachableNodes() {
 	showWholeGraphSet = new Set();
 	try {

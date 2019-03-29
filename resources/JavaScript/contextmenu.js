@@ -278,6 +278,12 @@ function markLastClickedEdge() {
     lastMarkedEdge = markedEdge;
 }
 
+/**
+ * generates an menu to select the targets of an given call site
+ * 
+ * @param {node} node - node on which the call site lives 
+ * @param {number} index - index of the call site
+ */
 function createCallSiteContextmenu(node, index){
     maxSuggests = 10;
 
@@ -332,6 +338,11 @@ function createCallSiteContextmenu(node, index){
     callSiteMenuIsOpen = true;
 }
 
+/**
+ * adds a target to the CallSiteContextmenu
+ * 
+ * @param {string} targetString - string, that identifies the node with the given data (see: idString())
+ */
 function addTargetToSelected(targetString){
     if(!targetString) {
         let targetSearch = document.getElementById("targetSearch");
@@ -348,6 +359,11 @@ function addTargetToSelected(targetString){
     selectedTargets.add(targetString);   // add selected target to selected
 }
 
+/**
+ * removes a target to the CallSiteContextmenu
+ * 
+ * @param {*} target - string, that identifies the node with the given data (see: idString())
+ */
 function removeTargetFromSelected(target){
     availableTargets.add(target);  // add selected target to available
     selectedTargets.delete(target);    // remove selected target from selected
@@ -374,6 +390,9 @@ function hideTargets(targets){
     }
 }
 
+/**
+ * If there are starting node/nodes, an menu is open, that is used to calculate the whole sub graph
+ */
 function createWholeGraphContextmenu(){
     if(rootNodes.length < 1){
         alert("There must be at least one starting node!");
@@ -391,6 +410,9 @@ function createWholeGraphContextmenu(){
     }
 }
 
+/**
+ * removes the menu which is created by createWholeGraphContextmenu
+ */
 function deleteWholeGraphContextmenu(){
     $("#wholeGraphContextMenu").remove();
 }
