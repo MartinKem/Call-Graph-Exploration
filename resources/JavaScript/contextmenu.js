@@ -1,5 +1,5 @@
 
-var clickedNode;
+
 var nodeMenuIsOpen = false;
 var clickedEdge;
 var edgeMenuIsOpen = false;
@@ -106,7 +106,7 @@ $("body").on("contextmenu",".div_node",function (e) {
             changeColorEdge('#000000');
             break;
         default:
-            markedNode = this;
+            markedEdge = this;
             if(lastMarkedEdge !== markedEdge){
                 markLastClickedEdge();
             }
@@ -220,7 +220,6 @@ function createEdgeContextmenu(e) {
 }
 
 function changeColorEdge(color) {
-    if(lastMarkedEdge === clickedEdge) $(lastMarkedEdge).removeClass("lastClickedEdge");
     if(color === '#000000'){
         $(clickedEdge).css('opacity', 0.5);
     }else{
@@ -415,4 +414,16 @@ function createWholeGraphContextmenu(){
  */
 function deleteWholeGraphContextmenu(){
     $("#wholeGraphContextMenu").remove();
+}
+
+
+
+/**
+* (only for testing)
+* EXPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+    module.exports.changeColorNode = changeColorNode;
+    
 }

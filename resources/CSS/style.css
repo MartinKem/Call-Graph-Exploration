@@ -265,7 +265,7 @@ line {
     border-color: red !important;
 }
 .lastClickedEdge{
-    stroke-width: 7px!important;
+    stroke-width: 7px;
     opacity: 1 !important;
     stroke: red !important;
 }
