@@ -111,7 +111,7 @@ test('Test hide of nodes 1', () => {
     expect(numberOfGeneratedEdges).toBe(5);
     expect(numberOfGeneratedEdges).toBe(5);
 
-    open_close();
+    index.open_close();
 
     expect(numberOfGeneratedEdges).toBe(5);
     expect(numberOfGeneratedEdges).toBe(5);
