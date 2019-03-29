@@ -308,13 +308,13 @@ line {
 
 #callSiteSelection{
     margin-top: 15px;
-    height: 930px;
+    height: 60%;
 }
 
 #selectedTargets{
     border: solid 1px;
     min-height: 80px;
-    max-height: 800px;
+    max-height: 100%;
     padding: 5px;
     overflow: auto;
 }
