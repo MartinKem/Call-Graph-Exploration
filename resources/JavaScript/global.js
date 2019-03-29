@@ -75,6 +75,7 @@ var nodes = [];
 
 var lockOnchange = false; //had to be added because onchange doesn't work anymore on id='fileinput' if file is droped, lockOnchange only exists because of this purpose
 
+var clickedNode; // last clicked node  DOM element (only use in test and contextmenu)
 /**
 * (only for testing)
 * EXPORT:
@@ -82,6 +83,7 @@ var lockOnchange = false; //had to be added because onchange doesn't work anymor
 */
 if (typeof module !== 'undefined') {
 
+    global.clickedNode = clickedNode;
     global.lockOnchange = lockOnchange;
     global.links = links;
     global.nodes = nodes;
