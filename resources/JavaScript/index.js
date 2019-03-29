@@ -13,12 +13,20 @@ var dropZone = document.getElementById('dropZone');
 dropZone.addEventListener('dragover', handleDragOver, false);
 dropZone.addEventListener('drop', handleFileSelect, false);
 
+/**
+ * handels DragOver event
+ * @param {object} evt - event 
+ */
 function handleDragOver(evt) {
 	evt.stopPropagation();
 	evt.preventDefault();
 	evt.dataTransfer.dropEffect = 'copy'; //shows it is a copy
 }
 
+/**
+ * handels drop event
+ * @param {object} evt - event
+ */
 function handleFileSelect(evt) {
 	evt.stopPropagation();
 	evt.preventDefault();
@@ -27,11 +35,11 @@ function handleFileSelect(evt) {
 
 	document.getElementById('fileinput').files = files; // set new file
 
-	if (!lockOnchange) {
-		lockOnchange = true;
-		document.getElementById('fileinput').setAttribute('disabled', true);
-		loadFile();
-	}
+	if (!lockOnchange) {														//
+		lockOnchange = true;													// had to be added because onchange doesn't work anymore on id='fileinput',
+		document.getElementById('fileinput').setAttribute('disabled', true);	// lockOnchange only exists because of this purpose
+		loadFile();																//
+	}																			//
 }
 
 /**
