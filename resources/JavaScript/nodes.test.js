@@ -115,7 +115,8 @@ test('Test hide of nodes 1', () => {
 
     expect(numberOfGeneratedEdges).toBe(5);
     expect(numberOfGeneratedEdges).toBe(5);
-
+    
+    SubRootNode.showChildNodes(1);
     sub2Sub2.showChildNodes(0);
     sub2Sub1.showChildNodes(0);
     sub3Sub1.showChildNodes(0);
