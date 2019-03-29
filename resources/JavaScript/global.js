@@ -16,14 +16,14 @@ var createdNodes = 0;
 
 var svgDragLock = false;
 var svgDrag = d3.behavior.drag()
-    .on("drag", function(){
-        if(d3.event.sourceEvent.path[0].nodeName !== "svg") return;
-        if(svgDragLock){
+    .on("drag", function () {
+        if (d3.event.sourceEvent.path[0].nodeName !== "svg") return;
+        if (svgDragLock) {
             svgDragLock = false;
         }
-        else{
-            document.getElementsByTagName('html')[0].scrollLeft -= 2*parseInt(d3.event.dx);
-            document.getElementsByTagName('html')[0].scrollTop -= 2*parseInt(d3.event.dy);
+        else {
+            document.getElementsByTagName('html')[0].scrollLeft -= 2 * parseInt(d3.event.dx);
+            document.getElementsByTagName('html')[0].scrollTop -= 2 * parseInt(d3.event.dy);
             svgDragLock = true;
         }
     });
@@ -40,15 +40,16 @@ var defsCont = svgCont.append("defs").attr("id", "definitions");
 // var rootNode;	// global rootNode not used anymore
 var rootNodes = [];
 
-/*
-maps from following string:
-declaringClass.name(parameterTypes[0],...,parameterTypes[n]):returnType
-to:
-node object
- */
+/**
+* maps from following string:
+* declaringClass.name(parameterTypes[0],...,parameterTypes[n]):returnType
+* to:
+* node object
+*/
 var nodeMap = new Map();
 var placedNodesMap = new Map();
 
+//variables that keep track of the graph stats
 var generatedNodes = 0;
 var totalNodes = 0;
 var totalEdges = 0;
@@ -57,17 +58,24 @@ var currentEdges = 0;
 var maxSuggests = 10;
 
 
-const nodeWidth = 380;
+const nodeWidth = 380; //380 default; sets width of nodes, should only be changed in conjunction with width of .callsite in style.css
 const nodeHeightEmpty = 143;
-const callSiteWidth = nodeWidth-33;
+const callSiteWidth = nodeWidth -30; //nodewidth - 33 default; used to place edges, no impact on width of callsite visuals
 const callSiteHeight = 27;
 const callSiteTopOffset = 128;
+
+//parameters of the force layout algorithm:
+const forceCharge = -18000;                // -100000 default; determines how much nodes attract or repel each other, negative equals repulsion
+const forceLinkDistance = 1000;            // 1500 default; sets the desired distance for each link
+const forceGravity = 0.001;                // 0.001 default; determines the attraction of nodes to the center of the graph
+const forceLinkStrength = 0.3;             // 1 default; determines how strongly link distance is adhered to, 1 equals full effect
 
 var links = [];
 var nodes = [];
 
-var lockOnchange = false;
+var lockOnchange = false; //had to be added because onchange doesn't work anymore on id='fileinput' if file is droped, lockOnchange only exists because of this purpose
 
+var clickedNode; // last clicked node  DOM element (only use in test and contextmenu)
 /**
 * (only for testing)
 * EXPORT:
@@ -75,6 +83,7 @@ var lockOnchange = false;
 */
 if (typeof module !== 'undefined') {
 
+    global.clickedNode = clickedNode;
     global.lockOnchange = lockOnchange;
     global.links = links;
     global.nodes = nodes;
@@ -100,18 +109,9 @@ if (typeof module !== 'undefined') {
     global.currentEdges = currentEdges;
     global.currentNodes = currentNodes;
     global.maxSuggests = maxSuggests;
-
-    //module.exports = {
-    //    f,
-    //    createdNodes,
-    //    svgCont,
-    //    defsCont,
-    //    rootNodes,
-    //    nodeMap,
-    //    placedNodesMap,
-    //    createdEdges,
-    //    currentEdges,
-    //    currentNodes
-    //}
+    global.forceCharge = forceCharge;
+    global.forceLinkDistance = forceLinkDistance;
+    global.forceGravity = forceGravity;
+    global.forceLinkStrength = forceLinkStrength;
 }
 

@@ -245,7 +245,7 @@ class Edge{
         });
         $("[id='" + edgeID + "']").click(function () {
             if(keyPressed === 17 ) {
-                thisEdge.source.focus();
+                focusWindowTo(this.getPointAtLength(0));
             }
         });
 

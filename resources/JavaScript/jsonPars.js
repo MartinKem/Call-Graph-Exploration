@@ -12,9 +12,9 @@ if (typeof module !== 'undefined') {
 }
 
 
-
-var strJson = "";
-var arr = [];
+// variables to store json data as string
+var strJson = "";	//- string
+var arr = [];			//- [string]
 
 /**
  * methodSign := {name: string, declaringClass: string, parameterTypes: string[], returnType: string}
@@ -43,6 +43,10 @@ function setProgBar(percent) {
 }
 
 
+/**
+ * gets the next part of the JSON Data as string and store it in arr
+ * @param {string} str - next part of the JSON Data as string
+ */
 var setString = function (str) {
 	strJson += str;
 	if (strJson.length >= 132217728) {//128MB
@@ -51,7 +55,9 @@ var setString = function (str) {
 	}
 };
 
-
+/**
+ * starts the loading and parsing process after file input is set
+ */
 function loadFile() {
 	if (typeof window.FileReader !== 'function') {
 		alert("The file API isn't supported on this browser yet.");
@@ -65,16 +71,31 @@ function loadFile() {
 
 	isLoading = true;
 	setProgBar(0);
+	document.getElementById("progress_bar_description").textContent = "Loading file ..."
 	let input = document.getElementById('fileinput').files[0];
+	// set Tab title
+	document.title = input.name;
+	// start loding and parsing
 	parseFile(input, setString);
 }
 
+/**
+ * parse the stings of the arr array, wich is set from the setString function
+ */
 function parseString() {
 	let rest = "";
 	let finalarray;
+	// for the progress-bar 
+	let lengthOfArr = 0;
 
 	arr.push(strJson);
-	arr.forEach(function (a) {
+
+	lengthOfArr = arr.length;
+
+	arr.forEach(function (a, i) {
+		setProgBar(Math.round((i / lengthOfArr) * 100));
+		console.log("ProgBar value = " + document.getElementById("progress").textContent);
+
 		a = rest + a;
 		let first = a.indexOf("\n    \"method\" : {") - 1;
 		let last = a.lastIndexOf("\n    \"method\" : {") - 3;
@@ -92,10 +113,15 @@ function parseString() {
 	Array.prototype.push.apply(finalarray, JSON.parse("{\n  \"reachableMethods\" : [ " + rest.slice(rest.indexOf("\n    \"method\" : {") - 1, -3) + " ]\n}").reachableMethods);
 	let parsedJson = { reachableMethods: finalarray };
 
+	// return parsed strings
 	return parsedJson;
 
 }
 
+/**
+ * remove 'L' and ';' out of the class names
+ * @param {Object} methods - parsed JSON
+ */
 function correctClassNames(methods) {
 	for (let i = 0; i < methods.reachableMethods.length; i++) {
 		correctSingleMethod(methods.reachableMethods[i].method);
@@ -118,6 +144,9 @@ function correctClassNames(methods) {
 	}
 }
 
+/**
+ * resets the varibels of the file reading process
+ */
 function resetFileRead() {
 	arr = [];
 	strJson = "";
@@ -125,29 +154,52 @@ function resetFileRead() {
 	lockOnchange = false;
 	document.getElementById('fileinput').disabled = false;
 	setProgBar(0);
+	document.getElementById("progress_bar_description").textContent = ""
 }
 
-
+/**
+ * Reads and parses the given file
+ * 
+ * @param {File} file - file to be read and parsed
+ * @param {Function} callback - function that handles the readed strings (in our case it shut be setString)
+ */
 function parseFile(file, callback) {
 	var fileSize = file.size;
 	var chunkSize = 16 * 4 * 1024 * 1024; // bytes
 	var offset = 0;
 	var chunkReaderBlock = null;
 
+	/**
+	 * function is called from FileReader on the onload event,
+	 * starts the next read of chungs,
+	 * starts parsing of the string after read,
+	 * change the ui,
+	 * starts the autocomplete
+	 * and things that shut be done after the read and parsing
+	 * 
+	 * @param {event} evt - event of the FileReader onload
+	 */
 	var readEventHandler = function (evt) {
+		// no error
 		if (evt.target.error == null) {
-			offset += evt.target.result.length;
-			callback(evt.target.result); // callback for handling read chunk
+			offset += evt.target.result.length;	// new offset
+			callback(evt.target.result); // callback for handling read chunk (setString function)
 		} else {
 			console.log("Read error: " + evt.target.error);
 			return;
 		}
+		// read is finish
 		if (offset >= fileSize) {
 			console.log("Done reading file");
+			setProgBar(100);
 
+			// try to pars the file
 			let parsedJson;
+			document.getElementById("progress_bar_description").textContent = "Parsing file ..."
+			setProgBar(0);
 			try {
-				parsedJson = parseString();
+				console.log("ProgBar value = " + document.getElementById("progress").textContent);
+				parsedJson = parseString();		//start parsing
 			} catch (e) {
 				if (e instanceof SyntaxError) {
 					alert("File could not be read. \n-Is the Json-File saved as UNIX (LF)? \n-Is the Json-File properly formatted? \n" + e);
@@ -177,7 +229,8 @@ function parseFile(file, callback) {
 			parsedJson.reachableMethods.forEach(function (element) {
 				if (element.callSites) totalEdges += element.callSites.length;
 			});
-			estGraphData();
+			estGraphData();	//set the detect Dates in the ui
+
 			//map rechableMethods to HashMap
 			parsedJsonMap = new Map();
 			parsedJson.reachableMethods.forEach(function (element) {
@@ -187,9 +240,12 @@ function parseFile(file, callback) {
 
 			//progress to 100%
 			setProgBar('100');
+			console.log("ProgBar value = " + document.getElementById("progress").textContent);
 			isLoading = false;
 
-			changeDiv();
+			changeDiv(); //change the loading page to the graph page
+
+			// reset loading variables
 			(function reset() {
 				strJson = "";
 				arr = [];
@@ -198,29 +254,37 @@ function parseFile(file, callback) {
 
 			document.getElementById("search").removeAttribute("disabled");
 
+			// starting autocomplete
 			var fullMethods = getStructuredMethodList();
-
 			autocomplete(document.getElementById("searchInput"), fullMethods);
-			return;
 
+			return;
 		}
 
 		// of to the next chunk
-
 		chunkReaderBlock(offset, chunkSize, file);
 	};
 
+	/**
+	 * Reads the File in chunks and sets the functions of the FileReader (like onload)
+	 * 
+	 * @param {number} _offset - Offset of the start to be read
+	 * @param {number} length - Size of the chunks to be read
+	 * @param {File} _file - File to load
+	 */
 	chunkReaderBlock = function (_offset, length, _file) {
 		var r = new FileReader();
 		var blob = _file.slice(_offset, length + _offset);
 		r.onload = readEventHandler;
-		r.onprogress = function (evt) {
+		r.onprogress = function (evt) {	// updates the progress bar
 			// evt is an ProgressEvent.
 			if (evt.lengthComputable) {
 				var percentLoaded = Math.round(((offset + evt.loaded) / fileSize) * 100);
 				// Increase the progress bar length.
 				if (percentLoaded < 100) {
 					setProgBar(percentLoaded);
+				} else {
+					setProgBar(100);
 				}
 			}
 		};
@@ -236,6 +300,10 @@ function parseFile(file, callback) {
 		return Array.from(parsedJsonMap.keys());
 	}
 }
+
+/**
+ * changes the loading page to the graph page
+ */
 function changeDiv() {
 	$("#load_page").addClass("invis");
 	$("#graph_page").removeClass("invis");
@@ -490,6 +558,11 @@ function createGraph() {
 	}
 }
 
+/**
+ * shows the whole graph from the shown root nodes
+ * 
+ * @param {number} [maxDepth = Number.MAX_VALUE] - max depth to go in the graph (children depth)
+ */
 function showWholeGraph(maxDepth) {
 	if (!maxDepth) maxDepth = Number.MAX_VALUE;
 	showWholeGraphSet = new Set();
@@ -514,29 +587,45 @@ function showWholeGraph(maxDepth) {
 	}
 }
 
+/**
+ * counts the nodes of the whole graph from the shown root nodes
+ */
 function countReachableNodes() {
 	showWholeGraphSet = new Set();
-	rootNodes.forEach(function (rootNode) {
-		if (rootNode.visible) {
-			showWholeGraphSet.add(idString(rootNode.nodeData));
-			countReachableGraph(parsedJsonMap.get(idString(rootNode.nodeData)));
-		}
-	});
+	try {
 
-	function countReachableGraph(node) {
-		node.callSites.forEach(function (callSite) {
-			callSite.targets.forEach(function (target) {
-				let targetString = idString(target);
-				if (!showWholeGraphSet.has(targetString)) {
-					showWholeGraphSet.add(targetString);
-					let jsonTarget = parsedJsonMap.get(targetString);
-					if (jsonTarget) countReachableGraph(jsonTarget);
-				}
-			});
+
+		rootNodes.forEach(function (rootNode) {
+			if (rootNode.visible) {
+				showWholeGraphSet.add(idString(rootNode.nodeData));
+				countReachableGraph(parsedJsonMap.get(idString(rootNode.nodeData)));
+			}
 		});
-	}
 
-	return showWholeGraphSet.size;
+		function countReachableGraph(node) {
+			node.callSites.forEach(function (callSite) {
+				callSite.targets.forEach(function (target) {
+					let targetString = idString(target);
+					if (!showWholeGraphSet.has(targetString)) {
+						showWholeGraphSet.add(targetString);
+						let jsonTarget = parsedJsonMap.get(targetString);
+						if (jsonTarget) countReachableGraph(jsonTarget);
+					}
+				});
+			});
+		}
+
+		return showWholeGraphSet.size;
+	} catch (e) {
+		if (e instanceof RangeError) {
+			alert("Subgraph zu groß");
+			return;
+		} else {
+			alert("Error");
+			console.log(e);
+			return;
+		}
+	}
 }
 
 /**

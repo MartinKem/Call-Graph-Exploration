@@ -76,15 +76,35 @@ test('Test hide of nodes 1', () => {
     sub2Sub1.showChildNodes(0);
     sub3Sub1.showChildNodes(0);
 
-    let numberOfGeneratedNodes = 0;
-    let numberOfGeneratedEdges = 0;
-    for(let i = 0; i < global.svgCont[0][0].childNodes.length; i++){
-        if(global.svgCont[0][0].childNodes[i].nodeName === "foreignObject") numberOfGeneratedNodes++;
-        else if(global.svgCont[0][0].childNodes[i].nodeName === "path") numberOfGeneratedEdges++;
-    }
+    SubRootNode.hideNode();         //
+    SubRootNode.showNode();         //
+    SubRootNode.showChildNodes(0);  //
+    SubRootNode.showChildNodes(1);  // For setting display = block via javascript
+    sub2Sub2.showChildNodes(0);     //
+    sub2Sub1.showChildNodes(0);     //
+    sub3Sub1.showChildNodes(0);     //
 
-    expect(numberOfGeneratedEdges.toBe(5));
-    expect(numberOfGeneratedEdges.toBe(5));
+    //get the html elements
+    let SubRootNodeHtml = document.getElementById("Main.main():int");
+    let sub2Sub2Html = document.getElementById("Sub2.sub2():int");
+    let sub2Sub1Html = document.getElementById("Sub2.sub1():int");
+    let sub3Sub1Html = document.getElementById("Sub3.sub1():int");
+    let subnSub1Html = document.getElementById("Subn.sub1():int");
+
+
+
+
+    //let numberOfGeneratedNodes = 0;
+    //let numberOfGeneratedEdges = 0;
+    //for (let i = 0; i < global.svgCont[0][0].childNodes.length; i++) {
+    //    if (global.svgCont[0][0].childNodes[i].nodeName === "foreignObject") numberOfGeneratedNodes++;
+    //    else if (global.svgCont[0][0].childNodes[i].nodeName === "path") numberOfGeneratedEdges++;
+    //}
+//
+    //expect(numberOfGeneratedEdges.toBe(5));
+    //expect(numberOfGeneratedEdges.toBe(5));
+
+
 
     // make sure it works
     expect(SubRootNode.getVisibility()).toBe(true);
@@ -92,6 +112,16 @@ test('Test hide of nodes 1', () => {
     expect(sub2Sub2.getVisibility()).toBe(true);
     expect(sub3Sub1.getVisibility()).toBe(true);
     expect(subnSub1.getVisibility()).toBe(true);
+    expect(SubRootNodeHtml.style.display).toEqual("block");
+    expect(sub2Sub2Html.style.display).toEqual("block");
+    expect(sub2Sub1Html.style.display).toEqual("block");
+    expect(sub3Sub1Html.style.display).toEqual("block");
+    expect(subnSub1Html.style.display).toEqual("block");
+
+
+
+
+
 
     //hide some nodes    
     sub2Sub2.hideNode();
@@ -102,6 +132,11 @@ test('Test hide of nodes 1', () => {
     expect(sub2Sub2.getVisibility()).toBe(false);
     expect(sub3Sub1.getVisibility()).toBe(true);
     expect(subnSub1.getVisibility()).toBe(true);
+    expect(SubRootNodeHtml.style.display).toEqual("block");
+    expect(sub2Sub2Html.style.display).toEqual("none");
+    expect(sub2Sub1Html.style.display).toEqual("block");
+    expect(sub3Sub1Html.style.display).toEqual("block");
+    expect(subnSub1Html.style.display).toEqual("block");
 
     //show the Nodes, all edges exept between Sub2.sub2 to Subn.Sub1
     SubRootNode.hideNode();
@@ -121,6 +156,11 @@ test('Test hide of nodes 1', () => {
     expect(sub2Sub2.getVisibility()).toBe(true);
     expect(sub3Sub1.getVisibility()).toBe(false);
     expect(subnSub1.getVisibility()).toBe(false);
+    expect(SubRootNodeHtml.style.display).toEqual("block");
+    expect(sub2Sub2Html.style.display).toEqual("block");
+    expect(sub2Sub1Html.style.display).toEqual("none");
+    expect(sub3Sub1Html.style.display).toEqual("none");
+    expect(subnSub1Html.style.display).toEqual("none");
 
     //show the Nodes, no edge between Sub2.sub2 to Subn.sub1
     SubRootNode.hideNode();
@@ -140,6 +180,11 @@ test('Test hide of nodes 1', () => {
     expect(sub2Sub2.getVisibility()).toBe(true);
     expect(sub3Sub1.getVisibility()).toBe(false);
     expect(subnSub1.getVisibility()).toBe(false);
+    expect(SubRootNodeHtml.style.display).toEqual("block");
+    expect(sub2Sub2Html.style.display).toEqual("block");
+    expect(sub2Sub1Html.style.display).toEqual("block");
+    expect(sub3Sub1Html.style.display).toEqual("none");
+    expect(subnSub1Html.style.display).toEqual("none");
 
     //show the Nodes, all edges
     SubRootNode.hideNode();
@@ -153,11 +198,18 @@ test('Test hide of nodes 1', () => {
 
     //hide some nodes
     sub3Sub1.hideNode();
+
+    //make sure the right ones are hidden
     expect(SubRootNode.getVisibility()).toBe(true);
     expect(sub2Sub1.getVisibility()).toBe(true);
     expect(sub2Sub2.getVisibility()).toBe(true);
     expect(sub3Sub1.getVisibility()).toBe(false);
     expect(subnSub1.getVisibility()).toBe(true);
+    expect(SubRootNodeHtml.style.display).toEqual("block");
+    expect(sub2Sub2Html.style.display).toEqual("block");
+    expect(sub2Sub1Html.style.display).toEqual("block");
+    expect(sub3Sub1Html.style.display).toEqual("none");
+    expect(subnSub1Html.style.display).toEqual("block");
 
 });
 
@@ -173,12 +225,33 @@ test('Test hide of nodes 2', () => {
     sub2Sub1.showChildNodes(0);
     sub3Sub1.showChildNodes(0);
 
+    SubRootNode.hideNode();         //
+    SubRootNode.showNode();         //
+    SubRootNode.showChildNodes(0);  //
+    SubRootNode.showChildNodes(1);  // For setting display = block via javascript
+    sub2Sub2.showChildNodes(0);     //
+    sub2Sub1.showChildNodes(0);     //
+    sub3Sub1.showChildNodes(0);     //
+
+    //get the html elements
+    let SubRootNodeHtml = document.getElementById("Main.main():int");
+    let sub2Sub2Html = document.getElementById("Sub2.sub2():int");
+    let sub2Sub1Html = document.getElementById("Sub2.sub1():int");
+    let sub3Sub1Html = document.getElementById("Sub3.sub1():int");
+    let subnSub1Html = document.getElementById("Subn.sub1():int");
+
+
     // make sure it works
     expect(SubRootNode.getVisibility()).toBe(true);
     expect(sub2Sub1.getVisibility()).toBe(true);
     expect(sub2Sub2.getVisibility()).toBe(true);
     expect(sub3Sub1.getVisibility()).toBe(true);
     expect(subnSub1.getVisibility()).toBe(true);
+    expect(SubRootNodeHtml.style.display).toEqual("block");
+    expect(sub2Sub2Html.style.display).toEqual("block");
+    expect(sub2Sub1Html.style.display).toEqual("block");
+    expect(sub3Sub1Html.style.display).toEqual("block");
+    expect(subnSub1Html.style.display).toEqual("block");
 
     //hide some nodes
     sub2Sub2.hideNode();
@@ -189,6 +262,11 @@ test('Test hide of nodes 2', () => {
     expect(sub2Sub2.getVisibility()).toBe(false);
     expect(sub3Sub1.getVisibility()).toBe(true);
     expect(subnSub1.getVisibility()).toBe(true);
+    expect(SubRootNodeHtml.style.display).toEqual("block");
+    expect(sub2Sub2Html.style.display).toEqual("none");
+    expect(sub2Sub1Html.style.display).toEqual("block");
+    expect(sub3Sub1Html.style.display).toEqual("block");
+    expect(subnSub1Html.style.display).toEqual("block");
 
 
     //show the Nodes, all edges
@@ -207,6 +285,11 @@ test('Test hide of nodes 2', () => {
     expect(sub2Sub2.getVisibility()).toBe(true);
     expect(sub3Sub1.getVisibility()).toBe(true);
     expect(subnSub1.getVisibility()).toBe(true);
+    expect(SubRootNodeHtml.style.display).toEqual("block");
+    expect(sub2Sub2Html.style.display).toEqual("block");
+    expect(sub2Sub1Html.style.display).toEqual("block");
+    expect(sub3Sub1Html.style.display).toEqual("block");
+    expect(subnSub1Html.style.display).toEqual("block");
 
     //hide some nodes
     sub2Sub2.hideNode();
@@ -217,6 +300,11 @@ test('Test hide of nodes 2', () => {
     expect(sub2Sub2.getVisibility()).toBe(false);
     expect(sub3Sub1.getVisibility()).toBe(true);
     expect(subnSub1.getVisibility()).toBe(true);
+    expect(SubRootNodeHtml.style.display).toEqual("block");
+    expect(sub2Sub2Html.style.display).toEqual("none");
+    expect(sub2Sub1Html.style.display).toEqual("block");
+    expect(sub3Sub1Html.style.display).toEqual("block");
+    expect(subnSub1Html.style.display).toEqual("block");
 
 
     //show the Nodes, all edges
@@ -238,5 +326,10 @@ test('Test hide of nodes 2', () => {
     expect(sub2Sub2.getVisibility()).toBe(true);
     expect(sub3Sub1.getVisibility()).toBe(false);
     expect(subnSub1.getVisibility()).toBe(true);
+    expect(SubRootNodeHtml.style.display).toEqual("block");
+    expect(sub2Sub2Html.style.display).toEqual("block");
+    expect(sub2Sub1Html.style.display).toEqual("none");
+    expect(sub3Sub1Html.style.display).toEqual("none");
+    expect(subnSub1Html.style.display).toEqual("block");
 
 }); 
