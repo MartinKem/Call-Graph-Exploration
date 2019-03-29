@@ -49,7 +49,6 @@ let callSites5 = [{ declaredTarget: { declaringClass: "Sub2", name: "sub1", para
 
 const nodes = require('./nodes');
 const index = require('./index');
-const global = require('./global');
 
 // create graphs
 let SubRootNode = new nodes.node(nodeData1, callSites1);
