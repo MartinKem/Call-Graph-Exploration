@@ -67,8 +67,8 @@ Um die Graphdaten direkt in die Map der Anwendung zu schreiben muss einiges beac
 
 ## Known Issues
 
-* CallSiteContextmenu: Je nach Zoomstufe des Browser werden die geöffneten CallSites zu weit nach unten verschoben
-* Ohne eine Internetverbindung könne die Recurcen `https://d3js.org/d3.v3.min.js` und `https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js` nicht geladen werden. Mögliche Lösung: Daten herunterladen und Dateien einbinden.
+* CallSiteContextmenu: Je nach Zoomstufe des Browser werden die geöffneten CallSites zu weit nach unten/oben verschoben
+* Ohne eine Internetverbindung könne die Recurcen `https://d3js.org/d3.v3.min.js` und `https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js` nicht geladen werden. Mögliche Lösung: In der `index.html` können alternative Ressourcen ausgewählt werden, die lokal gespeichert sind.
 
 ## TODO
 
