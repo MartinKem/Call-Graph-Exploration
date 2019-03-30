@@ -30,6 +30,8 @@ var autocompleteMode;
 var showWholeGraphSet;
 var documentListener = false;
 
+let nodeParentMap = new Map(); // Map for searching parent nodes, elements: {node : {string} nodeId, callSite: object}
+
 
 /**
  * 
@@ -81,6 +83,7 @@ function loadFile() {
 
 /**
  * parse the stings of the arr array, wich is set from the setString function
+ * @returns {Object} - parsed Object
  */
 function parseString() {
 	let rest = "";
@@ -515,6 +518,7 @@ function createNodeInstance(nodeData, parentNode, index) {
  *
  * @param {object[]} array - an array of objects to be sorted
  * @param {String} key - key by which to sort
+ * @returns {object[]} - sorted array
 */
 function sortByKey(array, key) {
 	return array.sort(function (a, b) {
@@ -589,6 +593,7 @@ function showWholeGraph(maxDepth) {
 
 /**
  * counts the nodes of the whole graph from the shown root nodes
+ * @returns {number} - counted number or null
  */
 function countReachableNodes() {
 	showWholeGraphSet = new Set();
@@ -629,10 +634,34 @@ function countReachableNodes() {
 }
 
 /**
- * @param {{name: string, declaringClass: string, parameterTypes: string[], returnType: string}} methodData - data of this single method (without call sites and targets)
+ * 
+ * @param {Object} element - element of reachableMethods from the JSON file
  */
-function addJsonMapEntry(methodData) {
-	parsedJsonMap.set(idString(methodData), methodData);
+function addJsonMapEntry(element) {
+	parsedJsonMap.set(idString(element.method), element);
+}
+
+
+/**
+ * function to set the nodeParentMap Map for parent search, has only to be called ones
+ */
+function createNodeParentMap(){
+	parsedJsonMap.forEach(function(nodeInfo){
+		nodeInfo.callSites.forEach(function(callSite){
+			callSite.targets.forEach(function(target){
+				let key = idString(target);
+
+				let arrOfParents = nodeParentMap.get(key);
+				if (!arrOfParents)
+				nodeParentMap.set(key,[{node: idString(nodeInfo.method), callSite: callSite}]); // {node : {string} nodeId, callSite: object}
+				else {
+					arrOfParents.push({node: idString(nodeInfo.method), callSite: callSite});
+					nodeParentMap.set(key,arrOfParents);
+				}
+			});
+		});
+	});
+	console.log("done parent node");
 }
 
 

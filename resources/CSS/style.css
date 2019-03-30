@@ -270,6 +270,25 @@ line {
     stroke: red !important;
 }
 
+#contextmenuParent{
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    height: 100%;
+    width: 30%;
+    background-color: white;
+    border: solid;
+    border-width: 1px;
+    padding: 15px;
+}
+
+#parentSelection{
+    margin-top: 15px;
+    height: 60%;
+    overflow: auto;
+    border: solid 1px;
+}
+
 /* styles for the call site contextmenu */
 
 #contextmenuCallSite {
