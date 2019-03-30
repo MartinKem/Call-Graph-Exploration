@@ -41,11 +41,11 @@ class node {
      *
      */
     constructor(data, callSites) {
-        this.parents = [];
+        this.parents = []; // {node : node, index: number, edge: edge}
         this.nodeData = data;
         this.callSites = callSites;
         this.sizes = { x: undefined, y: undefined, width: nodeWidth, height: nodeHeightEmpty + callSiteHeight * this.callSites.length };
-        this.children = [];		// {node, index, edge}
+        this.children = [];		// {node : node, index: number, edge: edge}
         this.detailed = true;
         this.visible = null;	// this.visible == null: node has never been placed or displayed;
         // this.visible == false: this node has valid x- and y-values, but is currently invisible

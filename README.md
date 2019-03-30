@@ -63,7 +63,7 @@ Um die Graphdaten direkt in die Map der Anwendung zu schreiben muss einiges beac
 4. Nach dem befüllen der Map  autocomplete aktivieren `var fullMethods = getStructuredMethodList(); autocomplete(document.getElementById("searchInput"), fullMethods);`
 5. Beim befüllen der Map: 
 	1. Map erstellen: `parsedJsonMap = new Map()`
-	2. Dann Knoten einfügen: `parsedJsonMap.set(idString(element.method), element);`, `element` ist ein Javascript Object mit den Attributen wie die Elemente der `reachableMethods` in den JSON Daten
+	2. Dann Knoten einfügen: mit `addJsonMapEntry(element)` oder `parsedJsonMap.set(idString(element.method), element);`, `element` ist ein Javascript Object mit den Attributen wie die Elemente der `reachableMethods` in den JSON Daten
 
 ## Known Issues
 
