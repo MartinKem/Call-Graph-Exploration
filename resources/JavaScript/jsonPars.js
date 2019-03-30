@@ -30,6 +30,8 @@ var autocompleteMode;
 var showWholeGraphSet;
 var documentListener = false;
 
+let nodeParentMap = new Map(); // Map for searching parent nodes, elements: {node : {string} nodeId, callSite: object}
+
 
 /**
  * 
@@ -81,6 +83,7 @@ function loadFile() {
 
 /**
  * parse the stings of the arr array, wich is set from the setString function
+ * @returns {Object} - parsed Object
  */
 function parseString() {
 	let rest = "";
@@ -309,7 +312,7 @@ function changeDiv() {
 	$("#graph_page").removeClass("invis");
 
 }
-
+var timeout = null;
 //Eingabe bei gegebenem Texteingabefeld mit gegebenem Stringarray autovervollständigen 
 function autocomplete(inp, arr) {
 	//2 Parameter, Textfeld und Array mit Vervollständigungsdaten
@@ -319,6 +322,10 @@ function autocomplete(inp, arr) {
 	//Texteingabe erkennen
 	inp.addEventListener("input", function (e) { autocompleteEvent(e, this); });
 	inp.addEventListener("focus", function (e) { autocompleteEvent(e, this); });
+
+	/*inp.addEventListener("keydown", function () {
+        clearTimeout(timeout);
+    });*/
 
 	if (!documentListener) {
 		document.addEventListener("click", function (e) {
@@ -335,79 +342,88 @@ function autocomplete(inp, arr) {
 	}
 
 	function autocompleteEvent(e, inputElem, scrollTop) {
-		var div, items, otherValue, thisArray, reducedArray = [], value = inputElem.value;
+        clearTimeout(timeout);
 
-		if (inputElem.name === "targetSearch") arr = Array.from(availableTargets.values());
-		//Alle offenen Listen schließen
-		closeAllLists();
-		//Unterbrechen, wenn das Textfeld leer ist
-		currentFocus = -1;
-		//DIV Element erstellen, das alle Vervollständigungsvorschläge enthält
-		div = document.createElement("DIV");
-		div.setAttribute("id", inputElem.id + "autocomplete-list");
-		div.setAttribute("class", "autocomplete-items");
-		//Füge das DIV Element dem Container als Kindelement hinzu
-		inputElem.parentNode.appendChild(div);
 
-		Loop1:
-		for (let i = 0; i < arr.length; i++) {
-			//Prüfe, ob die eingegebenen Zeichen mit beliebigem Teilstring des Vorschlags übereinstimmen
-			Loop2:
-			for (let j = 0; j < arr[i].length - value.length + 1; j++) {
-				if (arr[i].substr(j, value.length).toUpperCase() === value.toUpperCase()) {
-					arr[i] = escapeSG(arr[i]);
-					//Erstelle DIV Element für jeden übereinstimmenden Vorschlag
-					items = document.createElement("DIV");
-					//Hebe übereinstimmende Zeichen als fettgedruckt hervor
-					items.innerHTML = arr[i].substr(0, j);
-					items.innerHTML += "<strong>" + arr[i].substr(j, value.length) + "</strong>";
-					items.innerHTML += arr[i].substr(value.length + j);
-					//Erstelle INPUT Feld, das den aktuellen Wert der Vorschlags enthält
-					items.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-					//Führe die übergebene Funktion bei Knopfdruck des Elements aus
-					items.addEventListener("click", function (e) {
-						if (autocompleteMode === "callSite") {
-							// Das Call-Site-Menü soll nur durch die eigenen Buttons und andere Call-Site-Menüs schließbar sein
-							//Füge den Vervollständigungsvorschlag in das Textfeld ein
-							inp.value = this.getElementsByTagName("input")[0].value;
-							addTargetToSelected();
-							inp.value = "";
-							e.preventDefault();
-							this.remove();
-						} else {
-							//Füge den Vervollständigungsvorschlag in das Textfeld ein
-							inp.value = this.getElementsByTagName("input")[0].value;
-							//Alle offenen Listen schließen
-							closeAllLists();
-						}
+        timeout = setTimeout(f, autocompleteTimeout);
 
-					});
-					div.appendChild(items);
 
-					//Schleife unterbrechen wenn maxSuggests Elemente gefunden wurden
-					if (div.childElementCount >= maxSuggests) {
-						items = document.createElement("DIV");
-						items.innerHTML += "<p id='showMoreButton' style='text-align: center; margin: 0px'><i>show more...</i></p>";
-						// items.innerHTML += "<input type='hidden' name='show more'>";
-						div.appendChild(items);
-						let showMoreButton = document.getElementById("showMoreButton").parentNode;
-						showMoreButton.addEventListener("click", function (event) {
-							let scrollTop = showMoreButton.parentNode.scrollTop
-							showMoreButton.parentNode.remove();
-							maxSuggests += 10;
-							autocomplete(inp, arr);
-							autocompleteEvent(undefined, inputElem, scrollTop);
-							event.stopPropagation();
-						});
-						break Loop1;
-					}
-					break Loop2;
-				}
-			}
-		}
-		if (scrollTop) {
-			document.getElementById(inp.id + "autocomplete-list").scrollTop = scrollTop;
-		}
+        function f() {
+            var div, items, otherValue, thisArray, reducedArray = [], value = inputElem.value;
+
+            if (inputElem.name === "targetSearch") arr = Array.from(availableTargets.values());
+            //Alle offenen Listen schließen
+            closeAllLists();
+            //Unterbrechen, wenn das Textfeld leer ist
+            currentFocus = -1;
+            //DIV Element erstellen, das alle Vervollständigungsvorschläge enthält
+            div = document.createElement("DIV");
+            div.setAttribute("id", inputElem.id + "autocomplete-list");
+            div.setAttribute("class", "autocomplete-items");
+            //Füge das DIV Element dem Container als Kindelement hinzu
+            inputElem.parentNode.appendChild(div);
+
+            Loop1:
+                for (let i = 0; i < arr.length; i++) {
+                    //Prüfe, ob die eingegebenen Zeichen mit beliebigem Teilstring des Vorschlags übereinstimmen
+                    Loop2:
+                        for (let j = 0; j < arr[i].length - value.length + 1; j++) {
+                            if (arr[i].substr(j, value.length).toUpperCase() === value.toUpperCase()) {
+                                arr[i] = escapeSG(arr[i]);
+                                //Erstelle DIV Element für jeden übereinstimmenden Vorschlag
+                                items = document.createElement("DIV");
+                                //Hebe übereinstimmende Zeichen als fettgedruckt hervor
+                                items.innerHTML = arr[i].substr(0, j);
+                                items.innerHTML += "<strong>" + arr[i].substr(j, value.length) + "</strong>";
+                                items.innerHTML += arr[i].substr(value.length + j);
+                                //Erstelle INPUT Feld, das den aktuellen Wert der Vorschlags enthält
+                                items.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                                //Führe die übergebene Funktion bei Knopfdruck des Elements aus
+                                items.addEventListener("click", function (e) {
+                                    if (autocompleteMode === "callSite") {
+                                        // Das Call-Site-Menü soll nur durch die eigenen Buttons und andere Call-Site-Menüs schließbar sein
+                                        //Füge den Vervollständigungsvorschlag in das Textfeld ein
+                                        inp.value = this.getElementsByTagName("input")[0].value;
+                                        addTargetToSelected();
+                                        inp.value = "";
+                                        e.preventDefault();
+                                        this.remove();
+                                    } else {
+                                        //Füge den Vervollständigungsvorschlag in das Textfeld ein
+                                        inp.value = this.getElementsByTagName("input")[0].value;
+                                        //Alle offenen Listen schließen
+                                        closeAllLists();
+                                    }
+
+                                });
+                                div.appendChild(items);
+
+                                //Schleife unterbrechen wenn maxSuggests Elemente gefunden wurden
+                                if (div.childElementCount >= maxSuggests) {
+                                    items = document.createElement("DIV");
+                                    items.innerHTML += "<p id='showMoreButton' style='text-align: center; margin: 0px'><i>show more...</i></p>";
+                                    // items.innerHTML += "<input type='hidden' name='show more'>";
+                                    div.appendChild(items);
+                                    let showMoreButton = document.getElementById("showMoreButton").parentNode;
+                                    showMoreButton.addEventListener("click", function (event) {
+                                        let scrollTop = showMoreButton.parentNode.scrollTop
+                                        showMoreButton.parentNode.remove();
+                                        maxSuggests += 10;
+                                        autocomplete(inp, arr);
+                                        autocompleteEvent(undefined, inputElem, scrollTop);
+                                        event.stopPropagation();
+                                    });
+                                    break Loop1;
+                                }
+                                break Loop2;
+                            }
+                        }
+                }
+            if (scrollTop) {
+                document.getElementById(inp.id + "autocomplete-list").scrollTop = scrollTop;
+            }
+        }
+
 	}
 	//Führe eine Funktion aus, wenn die Tastatur betätigt wird
 	inp.addEventListener("keydown", function (e) {
@@ -515,6 +531,7 @@ function createNodeInstance(nodeData, parentNode, index) {
  *
  * @param {object[]} array - an array of objects to be sorted
  * @param {String} key - key by which to sort
+ * @returns {object[]} - sorted array
 */
 function sortByKey(array, key) {
 	return array.sort(function (a, b) {
@@ -589,6 +606,7 @@ function showWholeGraph(maxDepth) {
 
 /**
  * counts the nodes of the whole graph from the shown root nodes
+ * @returns {number} - counted number or null
  */
 function countReachableNodes() {
 	showWholeGraphSet = new Set();
@@ -628,11 +646,41 @@ function countReachableNodes() {
 	}
 }
 
+function hideWholeGraph() {
+    rootNodes.forEach(function (rn) {
+        rn.hideNode();
+    })
+}
+
 /**
- * @param {{name: string, declaringClass: string, parameterTypes: string[], returnType: string}} methodData - data of this single method (without call sites and targets)
+ * 
+ * @param {Object} element - element of reachableMethods from the JSON file
  */
-function addJsonMapEntry(methodData) {
-	parsedJsonMap.set(idString(methodData), methodData);
+function addJsonMapEntry(element) {
+	parsedJsonMap.set(idString(element.method), element);
+}
+
+
+/**
+ * function to set the nodeParentMap Map for parent search, has only to be called ones
+ */
+function createNodeParentMap(){
+	parsedJsonMap.forEach(function(nodeInfo){
+		nodeInfo.callSites.forEach(function(callSite){
+			callSite.targets.forEach(function(target){
+				let key = idString(target);
+
+				let arrOfParents = nodeParentMap.get(key);
+				if (!arrOfParents)
+				nodeParentMap.set(key,[{node: idString(nodeInfo.method), callSite: callSite}]); // {node : {string} nodeId, callSite: object}
+				else {
+					arrOfParents.push({node: idString(nodeInfo.method), callSite: callSite});
+					nodeParentMap.set(key,arrOfParents);
+				}
+			});
+		});
+	});
+	console.log("done parent node");
 }
 
 
