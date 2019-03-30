@@ -641,6 +641,12 @@ function countReachableNodes() {
 	}
 }
 
+function hideWholeGraph() {
+    rootNodes.forEach(function (rn) {
+        rn.hideNode();
+    })
+}
+
 /**
  * @param {{name: string, declaringClass: string, parameterTypes: string[], returnType: string}} methodData - data of this single method (without call sites and targets)
  */
