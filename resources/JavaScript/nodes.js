@@ -211,6 +211,22 @@ class node {
     }
 
 
+    showAllChildNodes(){
+
+        showWholeGraphSet = new Set();
+        showAllChildNodes(this);
+        function showAllChildNodes(node) {
+            node.callSites.forEach(function (callSite, index) {
+                node.showChildNodes(index);
+                showWholeGraphSet.add(idString(node.nodeData));
+            });
+            node.callSites.forEach(function (callSite) {
+                callSite.targets.forEach(function (target) {
+                    if (!showWholeGraphSet.has(idString(target))) showAllChildNodes(nodeMap.get(idString(target)));
+                });
+            });
+        }
+    }
 
     /**
      * hides this node, if it was already displayed before

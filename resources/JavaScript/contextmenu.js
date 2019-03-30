@@ -153,6 +153,7 @@ function createNodeContextmenu(e) {
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#abd3ff')\">Blue<span class='hotKeySpan'> [3+MouseLeft]</span><div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffff9f')\">Yellow<span class='hotKeySpan'> [4+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffffff')\">Default<span class='hotKeySpan'> [5+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
+            "        <div class=\"menuelement\" onclick='nodeMap.get(clickedNode.id).showAllChildNodes();'>Show all reachable nodes</div>" +
             "        <div class=\"menuelement\" onclick=\"switchContent()\">Details<span class='hotKeySpan'> [Double click]</span></div><div>"));
 
     $("#contextmenuNode").css({
@@ -164,7 +165,6 @@ function createNodeContextmenu(e) {
     nodeMenuIsOpen = true;
 
 }
-
 /**
  * changes color to the backgroundcolor of node div
  * @param color - String, RGB in Hex
