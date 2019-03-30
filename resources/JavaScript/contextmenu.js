@@ -153,6 +153,7 @@ function createNodeContextmenu(e) {
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffff9f')\">Yellow<span class='hotKeySpan'> [4+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffffff')\">Default<span class='hotKeySpan'> [5+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"switchContent()\">Details<span class='hotKeySpan'> [Double click]</span></div>" +
+            "        <div class=\"menuelement\" onclick='nodeMap.get(clickedNode.id).showAllChildNodes();'>Show all reachable nodes</div>" +
             "        <div class=\"menuelement\" onclick=\"showParents()\" title=\"Click to see the parents, May take some time at first use.\">Show Parents</div><div>"));
 
     $("#contextmenuNode").css({
@@ -164,7 +165,6 @@ function createNodeContextmenu(e) {
     nodeMenuIsOpen = true;
 
 }
-
 /**
  * changes color to the backgroundcolor of node div
  * @param color - String, RGB in Hex
@@ -209,11 +209,23 @@ function showParents(){
             "</div>"+
         "</div>");
 
-    let parentSelection = document.getElementById("parentSelection");
-    parents.forEach(function(parent){
-        parentSelection.innerHTML += "<div><p class='rmx' onclick='showParentAndCall(\""+parent.node+"\","+JSON.stringify(parent.callSite)+",\""+nodeId+"\")'>Create</p><p>" + parent.node + " at line " + parent.callSite.line +"</p></div>";
-    });
-
+    // has parents
+    if(parents){
+        // sort them
+        parents.sort(function(a,b){
+            if((a.node + a.callSite.line) < (b.node + b.callSite.line))
+                return -1;
+            else if ((a.node + a.callSite.line) > (b.node + b.callSite.line))
+                return +1;
+            else 
+                return 0;
+        });
+        //display them
+        let parentSelection = document.getElementById("parentSelection");
+        parents.forEach(function(parent){
+            parentSelection.innerHTML += "<div><p class='rmx' onclick='showParentAndCall(\""+parent.node+"\","+JSON.stringify(parent.callSite)+",\""+nodeId+"\")'>Create</p><p>" + parent.node + " at line " + parent.callSite.line +"</p></div>";
+        });
+    }
 }
 
 /**
