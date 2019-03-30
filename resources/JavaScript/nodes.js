@@ -100,7 +100,7 @@ class node {
      * shows all child nodes of a single call site and displays an edge to them
      *
      * @param {number} index - index of the call-site-array
-     * @param {string[] | undefined} names - only these targets shall be shown, shows all children if undefined
+     * @param {Set(string) | undefined} names - only these targets shall be shown, shows all children if undefined
      */
     showChildNodes(index, names) {
         let childrenToBeShown = [];

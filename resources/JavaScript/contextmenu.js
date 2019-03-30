@@ -153,8 +153,9 @@ function createNodeContextmenu(e) {
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#abd3ff')\">Blue<span class='hotKeySpan'> [3+MouseLeft]</span><div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffff9f')\">Yellow<span class='hotKeySpan'> [4+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffffff')\">Default<span class='hotKeySpan'> [5+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
+            "        <div class=\"menuelement\" onclick=\"switchContent()\">Details<span class='hotKeySpan'> [Double click]</span></div>" +
             "        <div class=\"menuelement\" onclick='nodeMap.get(clickedNode.id).showAllChildNodes();'>Show all reachable nodes</div>" +
-            "        <div class=\"menuelement\" onclick=\"switchContent()\">Details<span class='hotKeySpan'> [Double click]</span></div><div>"));
+            "        <div class=\"menuelement\" onclick=\"showParents()\" title=\"Click to see the parents, May take some time at first use.\">Show Parents</div><div>"));
 
     $("#contextmenuNode").css({
         "position":"absolute",
@@ -179,6 +180,66 @@ function deleteNodes() {
     let nodeId= $(clickedNode).attr('id');
 	let nodeInstance = nodeMap.get(nodeId);
 	nodeInstance.hideNode();
+}
+
+/**
+ * shows the parents of an clicked node
+ */
+function showParents(){
+    // empty map, then fill it
+    if(nodeParentMap.size === 0)
+    createNodeParentMap();
+
+    // old menu open ? then close it
+    if(document.getElementById('contextmenuParent'))
+    closeContextMenuParent();
+
+    let nodeId= $(clickedNode).attr('id');
+    let parents = nodeParentMap.get(nodeId); // {node : {string} nodeId, callSite: object}
+    
+    $("body").append(
+        "<div id='contextmenuParent'>" +
+            "<h3>Choose parent from <span>" + nodeId + "</span> to be shown:</h3>" +
+            "<div id='parentSelection'>" +
+                
+            "</div>" +
+            "<div id='contextmenuSubmit'>" +
+                "<button id='cmb1' onclick='closeContextMenuParent()'>Close</button>" +
+            "</div>"+
+        "</div>");
+
+    let parentSelection = document.getElementById("parentSelection");
+    parents.forEach(function(parent){
+        parentSelection.innerHTML += "<div><p class='rmx' onclick='showParentAndCall(\""+parent.node+"\","+JSON.stringify(parent.callSite)+",\""+nodeId+"\")'>Create</p><p>" + parent.node + " at line " + parent.callSite.line +"</p></div>";
+    });
+
+}
+
+/**
+ * shows the parent node and open the call site
+ * 
+ * @param {string} nodeId - id of parent node
+ * @param {Object} callSite - call site to be open by parent node
+ * @param {string} childId - id of the node of which the parent should be shown
+ */
+function showParentAndCall(nodeId, callSite, childId){
+    let callSiteIndex = 0;
+    document.getElementById("searchInput").value = nodeId;
+    createGraph();
+    let callSitesParent = placedNodesMap.get(nodeId).getCallSites();
+
+    //search for callSiteIndex
+    for(let index = 0; index < callSitesParent.length; index++){
+        let call = callSitesParent[index]
+        if(JSON.stringify(callSitesParent[index]) == JSON.stringify(callSite)){
+            callSiteIndex = index;
+            break;
+        }
+    }
+    // open callSite
+    let names = new Set();
+    names.add(childId);
+    placedNodesMap.get(nodeId).showChildNodes(callSiteIndex, names);
 }
 
 function switchContent() {
@@ -257,6 +318,11 @@ function closeCallSiteContextmenu(){
         autocompleteMode = undefined;   // autocomplete shall work as usual, when the call site contextmenu closes
         callSiteMenuIsOpen = false;
     }
+}
+
+//closes ContextMenuParent
+function closeContextMenuParent(){
+    $("#contextmenuParent").remove();  
 }
 
 // last clicked node-div gets the class: .lastClickedNode
