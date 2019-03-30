@@ -85,7 +85,9 @@ function escapeSG(string) {
 		.replace(/>/g, "&gt;");
 }
 
-// if a node is placed outside the current svg container, the container grows in that direction
+// if a node is placed outside the current svg container, the container grows in that direction.
+// in case that the container must be placed in negative direction, it is just increased as usual,
+// but the whole graph is moved in the direction
 function resizeSVGCont(node) {
 	let svgWidth = parseInt(svgCont.attr("width"));
 	let svgHeight = parseInt(svgCont.attr("height"));
@@ -111,7 +113,6 @@ function resizeSVGCont(node) {
 
 	// this function is executed until the placed node is inside the svg container
 	if (resized) {
-		// force.size([svgCont.attr("width"), svgCont.attr("height")]);
 		resizeSVGCont(node);
 	}
 
@@ -145,6 +146,11 @@ function resizeSVGCont(node) {
 	return resized;
 }
 
+/**
+ * This function toggles all nodes to detailed or all nodes to abstract
+ *
+ * @param {"Hide Details"|"Show Details"} currentValue - tells if all nodes shall show details or not
+ */
 function open_close(currentValue) {
 
 	if (currentValue === "Hide Details") {

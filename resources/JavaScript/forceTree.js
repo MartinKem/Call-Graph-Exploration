@@ -21,17 +21,6 @@ linkArr: array of links:{source: nodeA, target: nodeB}
 returns: [force, nodeSelection, linkSelection] initialized force instance and d3-selection of nodes and links
 */
 function initForce(svg, nodeArr, linkArr){
-
-	// var linkSelection = svg.selectAll("line")
-	// 	.data(linkArr)
-	// 	.enter().append("line");
-	//
-	// var nodeSelection = svg.selectAll("circle")
-	// 	.data(nodeArr)
-	// 	.enter().append("circle")
-	// 	.attr("r", 10 - .75)
-	// 	.style("fill", "rgb(31, 119, 180)");
-	
 	width = d3.select("svg").attr("width");
 	height = d3.select("svg").attr("height");
 	
@@ -51,45 +40,11 @@ function initForce(svg, nodeArr, linkArr){
 	}
 	force.stop();
 
-	return force //, nodeSelection, linkSelection];
+	return force;
 }
 
 /*
-defines the distribution of child nodes in the graph
-
-e: tick instance given by on tick function
-linkSelection: d3-selection of links
-nodeSelection: d3-selection of nodes
-
-returns void
-*/
-// function tick(e, linkSelection, nodeSelection) {
-// 	var k = 0.1 * e.alpha;
-// 	// push targets away from center
-// 	linkSelection.each(function(d) {
-// 		if(!d.target.fixed || !d.source.fixed){
-// 			var diffx = d.target.x - nodes[0].x;
-// 			var diffy = d.target.y - nodes[0].y;
-// 			d.target.x += k*diffx;
-// 			d.target.y += k*diffy;
-// 		}
-// 		})
-// 		.attr("x1", function(d) { return d.source.x; })
-// 		.attr("y1", function(d) { return d.source.y; })
-// 		.attr("x2", function(d) { return d.target.x; })
-// 		.attr("y2", function(d) { return d.target.y; });
-//
-// 	nodeSelection
-// 		.attr("cx", function(d) { return d.x; })
-// 		.attr("cy", function(d) { return d.y; });
-//
-// }
-
-/*
 fixes all plotted nodes
-
-e: tick instance given by on tick function
-linkSelection: d3 selection of links
 
 returns: void
 */
@@ -106,19 +61,21 @@ adds several nodes to the current force graph and calculates their positions
 sourceNodeID: id of the source node
 targetNodeIDs: array of ids of all the target nodes
 
-returns: positions: array of positions:{x: a, y: b} for each of the target nodes
+returns: positions: array of positions:{x: number, y: number, index: number} for each of the target nodes
 */
 function addNodeToForceTree(sourceNodeID, targetNodeIDs){
+	// in this case a new node is generated through the node search
     if(!targetNodeIDs){
         nodes.push({index: nodes.length, id: sourceNodeID});
         force.gravity(0.1);
-        restartForceLayouting(1);
+        restartForceLayouting();
         force.gravity(0.005);
         nodes[nodes.length-1].fixed = true;
         return {x: nodes[nodes.length-1].x, y: nodes[nodes.length-1].y, index: nodes.length-1};
     }
+    // we need to find the nodes-array element of the source node
 	sourceNode = 0;
-	for(var i = 0; i < nodes.length; i++){
+	for(let i = 0; i < nodes.length; i++){
 		if(sourceNodeID == nodes[i].id){
 			sourceNode = i;
 			break;
@@ -127,14 +84,16 @@ function addNodeToForceTree(sourceNodeID, targetNodeIDs){
 	
 	var firstIdx = nodes.length;
 	var count = targetNodeIDs.length;
+	// all new links and nodes are added to the corresponding array
 	do {
 		var idx = nodes.length;
 		nodes.push({index: idx, id: targetNodeIDs[targetNodeIDs.length - count]});
 		links.push({source: sourceNode, target: idx});
 	} while(--count > 0);
-	restartForceLayouting(targetNodeIDs.length);
+	restartForceLayouting();
 	var positions = [];
-	for(var i = firstIdx; i < nodes.length; i++){
+	// in the end we build an array with the new positions of the nodes, that have been placed
+	for(let i = firstIdx; i < nodes.length; i++){
 		positions.push({x: nodes[i].x, y: nodes[i].y, index: i});
 	}
 	return positions;
@@ -146,18 +105,7 @@ also starts the force-layouting
 
 returns: void
 */
-function restartForceLayouting(newNodes){
-	// nodeSelection = nodeSelection.data(nodes);
-	//
-	// nodeSelection.enter().insert("circle", ".cursor")
-	// 	.attr("r", 10 - .75)
-	// 	.style("fill", "rgb(31, 119, 180)");
-	//
-	// linkSelection = linkSelection.data(links);
-	//
-	// linkSelection.enter().insert("line", ".node")
-	// 	.attr("class", "link");
-
+function restartForceLayouting(){
 	force.nodes(nodes)
 		.links(links)
 		.on("end", function(e){ fix(); })
