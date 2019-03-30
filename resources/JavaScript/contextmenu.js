@@ -208,11 +208,23 @@ function showParents(){
             "</div>"+
         "</div>");
 
-    let parentSelection = document.getElementById("parentSelection");
-    parents.forEach(function(parent){
-        parentSelection.innerHTML += "<div><p class='rmx' onclick='showParentAndCall(\""+parent.node+"\","+JSON.stringify(parent.callSite)+",\""+nodeId+"\")'>Create</p><p>" + parent.node + " at line " + parent.callSite.line +"</p></div>";
-    });
-
+    // has parents
+    if(parents){
+        // sort them
+        parents.sort(function(a,b){
+            if((a.node + a.callSite.line) < (b.node + b.callSite.line))
+                return -1;
+            else if ((a.node + a.callSite.line) > (b.node + b.callSite.line))
+                return +1;
+            else 
+                return 0;
+        });
+        //display them
+        let parentSelection = document.getElementById("parentSelection");
+        parents.forEach(function(parent){
+            parentSelection.innerHTML += "<div><p class='rmx' onclick='showParentAndCall(\""+parent.node+"\","+JSON.stringify(parent.callSite)+",\""+nodeId+"\")'>Create</p><p>" + parent.node + " at line " + parent.callSite.line +"</p></div>";
+        });
+    }
 }
 
 /**
