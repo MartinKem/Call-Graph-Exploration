@@ -67,6 +67,28 @@ nodeMap.set(index.idString(nodeData5), subnSub1);
 
 test('Test hide of nodes 1', () => {
 
+    function getNumberOfGraphElements(){
+        let numberOfGeneratedNodes = 0;
+        let numberOfGeneratedEdges = 0;
+        let svg = document.getElementById("graph").firstChild;
+        for (let i = 0; i < global.svgCont[0][0].childNodes.length; i++) {
+            if (svg.childNodes[i].nodeName === "foreignObject") numberOfGeneratedNodes++;
+            else if (svg.childNodes[i].nodeName === "path") numberOfGeneratedEdges++;
+        }
+        return [numberOfGeneratedNodes, numberOfGeneratedEdges];
+    }
+
+    function nodesOutsideSVGCont(){
+        let result = false;
+        Array.from(nodeMap.values()).forEach(function(node){
+            if(node.sizes.x < 0 ||
+                node.sizes.y < 0 ||
+                node.sizes.x + node.sizes.width > parseInt(svgCont[0][0].getAttribute("width")) ||
+                node.sizes.y + node.sizes.height > parseInt(svgCont[0][0].getAttribute("height"))) result = true;
+        });
+        return result;
+    }
+
     //show the Nodes, no edge between Subn.sub1 to Sub2.sub1
     SubRootNode.hideNode();
     SubRootNode.showNode();
@@ -76,6 +98,9 @@ test('Test hide of nodes 1', () => {
     sub2Sub1.showChildNodes(0);
     sub3Sub1.showChildNodes(0);
 
+    expect(nodesOutsideSVGCont()).toBe(false);
+    expect(nodeMap.size).toBe(5);
+
     SubRootNode.hideNode();         //
     SubRootNode.showNode();         //
     SubRootNode.showChildNodes(0);  //
@@ -83,6 +108,8 @@ test('Test hide of nodes 1', () => {
     sub2Sub2.showChildNodes(0);     //
     sub2Sub1.showChildNodes(0);     //
     sub3Sub1.showChildNodes(0);     //
+
+    expect(nodesOutsideSVGCont()).toBe(false);
 
     //get the html elements
     let SubRootNodeHtml = document.getElementById("Main.main():int");
@@ -95,24 +122,22 @@ test('Test hide of nodes 1', () => {
 
 
     // tests for the actual number of generated nodes and edges in the svg container
-    let numberOfGeneratedNodes = 0;
-    let numberOfGeneratedEdges = 0;
-    let svg = document.getElementById("graph").firstChild;
-    for (let i = 0; i < global.svgCont[0][0].childNodes.length; i++) {
-       if (svg.childNodes[i].nodeName === "foreignObject") numberOfGeneratedNodes++;
-       else if (svg.childNodes[i].nodeName === "path") numberOfGeneratedEdges++;
-    }
 
+
+    let numberOfGeneratedNodes, numberOfGeneratedEdges;
+    [numberOfGeneratedNodes, numberOfGeneratedEdges] = getNumberOfGraphElements();
     expect(numberOfGeneratedEdges).toBe(5);
     expect(numberOfGeneratedEdges).toBe(5);
 
     sub2Sub2.hideNode();
 
+    [numberOfGeneratedNodes, numberOfGeneratedEdges] = getNumberOfGraphElements();
     expect(numberOfGeneratedEdges).toBe(5);
     expect(numberOfGeneratedEdges).toBe(5);
 
     index.open_close();
 
+    [numberOfGeneratedNodes, numberOfGeneratedEdges] = getNumberOfGraphElements();
     expect(numberOfGeneratedEdges).toBe(5);
     expect(numberOfGeneratedEdges).toBe(5);
     
@@ -133,15 +158,11 @@ test('Test hide of nodes 1', () => {
     expect(sub3Sub1Html.style.display).toEqual("block");
     expect(subnSub1Html.style.display).toEqual("block");
 
-
-
-
-
-
     //hide some nodes    
     sub2Sub2.hideNode();
 
     //make sure the right ones are hidden
+    expect(nodesOutsideSVGCont()).toBe(false);
     expect(SubRootNode.getVisibility()).toBe(true);
     expect(sub2Sub1.getVisibility()).toBe(true);
     expect(sub2Sub2.getVisibility()).toBe(false);
@@ -166,6 +187,7 @@ test('Test hide of nodes 1', () => {
     sub2Sub1.hideNode();
 
     //make sure the right ones are hidden
+    expect(nodesOutsideSVGCont()).toBe(false);
     expect(SubRootNode.getVisibility()).toBe(true);
     expect(sub2Sub1.getVisibility()).toBe(false);
     expect(sub2Sub2.getVisibility()).toBe(true);
@@ -190,6 +212,7 @@ test('Test hide of nodes 1', () => {
     sub3Sub1.hideNode();
 
     //make sure the right ones are hidden
+    expect(nodesOutsideSVGCont()).toBe(false);
     expect(SubRootNode.getVisibility()).toBe(true);
     expect(sub2Sub1.getVisibility()).toBe(true);
     expect(sub2Sub2.getVisibility()).toBe(true);
@@ -257,7 +280,6 @@ test('Test hide of nodes 2', () => {
 
 
     // make sure it works
-    expect(SubRootNode.getVisibility()).toBe(true);
     expect(sub2Sub1.getVisibility()).toBe(true);
     expect(sub2Sub2.getVisibility()).toBe(true);
     expect(sub3Sub1.getVisibility()).toBe(true);
@@ -272,7 +294,6 @@ test('Test hide of nodes 2', () => {
     sub2Sub2.hideNode();
 
     //make sure the right ones are hidden
-    expect(SubRootNode.getVisibility()).toBe(true);
     expect(sub2Sub1.getVisibility()).toBe(true);
     expect(sub2Sub2.getVisibility()).toBe(false);
     expect(sub3Sub1.getVisibility()).toBe(true);
