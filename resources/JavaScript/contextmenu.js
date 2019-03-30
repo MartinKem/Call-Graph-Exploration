@@ -27,7 +27,6 @@ $("html:not(.div_node)").on("contextmenu",function(e){
     closeEdgeContextmenu();
 });
 //on rightclick in .div_node calls nodeContextmenu and deactivates normal contextmenu
-// $(".div_node").contextmenu(function(e) {
 $("body").on("contextmenu",".div_node",function (e) {
     closeAllContextmenus();
     clickedNode = this;
@@ -175,7 +174,9 @@ function changeColorNode(color) {
     $(clickedNode).children(".nodeHeader").css("background-color", color);
 }
 
-
+/**
+ * hides the clicked node
+ */
 function deleteNodes() {
     let nodeId= $(clickedNode).attr('id');
 	let nodeInstance = nodeMap.get(nodeId);
@@ -230,7 +231,7 @@ function showParentAndCall(nodeId, callSite, childId){
 
     //search for callSiteIndex
     for(let index = 0; index < callSitesParent.length; index++){
-        let call = callSitesParent[index]
+        let call = callSitesParent[index];
         if(JSON.stringify(callSitesParent[index]) == JSON.stringify(callSite)){
             callSiteIndex = index;
             break;
@@ -242,6 +243,9 @@ function showParentAndCall(nodeId, callSite, childId){
     placedNodesMap.get(nodeId).showChildNodes(callSiteIndex, names);
 }
 
+/**
+ * toggles the clicked node to detailed or abstract according to its former value
+ */
 function switchContent() {
     let nodeId= $(clickedNode).attr('id');
     let node = nodeMap.get(nodeId);
@@ -280,6 +284,11 @@ function createEdgeContextmenu(e) {
     edgeMenuIsOpen = true;
 }
 
+/**
+ * sets the color of the clicked edge
+ *
+ * @param {string} color - new color-string for the edge
+ */
 function changeColorEdge(color) {
     if(color === '#000000'){
         $(clickedEdge).css('opacity', 0.5);
@@ -288,11 +297,13 @@ function changeColorEdge(color) {
     }
     $(clickedEdge).css('stroke', color);
 }
-//closes all custom contextmenus
+
+//closes all custom contextmenus except the one for the call sites
 function closeAllContextmenus() {
     closeNodeContextmenu();
     closeEdgeContextmenu();
 }
+
 //closes NodeContextmenu
 function closeNodeContextmenu() {
     if(nodeMenuIsOpen){
@@ -355,12 +366,15 @@ function createCallSiteContextmenu(node, index){
     // these variables are global, because local variables cannot be used in the following html-section
     selectedNode = node;    // the node, that holds the clicked call site
     callSiteIndex = index;  // the call site index of the clicked call site
-    selectedTargets = new Set();   // array of node strings, that holds the childnodes, that shall be shown later
-    availableTargets = new Set();  // array of node strings, that holds all possible child nodes, that belong to the clicked call site, but are not selected yet
+    selectedTargets = new Set();   // set of node strings, that holds the childnodes, that shall be shown later
+    availableTargets = new Set();  // set of node strings, that holds all possible child nodes, that belong to the clicked call site, but are not selected yet
 
+    // first all call site targets as strings are collected in the set
     node.callSites[index].targets.forEach(function(target){
         availableTargets.add(idString(target));
     });
+
+    // now all targets, that are already visible are moved from available set to selected set
     node.children
         .filter(child => (child.index === index && child.edge.visible))
         .forEach(function(child){
@@ -396,8 +410,10 @@ function createCallSiteContextmenu(node, index){
             addTargetToSelected(idString(child.node.nodeData));
         });
 
+    // while the contextmenu for call sites is used, the search shall be disabled
     document.getElementById("searchInput").setAttribute("disabled", true);
     document.getElementById("search").setAttribute("disabled", true);
+
     autocompleteMode = "callSite";  // this global variable is used in the autocomplete function, that shall work a little bit different, when in call site mode
     autocomplete(document.getElementById("targetSearch"), Array.from(availableTargets.values()));
     callSiteMenuIsOpen = true;
@@ -434,35 +450,14 @@ function removeTargetFromSelected(target){
     selectedTargets.delete(target);    // remove selected target from selected
 }
 
-function hideTargets(targets){
-    if(targets === undefined){
-        selectedNode.callSites[callSiteIndex].targets.forEach(function(target){
-            let targetNode = nodeMap.get(idString(target));
-            if(targetNode !== undefined && targetNode.visible && idString(target) !== idString(selectedNode.nodeData)){
-                targetNode.hideNode();
-                removeTargetFromSelected(idString(target));
-            }
-        });
-    } else {
-        // console.log(targets);
-        targets.forEach(function(targetStr){
-            let targetNode = nodeMap.get(targetStr);
-            if(targetNode !== undefined && targetNode.visible && targetStr !== idString(selectedNode.nodeData)){
-                targetNode.hideNode();
-                removeTargetFromSelected(targetStr);
-            }
-        });
-    }
-}
-
 /**
- * If there are starting node/nodes, an menu is open, that is used to calculate the whole sub graph
+ * If there are starting node/nodes, a menu is opening, that is used to calculate the whole sub graph
  */
 function createWholeGraphContextmenu(){
     if(rootNodes.length < 1){
         alert("There must be at least one starting node!");
     } else {
-        let reachableNodes = countReachableNodes()
+        let reachableNodes = countReachableNodes();
         if(reachableNodes) {
             $("body").append(
                 "<div id='wholeGraphContextMenu'>" +
