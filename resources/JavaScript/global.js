@@ -70,6 +70,9 @@ const forceLinkDistance = 1000;            // 1500 default; sets the desired dis
 const forceGravity = 0.001;                // 0.001 default; determines the attraction of nodes to the center of the graph
 const forceLinkStrength = 0.3;             // 1 default; determines how strongly link distance is adhered to, 1 equals full effect
 
+//time that have to pass after the last keystroke before autocomplete starts. Time in milliseconds.
+const autocompleteTimeout = 500;
+
 var links = [];
 var nodes = [];
 
