@@ -41,11 +41,11 @@ class node {
      *
      */
     constructor(data, callSites) {
-        this.parents = [];
+        this.parents = []; // {node : node, index: number, edge: edge}
         this.nodeData = data;
         this.callSites = callSites;
         this.sizes = { x: undefined, y: undefined, width: nodeWidth, height: nodeHeightEmpty + callSiteHeight * this.callSites.length };
-        this.children = [];		// {node, index, edge}
+        this.children = [];		// {node : node, index: number, edge: edge}
         this.detailed = true;
         this.visible = null;	// this.visible == null: node has never been placed or displayed;
         // this.visible == false: this node has valid x- and y-values, but is currently invisible
@@ -100,7 +100,7 @@ class node {
      * shows all child nodes of a single call site and displays an edge to them
      *
      * @param {number} index - index of the call-site-array
-     * @param {string[] | undefined} names - only these targets shall be shown, shows all children if undefined
+     * @param {Set(string) | undefined} names - only these targets shall be shown, shows all children if undefined
      */
     showChildNodes(index, names) {
         let childrenToBeShown = [];
@@ -211,6 +211,22 @@ class node {
     }
 
 
+    showAllChildNodes(){
+
+        showWholeGraphSet = new Set();
+        showAllChildNodes(this);
+        function showAllChildNodes(node) {
+            node.callSites.forEach(function (callSite, index) {
+                node.showChildNodes(index);
+                showWholeGraphSet.add(idString(node.nodeData));
+            });
+            node.callSites.forEach(function (callSite) {
+                callSite.targets.forEach(function (target) {
+                    if (!showWholeGraphSet.has(idString(target))) showAllChildNodes(nodeMap.get(idString(target)));
+                });
+            });
+        }
+    }
 
     /**
      * hides this node, if it was already displayed before
@@ -242,7 +258,7 @@ class node {
                 n.marked = false;
             });
         }
-
+        //marks every child of the node n
         function markChildren(n) {
 
             if (n.children.length > 0) {
@@ -255,7 +271,7 @@ class node {
                     });
             }
         }
-
+        //unmarks every child that should not be deleted
         function unmark(n) {
             if (n.parents.length) {
                 for (let i = 0; i < n.parents.length; i++) {
@@ -299,7 +315,7 @@ class node {
         /**
          * finds the child for the given target
          * @param t : idString of target
-         * @returns {*} child
+         * @returns child
          */
         function getChild(t) {
             let child;
@@ -318,6 +334,7 @@ class node {
             }
         })
     }
+    //similar to hidenode(), the node itself can stay
     hideChild() {
         if (this.visible === true) {
             this.marked = true;
@@ -515,6 +532,7 @@ function createSingleNode(x, y, nodeData, callSites) {
     let lock = false;
     let nodeHeight = nodeHeightEmpty + callSiteHeight * callSites.length;
 
+    //Verschiebt div und parent(foreignobject) in den Vordergrund
     function raiseNode(t) {
         d3.select(t.parentNode).each(function () {
             this.parentNode.appendChild(this);
@@ -529,7 +547,7 @@ function createSingleNode(x, y, nodeData, callSites) {
 
     var drag = d3.behavior.drag()
         .on("dragstart", function () {
-            //Verschiebt div und parent(foreignobject) in den Vordergrund
+
             d3.event.sourceEvent.stopPropagation();
             // svgDragLock = null;
             if (d3.event.sourceEvent.path[0].nodeName === "BUTTON"

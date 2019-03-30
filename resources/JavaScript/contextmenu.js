@@ -1,5 +1,5 @@
 
-var clickedNode;
+
 var nodeMenuIsOpen = false;
 var clickedEdge;
 var edgeMenuIsOpen = false;
@@ -34,21 +34,21 @@ $("body").on("contextmenu",".div_node",function (e) {
 
     createNodeContextmenu(e);
     return false;
-});
-$("body").on("contextmenu","svg path",function (e) {
+})
+    .on("contextmenu","svg path",function (e) {
     closeAllContextmenus();
     clickedEdge = this;
     createEdgeContextmenu(e);
     return false;
-});
-$("body").on("contextmenu","html:not(path)",function () {
+})
+    .on("contextmenu","html:not(path)",function () {
     closeEdgeContextmenu();
-});
+})
 
 /** ändert die Farbe der angeklickten Node wenn ein entsprechender Hotkey gedrückt wird.
  *  die Hotkey sind 1,2,3,4,5. Esfunktionieren sowohl die normalen Zahlen, als auch die vom Numpad
  *  */
-$("body").on("click",".div_node",function () {
+    .on("click",".div_node",function () {
     clickedNode = this;
     switch (keyPressed) {
         case 49: //1
@@ -77,12 +77,12 @@ $("body").on("click",".div_node",function () {
                 markLastClickedNode();
             }
     }
-});
+})
 
 /**ändert die Farbe der angeklickten Edge wenn ein entsprechender Hotkey gedrückt wird.
  * die Hotkey sind 1,2,3,4,5. Es funktionieren sowohl die normalen Zahlen, als auch die vom Numpad
  * */
-$("body").on("click","svg path",function () {
+    .on("click","svg path",function () {
     clickedEdge = this;
     switch (keyPressed) {
         case 49://1
@@ -106,54 +106,56 @@ $("body").on("click","svg path",function () {
             changeColorEdge('#000000');
             break;
         default:
-            markedNode = this;
+            markedEdge = this;
             if(lastMarkedEdge !== markedEdge){
                 markLastClickedEdge();
             }
     }
-});
+})
 
-$(document).on("keydown", function(e) {
-    keyPressed = e.which;
-
-});
-$(document).on("keyup", function(e){
-        if(keyPressed === e.which){
-            keyPressed = undefined;
-        }
-});
-
-$("body").on("click",".node_inhalt button",function (e) {
+    .on("click",".node_inhalt button",function (e) {
     let node = nodeMap.get(this.parentNode.parentNode.getAttribute("id"));
     let index = this.getAttribute("id").split("#");
     index = parseInt(index[index.length - 1]);
     if(node.callSites[index].targets.length >= callSiteThreshold){
         closeAllContextmenus();
         closeCallSiteContextmenu();
-        createCallSiteContextmenu(e, node, index);
+        createCallSiteContextmenu(node, index);
     }
     return false;
 });
 
-//loads rightclickmenu.html on current mouse position
+/**
+ * Stored the currently pressed key in keyPressed
+  */
+$(document).on("keydown", function(e) {
+    keyPressed = e.which;
+
+})
+    .on("keyup", function(e){
+        if(keyPressed === e.which){
+            keyPressed = undefined;
+        }
+});
+
+
+
+/**
+ * opens custom contextmenu on mouseposition
+ * @param e - event
+ */
 function createNodeContextmenu(e) {
     let x = e.pageX + "px";     // Get the horizontal coordinate
     let y = e.pageY + "px";     // Get the vertical coordinate
-    //let link = "https://raw.githubusercontent.com/MartinKem/Call-Graph-Exploration/developer's/eingelesener%20Graph/rightclickmenu.html?token=gAYfhzzRW1xhwgU-GLzFnB5r3gtbBHuFpks5cRbzjwA%3D%3D";
-   // let counter = 0;
-    /*try{
-        //$("body").append($("<div id='main-rightclick'></div>").load(link +" #main-rightclick>"));
-
-    }catch (e) {*/
-       // counter = 1;
-       // if(counter > 0)console.log("contextmenu nicht mehr aktuell");
         $("body").append($("<div id='contextmenuNode'>        <div class=\"menuelement\" onclick=\"deleteNodes()\" title=\"Click to hide this node and all childnodes without different parentnodes\">Hide</div>" +
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffc6c6')\">Red<span class='hotKeySpan'> [1+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffc6c6 \"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#beffbe')\">Green<span class='hotKeySpan'> [2+MouseLeft]</span><div class=\"color\" style=\"background-color: #beffbe\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#abd3ff')\">Blue<span class='hotKeySpan'> [3+MouseLeft]</span><div class=\"color\" style=\"background-color: #abd3ff\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffff9f')\">Yellow<span class='hotKeySpan'> [4+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffff9f\"></div></div>" +
             "        <div class=\"menuelement\" onclick=\"changeColorNode('#ffffff')\">Default<span class='hotKeySpan'> [5+MouseLeft]</span><div class=\"color\" style=\"background-color: #ffffff\"></div></div>" +
-            "        <div class=\"menuelement\" onclick=\"switchContent()\">Details<span class='hotKeySpan'> [Double click]</span></div><div>"));
+            "        <div class=\"menuelement\" onclick=\"switchContent()\">Details<span class='hotKeySpan'> [Double click]</span></div>" +
+            "        <div class=\"menuelement\" onclick='nodeMap.get(clickedNode.id).showAllChildNodes();'>Show all reachable nodes</div>" +
+            "        <div class=\"menuelement\" onclick=\"showParents()\" title=\"Click to see the parents, May take some time at first use.\">Show Parents</div><div>"));
 
     $("#contextmenuNode").css({
         "position":"absolute",
@@ -164,17 +166,94 @@ function createNodeContextmenu(e) {
     nodeMenuIsOpen = true;
 
 }
-//changes color to the backgroundcolor of elem
+/**
+ * changes color to the backgroundcolor of node div
+ * @param color - String, RGB in Hex
+ */
 function changeColorNode(color) {
     $(clickedNode).css('background-color', color);
     $(clickedNode).children(".nodeHeader").css("background-color", color);
 }
 
+
 function deleteNodes() {
-    var nodeId= $(clickedNode).attr('id');
-	var nodeInstance = nodeMap.get(nodeId);
+    let nodeId= $(clickedNode).attr('id');
+	let nodeInstance = nodeMap.get(nodeId);
 	nodeInstance.hideNode();
 }
+
+/**
+ * shows the parents of an clicked node
+ */
+function showParents(){
+    // empty map, then fill it
+    if(nodeParentMap.size === 0)
+    createNodeParentMap();
+
+    // old menu open ? then close it
+    if(document.getElementById('contextmenuParent'))
+    closeContextMenuParent();
+
+    let nodeId= $(clickedNode).attr('id');
+    let parents = nodeParentMap.get(nodeId); // {node : {string} nodeId, callSite: object}
+    
+    $("body").append(
+        "<div id='contextmenuParent'>" +
+            "<h3>Choose parent from <span>" + nodeId + "</span> to be shown:</h3>" +
+            "<div id='parentSelection'>" +
+                
+            "</div>" +
+            "<div id='contextmenuSubmit'>" +
+                "<button id='cmb1' onclick='closeContextMenuParent()'>Close</button>" +
+            "</div>"+
+        "</div>");
+
+    // has parents
+    if(parents){
+        // sort them
+        parents.sort(function(a,b){
+            if((a.node + a.callSite.line) < (b.node + b.callSite.line))
+                return -1;
+            else if ((a.node + a.callSite.line) > (b.node + b.callSite.line))
+                return +1;
+            else 
+                return 0;
+        });
+        //display them
+        let parentSelection = document.getElementById("parentSelection");
+        parents.forEach(function(parent){
+            parentSelection.innerHTML += "<div><p class='rmx' onclick='showParentAndCall(\""+parent.node+"\","+JSON.stringify(parent.callSite)+",\""+nodeId+"\")'>Create</p><p>" + parent.node + " at line " + parent.callSite.line +"</p></div>";
+        });
+    }
+}
+
+/**
+ * shows the parent node and open the call site
+ * 
+ * @param {string} nodeId - id of parent node
+ * @param {Object} callSite - call site to be open by parent node
+ * @param {string} childId - id of the node of which the parent should be shown
+ */
+function showParentAndCall(nodeId, callSite, childId){
+    let callSiteIndex = 0;
+    document.getElementById("searchInput").value = nodeId;
+    createGraph();
+    let callSitesParent = placedNodesMap.get(nodeId).getCallSites();
+
+    //search for callSiteIndex
+    for(let index = 0; index < callSitesParent.length; index++){
+        let call = callSitesParent[index]
+        if(JSON.stringify(callSitesParent[index]) == JSON.stringify(callSite)){
+            callSiteIndex = index;
+            break;
+        }
+    }
+    // open callSite
+    let names = new Set();
+    names.add(childId);
+    placedNodesMap.get(nodeId).showChildNodes(callSiteIndex, names);
+}
+
 function switchContent() {
     let nodeId= $(clickedNode).attr('id');
     let node = nodeMap.get(nodeId);
@@ -185,13 +264,12 @@ function switchContent() {
     else{
         node.toggleToDetailed();
     }
-    // for(var i = 0; i < node.parents.length; i++){		// first all edges to this node become hidden
-    //     var edge = document.getElementById(node.parents[i].node.getName() + "#" + node.parents[i].index + '->' + nodeName);
-    //     if(edge) edge.style.display = "none";
-        //method2nodeEdge(node.parents[i].getName() + "#"+ node.parents[i].getMethodIndex(nodeName),nodeName);
-    // }
 
 }
+/**
+ * opens custom contextmenu on mouseposition
+ * @param e - event
+ */
 function createEdgeContextmenu(e) {
     let x = e.pageX + "px";     // Get the horizontal coordinate
     let y = e.pageY + "px";     // Get the vertical coordinate
@@ -202,7 +280,7 @@ function createEdgeContextmenu(e) {
         " <div class=\"menuelement\" onclick=\"changeColorEdge('#3076B4')\">Blue <span class='hotKeySpan'>[3+MouseLeft]</span><div class=\"color\" style=\"background-color: #3076b4\"></div></div>" +
         " <div class=\"menuelement\" onclick=\"changeColorEdge('#C4C931')\">Yellow <span class='hotKeySpan'>[4+MouseLeft]</span><div class=\"color\" style=\"background-color: #c4c931\"></div></div>" +
         " <div class=\"menuelement\" onclick=\"changeColorEdge('#000000')\">Default <span class='hotKeySpan'>[5+MouseLeft]</span><div class=\"color\" style=\"background-color: #000000\"></div></div>" +
-        " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[0].split('#')[0]).focus()\" style=\"white-space: nowrap\">Focus Source <span class='hotKeySpan'>[Ctrl+MouseLeft]</span></div>" +
+        " <div class=\"menuelement\" onclick=\"focusWindowTo(clickedEdge.getPointAtLength(0))\" style=\"white-space: nowrap\">Focus Source <span class='hotKeySpan'>[Ctrl+MouseLeft]</span></div>" +
         " <div class=\"menuelement\" onclick=\"nodeMap.get(clickedEdge.getAttribute('id').split('->')[1]).focus()\" style=\"white-space: nowrap\">Focus Target <span class='hotKeySpan'>[Double Click]</span></div>" +
     "</div>");
 
@@ -215,7 +293,6 @@ function createEdgeContextmenu(e) {
 }
 
 function changeColorEdge(color) {
-    if(lastMarkedEdge === clickedEdge) $(lastMarkedEdge).removeClass("lastClickedEdge");
     if(color === '#000000'){
         $(clickedEdge).css('opacity', 0.5);
     }else{
@@ -223,23 +300,27 @@ function changeColorEdge(color) {
     }
     $(clickedEdge).css('stroke', color);
 }
-
+//closes all custom contextmenus
 function closeAllContextmenus() {
     closeNodeContextmenu();
     closeEdgeContextmenu();
 }
+//closes NodeContextmenu
 function closeNodeContextmenu() {
     if(nodeMenuIsOpen){
         $("#contextmenuNode").remove();
         nodeMenuIsOpen = false;
     }
 }
+
+//closes EdgeContextmenu
 function closeEdgeContextmenu() {
     if(edgeMenuIsOpen){
         $("#contextmenuEdge").remove();
         edgeMenuIsOpen = false;
     }
 }
+//closes CallSiteContextmenu
 function closeCallSiteContextmenu(){
     maxSuggests = 10;
     if(callSiteMenuIsOpen){
@@ -250,6 +331,13 @@ function closeCallSiteContextmenu(){
         callSiteMenuIsOpen = false;
     }
 }
+
+//closes ContextMenuParent
+function closeContextMenuParent(){
+    $("#contextmenuParent").remove();  
+}
+
+// last clicked node-div gets the class: .lastClickedNode
 function markLastClickedNode() {
     if(lastMarkedNode !== null){
         $(lastMarkedNode).removeClass("lastClickedNode");
@@ -257,6 +345,8 @@ function markLastClickedNode() {
     $(markedNode).addClass("lastClickedNode");
     lastMarkedNode = markedNode;
 }
+
+// last clicked edge gets the class: .lastClickedEdge
 function markLastClickedEdge() {
     if(lastMarkedEdge !== null){
         $(lastMarkedEdge).removeClass("lastClickedEdge");
@@ -265,7 +355,13 @@ function markLastClickedEdge() {
     lastMarkedEdge = markedEdge;
 }
 
-function createCallSiteContextmenu(e, node, index){
+/**
+ * generates an menu to select the targets of an given call site
+ * 
+ * @param {node} node - node on which the call site lives 
+ * @param {number} index - index of the call site
+ */
+function createCallSiteContextmenu(node, index){
     maxSuggests = 10;
 
     // these variables are global, because local variables cannot be used in the following html-section
@@ -319,6 +415,11 @@ function createCallSiteContextmenu(e, node, index){
     callSiteMenuIsOpen = true;
 }
 
+/**
+ * adds a target to the CallSiteContextmenu
+ * 
+ * @param {string} targetString - string, that identifies the node with the given data (see: idString())
+ */
 function addTargetToSelected(targetString){
     if(!targetString) {
         let targetSearch = document.getElementById("targetSearch");
@@ -335,6 +436,11 @@ function addTargetToSelected(targetString){
     selectedTargets.add(targetString);   // add selected target to selected
 }
 
+/**
+ * removes a target to the CallSiteContextmenu
+ * 
+ * @param {*} target - string, that identifies the node with the given data (see: idString())
+ */
 function removeTargetFromSelected(target){
     availableTargets.add(target);  // add selected target to available
     selectedTargets.delete(target);    // remove selected target from selected
@@ -361,6 +467,9 @@ function hideTargets(targets){
     }
 }
 
+/**
+ * If there are starting node/nodes, an menu is open, that is used to calculate the whole sub graph
+ */
 function createWholeGraphContextmenu(){
     if(rootNodes.length < 1){
         alert("There must be at least one starting node!");
@@ -378,6 +487,21 @@ function createWholeGraphContextmenu(){
     }
 }
 
+/**
+ * removes the menu which is created by createWholeGraphContextmenu
+ */
 function deleteWholeGraphContextmenu(){
     $("#wholeGraphContextMenu").remove();
+}
+
+
+
+/**
+* (only for testing)
+* EXPORT:
+* *******
+*/
+if (typeof module !== 'undefined') {
+    module.exports.changeColorNode = changeColorNode;
+    
 }

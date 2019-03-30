@@ -145,7 +145,7 @@ svg{
 }
 
 .callSite{
-	max-width: 300px;
+	max-width: 300px; /* default 300px can be changed to adjust width of callsites when changing node width*/
 	overflow: hidden;
 	white-space: nowrap;
 }
@@ -265,9 +265,28 @@ line {
     border-color: red !important;
 }
 .lastClickedEdge{
-    stroke-width: 7px!important;
+    stroke-width: 7px;
     opacity: 1 !important;
     stroke: red !important;
+}
+
+#contextmenuParent{
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    height: 100%;
+    width: 30%;
+    background-color: white;
+    border: solid;
+    border-width: 1px;
+    padding: 15px;
+}
+
+#parentSelection{
+    margin-top: 15px;
+    height: 60%;
+    overflow: auto;
+    border: solid 1px;
 }
 
 /* styles for the call site contextmenu */
@@ -308,13 +327,13 @@ line {
 
 #callSiteSelection{
     margin-top: 15px;
-    height: 930px;
+    height: 60%;
 }
 
 #selectedTargets{
     border: solid 1px;
     min-height: 80px;
-    max-height: 800px;
+    max-height: 100%;
     padding: 5px;
     overflow: auto;
 }
