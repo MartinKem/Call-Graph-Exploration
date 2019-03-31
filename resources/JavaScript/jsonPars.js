@@ -111,8 +111,6 @@ function parseString() {
 
 	});
 
-	//console.log(finalarray)
-	// console.log(JSON.parse("{\n  \"reachableMethods\" : [ "+rest.slice(rest.indexOf("\n    \"method\" : {")-1,-3)+" ]\n}"));
 	Array.prototype.push.apply(finalarray, JSON.parse("{\n  \"reachableMethods\" : [ " + rest.slice(rest.indexOf("\n    \"method\" : {") - 1, -3) + " ]\n}").reachableMethods);
 	let parsedJson = { reachableMethods: finalarray };
 
@@ -322,10 +320,6 @@ function autocomplete(inp, arr) {
 	//Texteingabe erkennen
 	inp.addEventListener("input", function (e) { autocompleteEvent(e, this); });
 	inp.addEventListener("focus", function (e) { autocompleteEvent(e, this); });
-
-	/*inp.addEventListener("keydown", function () {
-        clearTimeout(timeout);
-    });*/
 
 	if (!documentListener) {
 		document.addEventListener("click", function (e) {
@@ -547,6 +541,8 @@ function createGraph() {
 	maxSuggests = 10;
 	let rootNodeString = document.getElementById("searchInput").value;
 	let rootNode = nodeMap.get(rootNodeString);
+
+	// it is possible that the user wants to generate a node, that cannot be found in reachable methods, but in one of the call sites
 	if (!rootNode) rootNode = createNodeInstance(getNodeDataFromString(rootNodeString));
 	if (rootNode) {
 		if (!rootNode.getSizes().x) rootNode.placeCentrally();
@@ -558,6 +554,7 @@ function createGraph() {
 		rootNodes.push(rootNode);
 		createdNodes = 0;
 
+		// now the new generated node shall be connected with the existing graph
 		let pnm = Array.from(placedNodesMap.values());
 		pnm.pop();
 		pnm.forEach(function (node) {
