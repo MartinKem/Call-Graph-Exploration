@@ -106,6 +106,7 @@ class node {
         let childrenToBeShown = [];
         let thisNode = this;
 
+        // if names is undefined, all targets shall be shown. Otherwise only the targets, described in names shall be shown.
         if (!names) {
             this.callSites[index].targets.forEach(function (target) {
                 childrenToBeShown.push(target);
@@ -122,6 +123,7 @@ class node {
             createNodeInstance(target, thisNode, index);
         });
 
+        // all the children, that have not been placed before, are placed right now
         for (let i = 0; i < childrenToBeShown.length; i++) {
             if (!nodeMap.get(childrenToBeShown[i])) {
                 this.placeChildNodes(index, childrenToBeShown);
@@ -137,7 +139,6 @@ class node {
             if (childArrayElem.edge === undefined) {
                 childArrayElem.edge = edgeConstructor(thisNode, child, index);
                 childArrayElem.edge.create();
-                // child.edge = edge;
                 child.addParent(thisNode, childArrayElem.index, childArrayElem.edge);
             }
             else if (childArrayElem.edge.visible === false) {
@@ -149,6 +150,11 @@ class node {
             resizeSVGCont(nodeMap.get(idString(target)));
         });
 
+        /**
+         *
+         * @param {{declaringClass: string, name: string, parameterTypes: string[], returnType: string}} target - target's signature
+         * @returns {{node: {declaringClass: string, name: string, parameterTypes: string[], returnType: string}, line: number, edge: edge}}
+         */
         function getChildArrayElement(target){
             for(let i = 0; i < thisNode.children.length; i++){
                 if(idString(target) === idString(thisNode.children[i].node.nodeData) && index === thisNode.children[i].index) return thisNode.children[i];
@@ -210,9 +216,10 @@ class node {
         refreshGraphData();
     }
 
-
+    /**
+     * shows all children of this node
+     */
     showAllChildNodes(){
-
         showWholeGraphSet = new Set();
         showAllChildNodes(this);
         function showAllChildNodes(node) {
@@ -685,6 +692,10 @@ function createSingleNode(x, y, nodeData, callSites) {
         }
     });
 
+    /**
+     * describes what happens, when the user clicks a call site
+     * @param index
+     */
     function onClickFunction(index) {
         let node = nodeMap.get(idString(nodeData));
         let visibleTarget = false;
@@ -701,10 +712,7 @@ function createSingleNode(x, y, nodeData, callSites) {
         if (node.callSites[index].targets.length < callSiteThreshold) {
             if (!visibleTarget) node.showChildNodes(index);
             else {
-                node.hideCallsiteTargets(index)
-                /*node.callSites[index].targets.forEach(function (target) {
-                    if(idString(node.nodeData) !== idString(target)) nodeMap.get(idString(target)).hideNode();
-                });*/
+                node.hideCallsiteTargets(index);
             }
         }
     }
