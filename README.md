@@ -1,3 +1,5 @@
+Diese README richtet sich an die Nutzer und Weiterentwickler der Call-Graph-Exploration Anwendung.
+
 # Call-Graph-Exploration
 Call-Graph-Exploration ist eine Webanwendung zu Exploration von Call Graphen
 
@@ -65,11 +67,7 @@ Um die Graphdaten direkt in die Map der Anwendung zu schreiben muss einiges beac
 	1. Map erstellen: `parsedJsonMap = new Map()`
 	2. Dann Knoten einfügen: mit `addJsonMapEntry(element)` oder `parsedJsonMap.set(idString(element.method), element);`, `element` ist ein Javascript Object mit den Attributen wie die Elemente der `reachableMethods` in den JSON Daten
 
-## Known Issues
-
-* CallSiteContextmenu: Je nach Zoomstufe des Browser werden die geöffneten CallSites zu weit nach unten/oben verschoben
-* Ohne eine Internetverbindung könne die Recurcen `https://d3js.org/d3.v3.min.js` und `https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js` nicht geladen werden. Mögliche Lösung: In der `index.html` können alternative Ressourcen ausgewählt werden, die lokal gespeichert sind.
-
-## TODO
-
-* Alle Elternknoten eines Knoten suchen, von denen dann welche ausgewählt und angezeigt werden können.
+## Fremdcode
+Fremdcode: jquery.min.js, d3.v3.min.js
+https://jquery.org/license/
+https://github.com/d3/d3/blob/master/LICENSE
