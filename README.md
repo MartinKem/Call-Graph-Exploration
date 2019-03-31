@@ -23,7 +23,7 @@ Die JSON Datei muss zum aktuellem Stand einige Bedingungen erfüllen.
           "returnType" : "V",
           "parameterTypes" : [ ]
         },
-        "callSites" : [ {
+        "callSites" : [ {s
           "declaredTarget" : {
             "name" : "<init>",
             "declaringClass" : "Ljava/lang/Object;",
@@ -68,6 +68,9 @@ Um die Graphdaten direkt in die Map der Anwendung zu schreiben muss einiges beac
 	2. Dann Knoten einfügen: mit `addJsonMapEntry(element)` oder `parsedJsonMap.set(idString(element.method), element);`, `element` ist ein Javascript Object mit den Attributen wie die Elemente der `reachableMethods` in den JSON Daten
 
 ## Fremdcode
-Fremdcode: jquery.min.js, d3.v3.min.js
+Fremdcode: 
+
+jquery.min.js, d3.v3.min.js
+
 https://jquery.org/license/
 https://github.com/d3/d3/blob/master/LICENSE
