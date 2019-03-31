@@ -70,7 +70,8 @@ Um die Graphdaten direkt in die Map der Anwendung zu schreiben muss einiges beac
 ## Fremdcode
 Fremdcode: 
 
-jquery.min.js, d3.v3.min.js
-
+jquery.min.js, 
 https://jquery.org/license/
+
+d3.v3.min.js, 
 https://github.com/d3/d3/blob/master/LICENSE
