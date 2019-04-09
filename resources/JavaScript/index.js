@@ -1,3 +1,6 @@
+/* BSD 2-Clause License - see ./LICENSE for details. */
+
+
 /**
 * (only for testing)
 * IMPORT:

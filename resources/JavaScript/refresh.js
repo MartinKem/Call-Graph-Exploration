@@ -1,3 +1,5 @@
+/* BSD 2-Clause License - see ./LICENSE for details. */
+
 
 //used to refresh the number of current nodes and edges in the bottom left corner; called every time either is changed
 function refreshGraphData(){

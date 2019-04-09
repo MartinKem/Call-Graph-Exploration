@@ -1,3 +1,5 @@
+/* BSD 2-Clause License - see ./LICENSE for details. */
+
 
 document.body.innerHTML =
     '<div id="load_page">' +
